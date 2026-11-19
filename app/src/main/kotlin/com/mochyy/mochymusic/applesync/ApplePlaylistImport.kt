@@ -49,6 +49,12 @@ object ApplePlaylistImport {
     /** How many playlists are read at once. Apple's API is latency-bound, not throughput-bound. */
     private const val Reads = 4
 
+    /**
+     * Apple sends 1970-01-01T00:00:00Z for a collaborative playlist, and nothing for some others:
+     * neither says when the playlist last changed, so neither may skip the tracks read.
+     */
+    private fun String?.isUnknownStamp(): Boolean = this == null || startsWith("1970-01-01")
+
     /** Imports every playlist on the account, in Apple's own order. */
     suspend fun run(context: Context, onProgress: (Int, Int) -> Unit = { _, _ -> }): Result {
         val entry = EntryPointAccessors.fromApplication(
@@ -102,7 +108,10 @@ object ApplePlaylistImport {
         val upToDate = runCatching { dao.state(IMPORT_VERSION_KEY) }.getOrNull() == IMPORT_VERSION
         val needsRead = remotes.filter { remote ->
             val meta = metas[localId(remote.id)]
-            !upToDate || meta == null || remote.lastModified == null || meta.lastModified != remote.lastModified
+            // A collaborative playlist answers with 1970-01-01T00:00:00Z for lastModifiedDate, so
+            // its stamp never moves: an unknown stamp is read every time, or its songs never update.
+            !upToDate || meta == null || remote.lastModified.isUnknownStamp() ||
+                meta.lastModified != remote.lastModified
         }
 
         // read the tracks before writing anything: a failure is then still a failure of the read,
@@ -141,8 +150,11 @@ object ApplePlaylistImport {
 
         remotes.forEach { remote ->
             val playlistId = localId(remote.id)
-            // a playlist Apple says has not changed since the last import: no read, no write
-            if (remote.id !in tracks && metas[playlistId]?.lastModified == remote.lastModified) {
+            // a playlist Apple says has not changed since the last import: no read, no write.
+            // An unknown stamp is never treated as "unchanged", or its songs would never update.
+            if (remote.id !in tracks && metas[playlistId]?.lastModified == remote.lastModified &&
+                !remote.lastModified.isUnknownStamp()
+            ) {
                 PlaylistOwner.remember(dao, playlistId, remote, accountLabel)
                 songs += runCatching { database.playlistSongMaps(playlistId).size }.getOrDefault(0)
                 unchanged++

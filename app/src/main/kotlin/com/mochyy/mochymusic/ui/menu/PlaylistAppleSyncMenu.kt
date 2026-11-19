@@ -10,7 +10,10 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -190,7 +193,13 @@ fun rememberPlaylistAppleSync(playlistId: String, onDismiss: () -> Unit): Playli
                 }
             },
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // 26 playlists past the first screenful must still be reachable
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
                 Text(
                     text = stringResource(R.string.menu_apple_pick_body),
                     style = MaterialTheme.typography.bodyMedium,

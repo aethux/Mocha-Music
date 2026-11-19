@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +49,8 @@ fun AppleRefreshButton(tint: Color = Color.Unspecified) {
         CircularProgressIndicator(
             modifier = Modifier.size(20.dp),
             strokeWidth = 2.dp,
-            color = tint,
+            // the header's tint is Unspecified, which draws nothing on a dark background
+            color = if (tint == Color.Unspecified) LocalContentColor.current else tint,
         )
         return
     }

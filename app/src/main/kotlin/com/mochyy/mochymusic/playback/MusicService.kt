@@ -2153,7 +2153,7 @@ class MusicService :
         }
 
         if (player.shuffleModeEnabled) {
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
             applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
         }
     }
@@ -2561,7 +2561,7 @@ class MusicService :
         removeUpcomingExceptManual()
         player.addMediaItems(player.mediaItemCount, radioItems)
         if (player.shuffleModeEnabled) {
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
             applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
         }
         currentQueue = moreFrom
@@ -3152,7 +3152,7 @@ class MusicService :
 
             if (player.mediaItemCount == 0) return
 
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
             val currentIndex = player.currentMediaItemIndex
             val totalCount = player.mediaItemCount
 
