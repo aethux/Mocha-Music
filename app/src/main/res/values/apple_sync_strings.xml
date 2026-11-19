@@ -166,4 +166,16 @@
     <string name="apple_collaborators_none">Just you</string>
     <string name="apple_collaborators_none_desc">Apple’s own page names nobody else on it.</string>
     <string name="apple_collaborators_source">Names come from the playlist’s page on music.apple.com, which is the only place Apple publishes them.</string>
+    <!-- Songs Apple does not have: the card in the library, and the screen it opens -->
+    <string name="apple_unmatched_card">%1$d songs aren’t on Apple Music</string>
+    <string name="apple_unmatched_card_desc">Match them, or keep the YouTube version.</string>
+    <string name="apple_unmatched_review">Review</string>
+    <string name="apple_unmatched_title">Not on Apple Music</string>
+    <string name="apple_unmatched_blurb">Apple is the library of record here, so anything it has is already playing from Apple. These are the songs it does not have.</string>
+    <string name="apple_unmatched_looking">Looking them up on Apple Music…</string>
+    <string name="apple_unmatched_none">Everything in your library is on Apple Music.</string>
+    <string name="apple_unmatched_group">Songs Apple doesn’t have</string>
+    <string name="apple_unmatched_match">Match…</string>
+    <string name="apple_unmatched_keep">Keep on YouTube</string>
+    <string name="apple_unmatched_footnote">A song you match plays from Apple from then on; one you keep stays on YouTube and is not asked about again.</string>
 </resources>

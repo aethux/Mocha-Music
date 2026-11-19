@@ -47,6 +47,9 @@ fun NavGraphBuilder.appleSyncNavGraph(navController: NavController) {
             navController = navController,
         )
     }
+    composable(AppleUnmatchedRoute) {
+        com.mochyy.mochymusic.ui.applesync.AppleUnmatchedScreen(navController = navController)
+    }
     composable(AppleSyncRoute) {
         AppleSyncScreen(navController = navController)
     }

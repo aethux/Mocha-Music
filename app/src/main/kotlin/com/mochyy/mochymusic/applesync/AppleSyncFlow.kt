@@ -34,6 +34,8 @@ object AppleSyncFlow {
     /** Keys in the sidecar's `sync_state`: the footer reads them without asking Apple anything. */
     const val KEY_LAST_SYNC_AT = "last_sync_at"
     const val KEY_LAST_SYNC_SUMMARY = "last_sync_summary"
+    /** How many songs are waiting for "match it" or "keep it on YouTube". */
+    const val KEY_UNMATCHED = "unmatched_count"
 
     /**
      * Runs a full refresh. The caller decides where it runs: the button starts it in the process

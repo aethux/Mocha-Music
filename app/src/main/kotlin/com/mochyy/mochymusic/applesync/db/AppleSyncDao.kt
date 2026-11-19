@@ -219,6 +219,21 @@ interface AppleSyncDao {
     @Query("DELETE FROM playlist_collaborator WHERE playlistId = :playlistId")
     suspend fun clearCollaborators(playlistId: String)
 
+    // ---- songs Apple does not have: the person's answer ------------------------------------------
+
+    @Query("SELECT songId FROM unmatched_decision WHERE decision = :decision")
+    suspend fun decidedSongIds(decision: String = UnmatchedDecisionEntity.KEEP_YOUTUBE): List<String>
+
+    /** Observed, so the library's card drops a song the moment it is kept on YouTube. */
+    @Query("SELECT songId FROM unmatched_decision")
+    fun decidedSongIdsFlow(): Flow<List<String>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveDecision(row: UnmatchedDecisionEntity)
+
+    @Query("DELETE FROM unmatched_decision WHERE songId = :songId")
+    suspend fun clearDecision(songId: String)
+
     // ---- one-off facts about the last sync ------------------------------------------------------
 
     @Query("SELECT `value` FROM sync_state WHERE `key` = :key")

@@ -37,8 +37,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         PlaylistMetaEntity::class,
         AppleStateEntity::class,
         PlaylistCollaboratorEntity::class,
+        UnmatchedDecisionEntity::class,
     ],
-    version = 13,
+    version = 14,
     exportSchema = false,
 )
 abstract class AppleSyncDatabase : RoomDatabase() {
@@ -218,6 +219,18 @@ abstract class AppleSyncDatabase : RoomDatabase() {
             }
         }
 
+        private val Migration13To14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `unmatched_decision` (" +
+                        "`songId` TEXT NOT NULL, " +
+                        "`decision` TEXT NOT NULL, " +
+                        "`decidedAt` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`songId`))",
+                )
+            }
+        }
+
         fun newInstance(context: Context): AppleSyncDatabase =
             Room
                 .databaseBuilder(context, AppleSyncDatabase::class.java, DB_NAME)
@@ -235,6 +248,7 @@ abstract class AppleSyncDatabase : RoomDatabase() {
                     Migration10To11,
                     Migration11To12,
                     Migration12To13,
+                    Migration13To14,
                 )
                 .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()

@@ -147,9 +147,11 @@ fun LibraryHomeScreen(
             bottomInset = bottomInset,
         ) {
             item(key = "appleSyncCard") {
-                // MOCHY-APPLE: the sync's own progress, above everything it is about to change
-                com.mochyy.mochymusic.ui.applesync.AppleSyncCard(
-                    modifier = Modifier.padding(horizontal = SearchHorizontalPadding, vertical = 8.dp),
+                // MOCHY-APPLE: the sync's progress, and what Apple turns out not to have
+                com.mochyy.mochymusic.applesync.ui.appleStatusCards(
+                    songs,
+                    navController,
+                    Modifier.padding(horizontal = SearchHorizontalPadding, vertical = 8.dp),
                 )
             }
 
