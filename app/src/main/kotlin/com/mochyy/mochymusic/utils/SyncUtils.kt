@@ -414,6 +414,9 @@ class SyncUtils @Inject constructor(
         val artist = database.song(s.id).firstOrNull()?.artists?.firstOrNull()?.name
         if (artist != null) scrobbler.love(artist, s.title, s.liked)
 
+        // MOCHY-APPLE: an Apple song's heart is a rating on Apple, and YouTube has no id for it
+        if (com.mochyy.mochymusic.applesync.AppleSongWrites.pushLike(context, s.id, s.liked, s.title)) return@withContext
+
         if (!isLoggedIn()) {
             Timber.w("Skipping likeSong - user not logged in")
             return@withContext
@@ -443,7 +446,10 @@ class SyncUtils @Inject constructor(
                 try {
                     val remoteSongs = page.songs
                     val remoteIds = remoteSongs.map { it.id }.toSet()
+                    // MOCHY-APPLE: an Apple song is not on YouTube's liked list and never will be;
+                    // sweeping it here un-liked every heart the user set, over and over
                     val localSongs = database.likedSongsByNameAsc().first()
+                        .filterNot { it.song.id.startsWith("AM_") }
 
                     // likes from an import aren't "unliked on YouTube" — they're new; push them up
                     // instead of unliking them here. Ones unliked locally since are just dropped.
