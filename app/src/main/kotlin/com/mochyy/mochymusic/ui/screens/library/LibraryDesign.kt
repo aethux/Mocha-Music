@@ -478,6 +478,7 @@ fun LibraryPlayBar(
     onPlay: () -> Unit,
     onMore: () -> Unit,
     modifier: Modifier = Modifier,
+    trailing: (@Composable () -> Unit)? = null, // MOCHY-APPLE:
 ) {
     Row(
         modifier = modifier.fillMaxWidth().padding(horizontal = SearchHorizontalPadding),
@@ -491,5 +492,9 @@ fun LibraryPlayBar(
             onClick = onMore,
             spinOnClick = true,
         )
+        if (trailing != null) {
+            Spacer(modifier = Modifier.weight(1f))
+            trailing()
+        }
     }
 }

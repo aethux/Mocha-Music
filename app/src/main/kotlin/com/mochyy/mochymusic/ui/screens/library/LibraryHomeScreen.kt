@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mochyy.mochymusic.applesync.ui.appleLibrarySummary
 import com.mochyy.mochymusic.ui.menu.rememberResyncAll
 import com.mochyy.mochymusic.LocalPlayerAwareWindowInsets
 import com.mochyy.mochymusic.R
@@ -132,13 +133,26 @@ fun LibraryHomeScreen(
             collapseProvider = { collapse.value },
             pureBlack = pureBlack,
             trailing = {
-                SearchAvatar(
-                    imageUrl = profilePicStr.ifBlank { null },
-                    onClick = { navController.navigateToTab("settings") },
-                )
+                // MOCHY-APPLE: the sync sits beside the profile, where a refresh belongs
+                androidx.compose.foundation.layout.Row(
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    com.mochyy.mochymusic.ui.applesync.AppleRefreshButton()
+                    SearchAvatar(
+                        imageUrl = profilePicStr.ifBlank { null },
+                        onClick = { navController.navigateToTab("settings") },
+                    )
+                }
             },
             bottomInset = bottomInset,
         ) {
+            item(key = "appleSyncCard") {
+                // MOCHY-APPLE: the sync's own progress, above everything it is about to change
+                com.mochyy.mochymusic.ui.applesync.AppleSyncCard(
+                    modifier = Modifier.padding(horizontal = SearchHorizontalPadding, vertical = 8.dp),
+                )
+            }
+
             item(key = "tabs") {
                 LibraryTabChips(
                     selected = tab,
@@ -193,6 +207,8 @@ fun LibraryHomeScreen(
                         onUnpin = viewModel::unpin,
                         navController = navController,
                     )
+                    // MOCHY-APPLE: what the library holds, at the end of it
+                    appleLibrarySummary(songs, albums.size, playlists.size, navController)
                 }
 
                 LibraryTab.Local -> {

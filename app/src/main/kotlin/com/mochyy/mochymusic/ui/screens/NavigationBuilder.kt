@@ -115,6 +115,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.util.UUID
+import com.mochyy.mochymusic.ui.applesync.appleSyncNavGraph
 
 private val CoverRoutes = listOf("album/", "local_playlist/", "online_playlist/", "auto_playlist/")
 
@@ -309,6 +310,9 @@ fun NavGraphBuilder.navigationBuilder(
             com.mochyy.mochymusic.ui.screens.library.LibraryPlaylistsScreen(navController = navController)
         }
     }
+
+    // MOCHY-APPLE: the fork's own pages, in one file
+    appleSyncNavGraph(navController)
 
     coverSourceComposable("library/added") {
         com.mochyy.mochymusic.ui.screens.library.LibraryRecentlyAddedScreen(navController = navController)

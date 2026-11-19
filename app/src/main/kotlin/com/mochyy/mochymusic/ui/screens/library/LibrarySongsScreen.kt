@@ -13,6 +13,7 @@ import com.mochyy.mochymusic.LocalPlayerConnection
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.extensions.toMediaItem
 import com.mochyy.mochymusic.playback.queues.ListQueue
+import com.mochyy.mochymusic.applesync.ui.playBar
 import com.mochyy.mochymusic.ui.component.LocalMenuState
 import com.mochyy.mochymusic.ui.component.SongSwipeBox
 import com.mochyy.mochymusic.ui.component.librarySwipeAction
@@ -32,21 +33,22 @@ fun LibrarySongsScreen(
     val menuState = LocalMenuState.current
     val songsTitle = stringResource(R.string.songs)
 
+    // MOCHY-APPLE: order and sort control live in applesync/ui/SongsOrdering.kt
+    val order = com.mochyy.mochymusic.applesync.ui.rememberSongsOrder(songs)
+    val ordered = order.songs
+
     LibraryEntityListScreen(
         title = songsTitle,
         subtitle = stringResource(R.string.lib_songs_subtitle),
         searchPlaceholder = stringResource(R.string.lib_songs_search),
-        items = songs,
+        items = ordered,
         idOf = { it.id },
         nameOf = { it.song.title },
         subtitleOf = { it.artists.joinToString { a -> a.name }.ifBlank { null } },
         thumbnailOf = { it.song.thumbnailUrl },
         playingIdOf = { it.id },
         onClick = { song ->
-            // Queue the alphabetical order the user is looking at, not the underlying
-            // create-date order — otherwise tapping a row starts a queue that jumps somewhere
-            // unrelated to what's on screen.
-            val ordered = sortForLibraryIndex(songs) { it.song.title }
+            // Queue the order the user is looking at, not the underlying create-date order
             playerConnection.playQueue(
                 ListQueue(
                     title = songsTitle,
@@ -55,6 +57,9 @@ fun LibrarySongsScreen(
                 ),
             )
         },
+        // MOCHY-APPLE: the whole list plays or shuffles, with the sort control at the bar's end
+        playBar = { order.playBar(playerConnection, songsTitle) },
+        sectioned = order.byName,
         onLongClick = { song ->
             menuState.show {
                 SongMenu(

@@ -42,7 +42,9 @@ fun LibraryPlaylistsScreen(
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalContext.current.resources
 
-    LibraryEntityListScreen(
+    // MOCHY-APPLE: list or grid, whichever was last chosen; both live in applesync/ui
+    com.mochyy.mochymusic.applesync.ui.PlaylistsCollectionScreen(
+        playlists = playlists,
         title = stringResource(R.string.lib_playlist),
         subtitle = when {
             source != null -> stringResource(R.string.lib_playlists_imported_subtitle, source.label)
@@ -51,14 +53,7 @@ fun LibraryPlaylistsScreen(
             else -> stringResource(R.string.lib_playlists_all_subtitle)
         },
         searchPlaceholder = stringResource(R.string.lib_playlists_search),
-        items = playlists,
-        idOf = { it.id },
-        nameOf = { it.playlist.name },
-        subtitleOf = { resources.getQuantityString(R.plurals.lib_song_count, it.songCount, it.songCount) },
-        thumbnailOf = { it.thumbnails.firstOrNull() },
-        // the same key Home's cards use, so the playlist opens growing out of its cover
-        sharedElementKeyOf = { "playlist-${it.id}" },
-        onClick = { playlist -> navController.navigate("local_playlist/${playlist.id}") },
+        onOpen = { playlist -> navController.navigate("local_playlist/${playlist.id}") },
         onLongClick = { playlist ->
             menuState.show {
                 PlaylistMenu(
@@ -69,6 +64,7 @@ fun LibraryPlaylistsScreen(
                 )
             }
         },
+        navController = navController,
         modifier = modifier,
         pureBlack = pureBlack,
     )

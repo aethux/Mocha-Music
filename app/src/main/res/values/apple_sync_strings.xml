@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MOCHY-APPLE: every string this fork adds.
+
+  They live in their own file rather than in strings.xml so the fork never edits an upstream resource
+  file: Android merges every values/*.xml at build time, and a rebase then has nothing to conflict on
+  here at all.
+-->
+<resources>
+    <!-- Apple Music sync -->
+    <string name="apple_sync_title">Apple Music</string>
+    <string name="apple_sync_account_header">Account</string>
+    <string name="apple_sync_signed_in_desc">%1$s · %2$d songs</string>
+    <string name="apple_sync_sign_in_title">Sign in</string>
+    <string name="apple_sync_sign_in_desc">Connect your Apple Music library</string>
+    <string name="apple_sync_sign_out">Sign out</string>
+    <string name="apple_sync_sign_out_confirm">Mochy will stop syncing with this account. Nothing on Apple is changed.</string>
+    <string name="apple_sync_changes_header">Changes</string>
+    <string name="apple_sync_allow_title">Allow Mochy to change your library</string>
+    <string name="apple_sync_allow_desc">Only playlists and songs Mochy created itself</string>
+    <string name="apple_sync_now_header">Now</string>
+    <string name="apple_sync_check_title">Check my library</string>
+    <string name="apple_sync_check_desc">Reads everything and reports anything missing</string>
+    <string name="apple_sync_session_title">Open the music.apple.com session</string>
+    <string name="apple_sync_session_desc">Sign-in page and write tests</string>
+    <string name="apple_sync_reading">Reading your library…</string>
+    <string name="apple_sync_history_header">Recent activity</string>
+    <string name="apple_sync_untouched">Everything that was there is still there</string>
+    <string name="apple_sync_drift">Something changed</string>
+    <string name="apple_sync_counts">%1$d songs and %2$d playlists in %3$s</string>
+    <string name="apple_sync_baseline">%1$d recorded before Mochy ever wrote anything</string>
+    <string name="apple_sync_missing">Missing since: %1$d</string>
+    <string name="apple_sync_added">Added since: %1$d</string>
+    <string name="apple_sync_baseline_taken">baseline taken</string>
+    <string name="apple_sync_unchanged">unchanged</string>
+    <string name="apple_sync_changed">drift found</string>
+    <string name="menu_apple_sync_title">Sync with Apple Music</string>
+    <string name="menu_apple_sync_desc">Keep this playlist the same on both sides</string>
+    <string name="menu_apple_push_title">Send to Apple Music</string>
+    <string name="menu_apple_push_desc">Sends this playlist’s songs, in this order, to Apple now</string>
+    <string name="menu_apple_pick_title">Which Apple playlist?</string>
+    <string name="menu_apple_pick_body">Pick the Apple Music playlist this one should stay in step with. Linking is what allows Mochy to change it; nothing outside the link is touched.</string>
+    <string name="menu_apple_linked">Linked to %1$s</string>
+
+    <!-- Search YouTube Music by hand: the guess was wrong, so the user picks the recording -->
+    <string name="pick_manual_title">Search YouTube Music</string>
+    <string name="pick_manual_desc">Type what you are looking for and pick the recording. It becomes this song, so the next play finds it too.</string>
+    <string name="pick_page_hint">Pick the recording “%1$s” should play</string>
+    <string name="pick_manual_open">Pick a recording by hand</string>
+    <string name="pick_manual_hide">Hide the search</string>
+    <string name="pick_manual_search">Search YouTube Music</string>
+    <string name="pick_looking">Searching…</string>
+    <string name="pick_none">Nothing came back. Try another spelling.</string>
+    <string name="pick_failed">YouTube Music didn\'t answer</string>
+    <string name="pick_matched">Matched to Apple’s “%1$s”</string>
+    <string name="pick_playing">Playing %1$s</string>
+    <string name="pick_already">this one</string>
+    <string name="pick_no_video">YouTube has no video for this song; pick one in the song\'s menu instead</string>
+
+    <!-- The heart and the library button, pushed to Apple as they are pressed -->
+    <string name="apple_write_off">Turn on “Allow Mochy to change your library” first</string>
+    <string name="apple_write_signed_out">Apple signed this session out. Sign in again.</string>
+    <string name="apple_write_preexisting">Mochy won\'t remove a song that was in your library before it started syncing</string>
+    <string name="apple_write_added">Added to your Apple Music library</string>
+    <string name="apple_write_removed">Removed from your Apple Music library</string>
+    <string name="apple_write_pending">Apple is still adding it; it lands in a moment</string>
+    <string name="apple_write_unconfirmed">Apple didn\'t show %1$s afterwards</string>
+    <string name="apple_write_failed">Apple refused: %1$s</string>
+    <!-- the song menu's four tiles -->
+    <!-- search sources -->
+    <string name="search_apple_in_library">In your Apple library</string>
+    <string name="cover_menu_title">Cover</string>
+    <string name="cover_menu_desc">Choose one yourself, or go back to Apple’s</string>
+    <string name="cover_sheet_title">Playlist cover</string>
+    <string name="cover_sheet_song">Song cover</string>
+    <string name="cover_sheet_artist">Artist picture</string>
+    <string name="cover_sheet_album">Album cover</string>
+    <string name="cover_sheet_pick">Choose an image from this phone</string>
+    <string name="cover_image_failed">That image couldn’t be read</string>
+    <string name="cover_sheet_url">Paste an image link</string>
+    <string name="cover_sheet_use">Use this image</string>
+    <string name="cover_sheet_apple">Use Apple’s cover</string>
+    <string name="cover_set">Cover set</string>
+    <string name="cover_reverted">Back to Apple’s cover</string>
+    <string name="apple_cover_motion">Cover: Apple’s animated artwork, cached</string>
+    <string name="apple_cover_art">Cover: Apple’s artwork, cached</string>
+    <string name="apple_cover_youtube">Cover: YouTube’s thumbnail — Apple has none for this one</string>
+    <string name="apple_cover_none">Cover: not fetched yet</string>
+    <string name="apple_playlist_unlinked">This playlist isn’t linked to one on Apple Music</string>
+    <string name="apple_playlist_sign_in">Sign in to Apple Music first</string>
+    <string name="apple_playlist_nothing_to_send">None of these songs are on Apple Music yet</string>
+    <string name="apple_playlist_refused">Apple refused the playlist change (%1$s)</string>
+    <plurals name="apple_playlist_pushed">
+        <item quantity="one">Sent %1$d song to Apple Music</item>
+        <item quantity="other">Sent %1$d songs to Apple Music</item>
+    </plurals>
+    <string name="apple_playlist_push_failed">Apple didn’t take the playlist change</string>
+    <string name="apple_playlist_not_editable">Apple doesn’t allow this playlist to be changed — it’s one you follow, not one you made</string>
+    <string name="apple_playlist_unverified">Apple took it, but its list doesn’t match what was sent — check the playlist</string>
+    <string name="apple_playlists_import">Import Apple playlists</string>
+    <string name="apple_playlists_import_desc">Brings every playlist on your account into Mochy as a real playlist, with its songs in Apple’s order, and links each one so changes can go back.</string>
+    <string name="apple_playlists_imported">%1$d playlists · %2$d songs imported</string>
+    <string name="apple_covers_clear">Clear cover cache</string>
+    <string name="apple_covers_clear_desc">Covers are remembered, so imports and refreshes don’t fetch them again. Clearing this makes the next import fetch every cover once more — animated artwork first, then Apple’s still, then YouTube’s.</string>
+    <string name="apple_covers_cleared">Cover cache cleared — the next import fetches them again</string>
+    <string name="ps_action_shuffle_off">Shuffle off</string>
+    <string name="ps_action_repeat_all">Repeat all</string>
+    <string name="ps_action_repeat_one">Repeat one</string>
+    <string name="ps_action_repeat_off">Repeat off</string>
+    <string name="menu_match_apple">Match on Apple Music…</string>
+    <string name="menu_match_apple_desc">Pick the Apple recording this song is</string>
+    <string name="match_apple_hint">Which Apple Music recording is “%1$s”?</string>
+    <string name="search_apple_not_playable">Apple playlists and videos open in Apple Music for now</string>
+    <string name="menu_apple_info_library">On Apple Music, in your Apple library</string>
+    <string name="menu_apple_info_synced">On Apple Music, but not in your Apple library</string>
+    <string name="menu_apple_info_missing">Not on Apple Music yet — tap to match it and add it there</string>
+    <string name="menu_apple_info_working">Asking Apple Music…</string>
+    <string name="search_source_all">All</string>
+    <string name="search_source_yt">YouTube Music</string>
+    <string name="search_source_apple">Apple Music</string>
+    <string name="search_apple_looking">Searching Apple Music…</string>
+    <string name="search_apple_none">Nothing on Apple Music for that.</string>
+    <string name="menu_pick_recording">Pick a recording…</string>
+    <string name="menu_pick_recording_desc">Search YouTube Music and choose the exact one</string>
+    <string name="menu_tile_like">Add to liked</string>
+    <string name="menu_tile_unlike">Remove from liked</string>
+    <string name="apple_like_adding">Loving “%1$s” on Apple Music…</string>
+    <string name="apple_like_removing">Removing “%1$s” from your favourites…</string>
+    <string name="apple_like_added">Loved “%1$s” on Apple Music</string>
+    <string name="apple_like_removed">“%1$s” is no longer a favourite on Apple Music</string>
+    <string name="apple_like_unmapped">“%1$s” isn\'t on Apple Music yet, so this heart stays in Mochy</string>
+    <string name="apple_write_adding">Adding “%1$s” to Apple Music…</string>
+    <string name="apple_write_removing">Taking “%1$s” out of Apple Music…</string>
+    <string name="apple_write_added_as">Added “%1$s” — %2$s to your Apple Music library</string>
+    <string name="apple_write_no_match">Apple Music has no match for \'%1$s\'. It stays in Mochy only.</string>
+    <string name="apple_write_remove_confirm">Mochy didn\'t add “%1$s” to your library. Removing it also takes it out of every Apple playlist.</string>
+    <string name="apple_write_remove_anyway">Remove anyway</string>
+    <string name="lib_playlists_show_grid">Show as grid</string>
+    <string name="lib_playlists_show_list">Show as list</string>
+    <string name="apple_collaborators_title">Collaborators</string>
+    <string name="apple_collaborators_desc">Read the other people on your shared playlists from the Apple Music page</string>
+</resources>

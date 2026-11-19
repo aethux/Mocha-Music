@@ -27,9 +27,11 @@ import com.mochyy.mochymusic.ui.component.GlassState
 import com.mochyy.mochymusic.ui.screens.search.rememberCollapseProgress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import com.mochyy.mochymusic.applesync.ui.indexRows
+import com.mochyy.mochymusic.applesync.ui.libraryFilter
 
 /** A flattened row: either a section header or an item. */
-private sealed interface IndexedRow<out T> {
+internal sealed interface IndexedRow<out T> {
     data class Header(val section: IndexSection) : IndexedRow<Nothing>
     data class Entry<T>(val item: T) : IndexedRow<T>
 }
@@ -58,6 +60,9 @@ fun <T> LibraryEntityListScreen(
     rowWrapper: @Composable (item: T, row: @Composable () -> Unit) -> Unit = { _, row -> row() },
     // shown at the end of the header, where the Library home has its avatar
     trailing: (@Composable () -> Unit)? = null,
+    // song lists: the play-and-shuffle bar, and whether sections (and the letter rail) are honest
+    playBar: (@Composable () -> Unit)? = null,
+    sectioned: Boolean = true,
 ) {
     var query by remember { mutableStateOf(TextFieldValue()) }
     val listState = rememberLazyListState()
@@ -67,6 +72,8 @@ fun <T> LibraryEntityListScreen(
     val bottomInset = LocalPlayerAwareWindowInsets.current.asPaddingValues().calculateBottomPadding()
 
     val playerConnection = LocalPlayerConnection.current
+    // MOCHY-APPLE: tapping the row that is already playing opens the player instead of restarting
+    val playerSheet = com.mochyy.mochymusic.ui.component.LocalPlayerBottomSheetState.current
     val idle = remember { MutableStateFlow<com.mochyy.mochymusic.models.MediaMetadata?>(null) }
     val metadataFlow = if (playingIdOf != null) playerConnection?.mediaMetadata ?: idle else idle
     val nowPlaying by metadataFlow.collectAsState()
@@ -74,27 +81,9 @@ fun <T> LibraryEntityListScreen(
 
     // Sectioned here rather than trusting the caller: an index rail against an unsorted list is
     // meaningless, and every caller wants it in index order anyway.
-    val sections = remember(items, query.text) {
-        val q = query.text.trim()
-        val visible = if (q.isBlank()) {
-            items
-        } else {
-            // The title or the line under it, so a search finds an artist's songs too.
-            items.filter {
-                nameOf(it).contains(q, ignoreCase = true) || subtitleOf(it)?.contains(q, ignoreCase = true) == true
-            }
-        }
-        indexSections(visible, nameOf)
-    }
-
-    val rows = remember(sections) {
-        buildList<IndexedRow<T>> {
-            sections.forEach { (section, entries) ->
-                add(IndexedRow.Header(section))
-                entries.forEach { add(IndexedRow.Entry(it)) }
-            }
-        }
-    }
+    val visible = remember(items, query.text) { libraryFilter(items, query.text, nameOf, subtitleOf) }
+    val sections = remember(visible, sectioned) { if (sectioned) indexSections(visible, nameOf) else emptyList() }
+    val rows = remember(visible, sections) { indexRows(visible, sections) }
 
     val sectionIndex = remember(rows) {
         buildMap {
@@ -123,6 +112,9 @@ fun <T> LibraryEntityListScreen(
                 LibraryRule()
                 Spacer(modifier = Modifier.height(8.dp))
             }
+
+            // MOCHY-APPLE: the play-and-shuffle bar a song list can show above its rows
+            playBar?.let { bar -> item(key = "playbar") { bar(); Spacer(Modifier.height(14.dp)) } }
 
             if (rows.isEmpty()) {
                 item(key = "empty") { LibraryEmptyState() }
@@ -153,7 +145,10 @@ fun <T> LibraryEntityListScreen(
                             sharedElementKey = sharedElementKeyOf?.invoke(row.item),
                             // only song lists say which song a row is
                             songId = playingIdOf?.invoke(row.item),
-                            onClick = { onClick(row.item) },
+                            onClick = {
+                                // MOCHY-APPLE: the song that is already playing is opened, not restarted
+                                if (active && playerSheet != null) playerSheet.expandSoft() else onClick(row.item)
+                            },
                             onLongClick = { onLongClick(row.item) },
                         )
                     }

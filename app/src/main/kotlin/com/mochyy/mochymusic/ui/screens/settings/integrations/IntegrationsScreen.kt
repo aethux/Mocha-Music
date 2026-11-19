@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.scrobble.ScrobbleSite
+import com.mochyy.mochymusic.ui.applesync.AppleSyncRoute
 import com.mochyy.mochymusic.ui.component.SubSettingsScaffold
 import com.mochyy.mochymusic.ui.screens.settings.importsync.YouTubeSyncRoute
 import com.mochyy.mochymusic.ui.screens.settings.integrations.discord.DiscordRoute
@@ -22,6 +23,9 @@ const val IntegrationsRoute = "integrations_settings"
 
 // the youtube music logo is a red disc, this fills its corners so it sits as a tile like the others
 private val YouTubeMusicRed = Color(0xFFFF0000)
+
+// MOCHY-APPLE: Apple Music's own red, so its row sits with the others as a logo, not a headset
+private val AppleMusicRed = Color(0xFFFA243C)
 
 @Composable
 fun IntegrationsScreen(navController: NavController) {
@@ -54,6 +58,14 @@ fun IntegrationsScreen(navController: NavController) {
                 icon = R.drawable.provider_youtube_music,
                 iconBackground = YouTubeMusicRed,
                 onClick = { navController.navigate(YouTubeSyncRoute) },
+            )
+            // MOCHY-APPLE: read-only library audit; the sync itself lands here later
+            IntegrationRow(
+                name = "Apple Music",
+                description = "Read-only library audit",
+                icon = R.drawable.provider_apple_music,
+                iconBackground = AppleMusicRed,
+                onClick = { navController.navigate(AppleSyncRoute) },
             )
         }
 

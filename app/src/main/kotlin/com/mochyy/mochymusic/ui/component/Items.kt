@@ -372,6 +372,14 @@ fun SongListItem(
     showDownloadIcon: Boolean = true,
     downloadState: Int? = null,
     badges: @Composable RowScope.() -> Unit = {
+        // MOCHY-APPLE: a red dot means this song has no Apple Music copy yet
+        if (com.mochyy.mochymusic.applesync.AppleSyncStatus.shouldMark(song.id)) {
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(MaterialTheme.colorScheme.error, CircleShape),
+            )
+        }
         if (showLikedIcon && song.song.liked) {
             Icon.Favorite()
         }

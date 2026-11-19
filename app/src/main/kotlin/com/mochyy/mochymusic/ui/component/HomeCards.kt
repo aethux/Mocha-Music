@@ -483,6 +483,16 @@ fun HomeTrackRow(
                 )
             }
         }
+        // MOCHY-APPLE: a song with no Apple copy says so, on every row type, not only in the
+        // full song list where the old badge lived
+        if (songId != null && com.mochyy.mochymusic.applesync.AppleSyncStatus.shouldMark(songId)) {
+            Box(
+                modifier = Modifier
+                    .padding(end = 6.dp)
+                    .size(6.dp)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.error, CircleShape),
+            )
+        }
         OnDeviceMarks(songId, modifier = Modifier.padding(end = 2.dp))
         if (onMoreClick != null) Box(
             contentAlignment = Alignment.Center,

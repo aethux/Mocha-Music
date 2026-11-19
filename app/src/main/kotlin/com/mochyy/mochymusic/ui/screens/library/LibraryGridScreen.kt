@@ -8,7 +8,8 @@
 
 package com.mochyy.mochymusic.ui.screens.library
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,6 +76,8 @@ fun LibraryGridScreen(
     searchPlaceholder: String,
     entries: List<LibraryGridEntry>,
     onOpen: (LibraryGridEntry) -> Unit,
+    onLongClick: ((LibraryGridEntry) -> Unit)? = null, // MOCHY-APPLE: playlist tiles carry a menu
+    trailing: (@Composable () -> Unit)? = null, // MOCHY-APPLE: the list/grid switch, where the list has one
     onPlay: () -> Unit,
     onShuffle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -107,6 +110,7 @@ fun LibraryGridScreen(
         pureBlack = pureBlack,
         bottomInset = bottomInset,
         modifier = modifier,
+        trailing = trailing,
     ) {
         item(key = "rule") {
             LibraryRule()
@@ -132,7 +136,7 @@ fun LibraryGridScreen(
                 horizontalArrangement = Arrangement.spacedBy(HomeCardSpacing),
             ) {
                 row.forEach { entry ->
-                    LibraryGridTile(entry = entry, onClick = { onOpen(entry) }, modifier = Modifier.weight(1f))
+                    LibraryGridTile(entry, { onOpen(entry) }, onLongClick?.let { long -> { long(entry) } }, Modifier.weight(1f))
                 }
                 // Half-filled last row keeps its tile at column width instead of stretching.
                 if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
@@ -147,13 +151,16 @@ fun LibraryGridScreen(
  * highlight instead of a square ripple, and the cards' type
  */
 @Composable
-private fun LibraryGridTile(entry: LibraryGridEntry, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun LibraryGridTile(entry: LibraryGridEntry, onClick: () -> Unit, onLongClick: (() -> Unit)? = null, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(HomeCardCornerRadius)
     Column(
-        modifier = modifier.clickable(
-            interactionSource = null,
+        // combinedClickable, because a playlist tile carries a menu: the same highlight, plus the
+        // long press the list rows have always had
+        modifier = modifier.combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
             indication = HomeCardHighlight,
             onClick = onClick,
+            onLongClick = onLongClick,
         ),
     ) {
         Box(
