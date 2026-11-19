@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -123,9 +122,8 @@ private fun SentenceLink(label: String, onClick: () -> Unit) {
         color = SearchColors.Primary,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
-            .minimumInteractiveComponentSize()
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
+            .padding(vertical = 6.dp, horizontal = 1.dp),
     )
 }
 

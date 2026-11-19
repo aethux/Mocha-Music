@@ -37,15 +37,31 @@ fun AppleSongsScreen(
     modifier: Modifier = Modifier,
     pureBlack: Boolean = false,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val viewModel: LibraryHomeViewModel = hiltViewModel()
     val all by viewModel.songs.collectAsState()
+    // the footer counts a song matched by hand as Apple's, so this list must too, or the number
+    // and the list it opens disagree (one on YouTube, four rows)
+    val dao = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            com.mochyy.mochymusic.applesync.di.ApplePlaylistEntryPoint::class.java,
+        ).dao()
+    }
+    val pinned by remember(dao) {
+        dao.rematchSongIdsFlow(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE)
+    }.collectAsState(initial = emptyList())
     val playerConnection = LocalPlayerConnection.current ?: return
     val menuState = LocalMenuState.current
 
     val onApple = source != "youtube"
     val title = if (onApple) "On Apple Music" else "On YouTube"
-    val songs = remember(all, onApple) {
-        all.filter { if (onApple) it.id.startsWith("AM_") else !it.id.startsWith("AM_") }
+    val songs = remember(all, onApple, pinned) {
+        val apple = pinned.toSet()
+        all.filter {
+            val isApple = it.id.startsWith("AM_") || it.id in apple
+            isApple == onApple
+        }
     }
     val order = rememberSongsOrder(songs)
 
