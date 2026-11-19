@@ -51,13 +51,15 @@ fun AppleSongsScreen(
     val pinned by remember(dao) {
         dao.rematchSongIdsFlow(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE)
     }.collectAsState(initial = emptyList())
+    // a song the add path matched has an Apple track row but keeps a YouTube id: Apple's, too
+    val tracked by remember(dao) { dao.trackedSongIdsFlow() }.collectAsState(initial = emptyList())
     val playerConnection = LocalPlayerConnection.current ?: return
     val menuState = LocalMenuState.current
 
     val onApple = source != "youtube"
     val title = if (onApple) "On Apple Music" else "On YouTube"
-    val songs = remember(all, onApple, pinned) {
-        val apple = pinned.toSet()
+    val songs = remember(all, onApple, pinned, tracked) {
+        val apple = pinned.toSet() + tracked.toSet()
         all.filter {
             val isApple = it.id.startsWith("AM_") || it.id in apple
             isApple == onApple
