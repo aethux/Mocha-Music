@@ -17,6 +17,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.mochyy.mochymusic.R
 import androidx.compose.ui.unit.dp
 import com.mochyy.mochymusic.applesync.AppleSyncStatus
 import com.mochyy.mochymusic.ui.screens.settings.importsync.ImportInfoCard
@@ -53,8 +55,11 @@ fun AppleSyncCard(modifier: Modifier = Modifier) {
             Spacer(Modifier.height(8.dp))
             Text(
                 text = buildString {
-                    append("${progress.songs} songs")
-                    if (progress.playlists > 0) append(" · ${progress.playlists} playlists")
+                    append(stringResource(R.string.apple_card_songs, progress.songs))
+                    if (progress.playlists > 0) {
+                        append(" · ")
+                        append(stringResource(R.string.apple_card_playlists, progress.playlists))
+                    }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -73,7 +78,7 @@ fun AppleSyncCard(modifier: Modifier = Modifier) {
                     )
                 }
                 TextButton(onClick = AppleSyncStatus::dismiss) {
-                    Text("OK")
+                    Text(stringResource(R.string.apple_sync_ok))
                 }
             }
         }

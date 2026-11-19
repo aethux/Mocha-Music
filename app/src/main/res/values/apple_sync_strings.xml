@@ -139,4 +139,31 @@
     <string name="lib_playlists_show_list">Show as list</string>
     <string name="apple_collaborators_title">Collaborators</string>
     <string name="apple_collaborators_desc">Read the other people on your shared playlists from the Apple Music page</string>
+    <!-- The library's closing sentences, the sync card, and the marks on a row -->
+    <string name="apple_summary_songs">%1$s songs</string>
+    <string name="apple_summary_albums">%1$s albums</string>
+    <string name="apple_summary_playlists">%1$s playlists</string>
+    <string name="apple_summary_on_apple">%1$s on Apple Music</string>
+    <string name="apple_summary_on_youtube">%1$s on YouTube</string>
+    <string name="apple_summary_not_synced">not synced yet</string>
+    <string name="apple_summary_just_now">synced just now</string>
+    <string name="apple_summary_minutes">synced %1$d min ago</string>
+    <string name="apple_summary_hours">synced %1$d h ago</string>
+    <string name="apple_summary_yesterday">synced yesterday</string>
+    <string name="apple_summary_days">synced %1$d days ago</string>
+    <string name="apple_sync_connected">Connected</string>
+    <string name="apple_sync_ok">OK</string>
+    <string name="apple_sync_allow_confirm">Mochy will only touch playlists and songs it created itself. Anything that was in your library before it ever wrote is refused by a check in the code, not by good intentions.</string>
+    <string name="apple_sync_no_answer">Apple didn’t answer.</string>
+    <string name="apple_refresh_desc">Sync with Apple Music</string>
+    <string name="apple_mark_missing">No Apple Music copy</string>
+    <string name="apple_card_songs">%1$d songs</string>
+    <string name="apple_card_playlists">%1$d playlists</string>
+
+    <!-- A shared playlist's other people, read from its page -->
+    <string name="apple_collaborators_reading">Reading who is on this playlist…</string>
+    <string name="apple_collaborators_people">Also on this playlist</string>
+    <string name="apple_collaborators_none">Just you</string>
+    <string name="apple_collaborators_none_desc">Apple’s own page names nobody else on it.</string>
+    <string name="apple_collaborators_source">Names come from the playlist’s page on music.apple.com, which is the only place Apple publishes them.</string>
 </resources>

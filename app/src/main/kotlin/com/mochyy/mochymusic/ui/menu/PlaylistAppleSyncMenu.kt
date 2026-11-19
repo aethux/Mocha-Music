@@ -42,6 +42,7 @@ import com.mochyy.mochymusic.db.entities.Playlist
 import com.mochyy.mochymusic.ui.component.DefaultDialog
 import com.mochyy.mochymusic.ui.component.Material3MenuItemData
 import com.mochyy.mochymusic.ui.component.PopupSheetState
+import com.mochyy.mochymusic.ui.player.menu.MenuRow
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -89,7 +90,7 @@ class PlaylistAppleSyncState internal constructor(
             linked = runCatching { linker.linked(playlistId) }.getOrNull()
             if (linked == null) {
                 candidates = runCatching { linker.candidates() }.getOrElse { error ->
-                    message = error.message ?: "Apple didn't answer."
+                    message = error.message ?: context.getString(R.string.apple_sync_no_answer)
                     emptyList()
                 }
                 pickerOpen = candidates.isNotEmpty()
@@ -206,13 +207,12 @@ fun rememberPlaylistAppleSync(playlistId: String, onDismiss: () -> Unit): Playli
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 for (playlist in state.candidates) {
-                    Text(
-                        text = playlist.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { state.choose(playlist) }
-                            .padding(vertical = 12.dp),
+                    // the same row shape as every other picker in the app
+                    MenuRow(
+                        icon = R.drawable.playlist_add,
+                        title = playlist.name,
+                        enabled = !state.busy,
+                        onClick = { state.choose(playlist) },
                     )
                 }
             }

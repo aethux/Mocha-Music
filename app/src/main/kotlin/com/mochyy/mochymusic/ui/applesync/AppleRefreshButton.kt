@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.applesync.AppleSyncRunner
@@ -64,7 +65,7 @@ fun AppleRefreshButton(tint: Color = Color.Unspecified) {
     ) {
         Icon(
             painter = painterResource(R.drawable.refresh),
-            contentDescription = "Sync with Apple Music",
+            contentDescription = stringResource(R.string.apple_refresh_desc),
             tint = tint,
         )
     }

@@ -75,7 +75,7 @@ fun AppleSyncScreen(navController: NavController) {
                 listOf(
                     if (signedIn) {
                         SettingsItem(
-                            title = { Text("Apple ID") },
+                            title = { Text(viewModel.accountLabel ?: stringResource(R.string.apple_sync_account_header)) },
                             descriptionText = accountLine(state),
                             icon = painterResource(R.drawable.account),
                             iconShape = CircleShape,
@@ -162,21 +162,6 @@ fun AppleSyncScreen(navController: NavController) {
                                 )
                             }
                         },
-                    ),
-                    SettingsItem(
-                        // MOCHY-APPLE: the names of the other people on shared playlists, from the page
-                        title = { Text(stringResource(R.string.apple_collaborators_title)) },
-                        descriptionText = stringResource(R.string.apple_collaborators_desc),
-                        icon = painterResource(R.drawable.group_filled),
-                        iconShape = CircleShape,
-                        onClick = { navController.navigate(com.mochyy.mochymusic.ui.applesync.appleCollaboratorsRoute(com.mochyy.mochymusic.ui.applesync.AppleCollaboratorsAll)) },
-                    ),
-                    SettingsItem(
-                        title = { Text(stringResource(R.string.apple_sync_session_title)) },
-                        descriptionText = stringResource(R.string.apple_sync_session_desc),
-                        icon = painterResource(R.drawable.cloud),
-                        iconShape = CircleShape,
-                        onClick = { navController.navigate(AppleSessionRoute) },
                     ),
                 ),
         )
@@ -292,9 +277,7 @@ fun AppleSyncScreen(navController: NavController) {
             },
         ) {
             Text(
-                text = "Mochy will only touch playlists and songs it created itself. Anything that " +
-                    "was in your library before it ever wrote is refused by a check in the code, " +
-                    "not by good intentions.",
+                text = stringResource(R.string.apple_sync_allow_confirm),
                 style = MaterialTheme.typography.bodyLarge,
             )
         }

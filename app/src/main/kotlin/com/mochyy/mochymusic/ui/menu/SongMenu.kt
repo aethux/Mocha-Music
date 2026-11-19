@@ -435,7 +435,7 @@ fun SongMenu(
         item {
             Material3MenuGroup(
                 items = buildList {
-                    add(
+                    if (!song.id.startsWith("AM_")) add( // MOCHY-APPLE: a speed dial entry is YouTube's
                         Material3MenuItemData(
                             title = {
                                 Text(
@@ -566,7 +566,7 @@ fun SongMenu(
                             )
                         )
                     }
-                    add(
+                    if (!song.id.startsWith("AM_")) add( // MOCHY-APPLE: nothing on YouTube to refetch
                         Material3MenuItemData(
                             title = { Text(text = stringResource(R.string.refetch)) },
                             description = {

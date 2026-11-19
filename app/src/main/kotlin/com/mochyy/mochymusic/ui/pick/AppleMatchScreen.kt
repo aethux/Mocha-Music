@@ -97,7 +97,11 @@ fun AppleMatchScreen(songId: String, navController: NavController) {
         if (term.isBlank()) return@LaunchedEffect
         results = null
         delay(350)
-        val found = AppleAdopt.search(context, term)
+        // an album, its single and its deluxe all answer with the same recording
+        val found = AppleAdopt.search(context, term).distinctBy { song ->
+            song.isrc?.takeIf { it.isNotBlank() }
+                ?: "${'$'}{song.title.lowercase()}/${'$'}{song.artist.lowercase()}"
+        }
         results = found
         owned = AppleAdopt.inLibrary(context, found.map { it.id })
     }

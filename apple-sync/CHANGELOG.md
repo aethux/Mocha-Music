@@ -1,8 +1,7 @@
 # What this fork changed, and how
 
-Fork of `realidkroo/Mochy-Music` on branch `apple-sync`: 12 commits, one per feature,
-165 files touched, +15,764 / -262 lines. Apple Music is the library of record; YouTube still
-supplies what Apple does not have.
+Fork of `realidkroo/Mochy-Music` on branch `apple-sync`: one commit per feature, 165 files
+touched. Apple Music is the library of record; YouTube still supplies what Apple does not have.
 
 This file is the list of what changed and the method behind each change. It is organised by area,
 because the same three techniques keep coming back:

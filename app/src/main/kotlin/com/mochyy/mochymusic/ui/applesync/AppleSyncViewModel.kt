@@ -18,6 +18,7 @@ import com.mochyy.mochymusic.applesync.db.AppleSyncDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -50,6 +51,10 @@ class AppleSyncViewModel @Inject constructor(
     var state by mutableStateOf<State>(State.SignedOut)
         private set
 
+    /** The account's own name, so the page says who is signed in rather than "Apple ID". */
+    var accountLabel by mutableStateOf<String?>(null)
+        private set
+
     /** The switch that lets Mochy change anything on Apple. Off until the user says otherwise. */
     var writesEnabled by mutableStateOf(false)
         private set
@@ -64,6 +69,13 @@ class AppleSyncViewModel @Inject constructor(
         viewModelScope.launch {
             state = if (tokens.read() != null) State.Ready else State.SignedOut
             writesEnabled = AppleWritePrefs.enabled(context)
+            // the account row's own label is empty on a captured session; the name Apple uses as
+            // the owner of this account's playlists is the same person and is always there
+            accountLabel = runCatching { dao.account().first()?.label?.takeIf { it.isNotBlank() } }.getOrNull()
+                ?: runCatching {
+                    com.mochyy.mochymusic.applesync.PlaylistCollaborators.selfName(dao.playlistMetas())
+                        ?.takeIf { it.isNotBlank() }
+                }.getOrNull()
         }
     }
 

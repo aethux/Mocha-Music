@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.applesync.AppleSyncFlow
 import com.mochyy.mochymusic.applesync.di.ApplePlaylistEntryPoint
 import com.mochyy.mochymusic.db.entities.Song
@@ -70,30 +72,36 @@ fun AppleLibrarySummary(
     ) {
         // One sentence, not a row of buttons: every count is a word you can tap.
         FlowRow(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-            SentenceLink("${numbers.format(songs.size)} songs") { navController.navigate("library/songs") }
+            SentenceLink(stringResource(R.string.apple_summary_songs, numbers.format(songs.size))) {
+                navController.navigate("library/songs")
+            }
             if (albumCount > 0) {
                 SentenceDot()
-                SentenceLink("${numbers.format(albumCount)} albums") { navController.navigate("library/albums") }
+                SentenceLink(stringResource(R.string.apple_summary_albums, numbers.format(albumCount))) {
+                    navController.navigate("library/albums")
+                }
             }
             if (playlistCount > 0) {
                 SentenceDot()
-                SentenceLink("${numbers.format(playlistCount)} playlists") { navController.navigate("library/playlists") }
+                SentenceLink(stringResource(R.string.apple_summary_playlists, numbers.format(playlistCount))) {
+                    navController.navigate("library/playlists")
+                }
             }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-            SentenceLink("${numbers.format(onApple)} on Apple Music") {
+            SentenceLink(stringResource(R.string.apple_summary_on_apple, numbers.format(onApple))) {
                 navController.navigate(appleSongsRoute("apple"))
             }
             val youtube = songs.size - onApple
             if (youtube > 0) {
                 SentenceDot()
-                SentenceLink("${numbers.format(youtube)} on YouTube") {
+                SentenceLink(stringResource(R.string.apple_summary_on_youtube, numbers.format(youtube))) {
                     navController.navigate(appleSongsRoute("youtube"))
                 }
             }
             SentenceDot()
             Text(
-                text = lastSync ?: "not synced yet",
+                text = lastSync ?: stringResource(R.string.apple_summary_not_synced),
                 style = MaterialTheme.typography.bodySmall,
                 color = SearchColors.Secondary,
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -140,17 +148,19 @@ private fun lastSyncLine(): String? {
         ).dao()
     }
     val states by remember(dao) { dao.stateFlow() }.collectAsState(initial = emptyList())
-    return states.firstOrNull { it.key == AppleSyncFlow.KEY_LAST_SYNC_AT }?.value?.toLongOrNull()?.let(::ago)
+    return states.firstOrNull { it.key == AppleSyncFlow.KEY_LAST_SYNC_AT }
+        ?.value?.toLongOrNull()?.let { at -> ago(at) }
 }
 
+@Composable
 private fun ago(at: Long): String {
-    val minutes = ((System.currentTimeMillis() - at) / 60_000L).coerceAtLeast(0)
+    val minutes = ((System.currentTimeMillis() - at) / 60_000L).coerceAtLeast(0).toInt()
     return when {
-        minutes < 1 -> "synced just now"
-        minutes < 60 -> "synced $minutes min ago"
-        minutes < 60 * 24 -> "synced ${minutes / 60} h ago"
-        minutes < 60 * 24 * 2 -> "synced yesterday"
-        else -> "synced ${minutes / (60 * 24)} days ago"
+        minutes < 1 -> stringResource(R.string.apple_summary_just_now)
+        minutes < 60 -> stringResource(R.string.apple_summary_minutes, minutes)
+        minutes < 60 * 24 -> stringResource(R.string.apple_summary_hours, minutes / 60)
+        minutes < 60 * 24 * 2 -> stringResource(R.string.apple_summary_yesterday)
+        else -> stringResource(R.string.apple_summary_days, minutes / (60 * 24))
     }
 }
 

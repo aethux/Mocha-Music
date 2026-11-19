@@ -83,6 +83,14 @@ fun PlaylistsCollectionScreen(
             sharedElementKeyOf = { "playlist-${it.id}" },
             onClick = onOpen,
             onLongClick = onLongClick,
+            // the grid already shows this bar; a collection that grows one control in one mode is
+            // the same screen looking like two
+            playBar = {
+                com.mochyy.mochymusic.ui.screens.library.LibraryPlayBar(
+                    onPlay = { playlists.firstOrNull()?.let(onOpen) },
+                    onMore = { playlists.randomOrNull()?.let(onOpen) },
+                )
+            },
             trailing = toggle,
             modifier = modifier,
             pureBlack = pureBlack,

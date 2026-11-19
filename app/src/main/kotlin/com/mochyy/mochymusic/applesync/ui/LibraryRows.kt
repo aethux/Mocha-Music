@@ -7,6 +7,14 @@
 
 package com.mochyy.mochymusic.applesync.ui
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.mochyy.mochymusic.applesync.AppleSyncStatus
 import com.mochyy.mochymusic.ui.screens.library.IndexSection
 import com.mochyy.mochymusic.ui.screens.library.IndexedRow
 
@@ -40,4 +48,22 @@ internal fun <T> indexRows(
             entries.forEach { add(IndexedRow.Entry(it)) }
         }
     }
+}
+
+/**
+ * The mark beside a song that has no Apple Music copy yet.
+ *
+ * A dot in the error colour read as a notification nobody could name, so it is the app's own
+ * "library music" glyph instead, in the row's own content colour: the same vocabulary as the liked
+ * heart and the download arrow next to it, and it carries the sentence a screen reader needs.
+ */
+@Composable
+fun AppleMissingMark(songId: String?, modifier: Modifier = Modifier) {
+    if (songId == null || !AppleSyncStatus.shouldMark(songId)) return
+    Icon(
+        painter = painterResource(com.mochyy.mochymusic.R.drawable.library_music_outlined),
+        contentDescription = stringResource(com.mochyy.mochymusic.R.string.apple_mark_missing),
+        tint = androidx.compose.material3.LocalContentColor.current.copy(alpha = 0.7f),
+        modifier = modifier.size(13.dp),
+    )
 }

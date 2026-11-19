@@ -69,10 +69,17 @@ object AppleAlbums {
         // The pass rewrites every album row and every song→album link. When neither the albums nor
         // which song is on which has changed - the usual case on a refresh - that is a minute of
         // writes for nothing, so a stamp of the resulting shape decides whether to run it at all.
-        val signature = groups.entries
-            .flatMap { (albumId, entries) -> entries.map { "$albumId:${it.first}" } }
-            .sorted()
-            .joinToString(",")
+        // It is a digest: the shape itself is 44 KB on a 917-album library, and only equality matters.
+        val signature = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(
+                groups.entries
+                    .flatMap { (albumId, entries) -> entries.map { "$albumId:${it.first}" } }
+                    .sorted()
+                    .joinToString(",")
+                    .toByteArray(),
+            )
+            .joinToString("") { "%02x".format(it) }
+            .take(32)
         if (runCatching { dao.state(SIGNATURE_KEY) }.getOrNull() == signature) return Result(0, 0)
 
         // Three reads for the whole pass, not one per album and one per song. A failed read is a

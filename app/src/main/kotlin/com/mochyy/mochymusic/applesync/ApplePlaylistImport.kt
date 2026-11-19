@@ -37,6 +37,8 @@ object ApplePlaylistImport {
         val unchanged: Int = 0,
         /** Songs that came with a playlist but are not in the library. */
         val outsideTheLibrary: Int = 0,
+        /** Playlists whose rows were actually rewritten; "read" and "changed" are not the same. */
+        val written: Int = 0,
     )
 
     /** The local playlist id an Apple playlist is imported as. */
@@ -71,6 +73,7 @@ object ApplePlaylistImport {
         var songs = 0
         var skipped = 0
         var unchanged = 0
+        var written = 0
         var extra = 0
 
         // one read for the whole pass: asking per track which songs exist was 742 queries on this
@@ -262,6 +265,7 @@ object ApplePlaylistImport {
                 songs += merged.size
                 // it came from Apple, so it already matches: no push on the way out
                 ApplePlaylistPush.seed(playlistId, signature)
+                written++
             }
         }
 
@@ -272,6 +276,7 @@ object ApplePlaylistImport {
             skipped = skipped,
             unchanged = unchanged,
             outsideTheLibrary = extra,
+            written = written,
         )
     }
 

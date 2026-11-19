@@ -94,10 +94,13 @@ object AppleSyncFlow {
         if (songs.albums > 0) parts += "${songs.albums} albums"
 
         val changed = playlists.playlists - playlists.unchanged
+        // read and rebuilt the rows is not the same as "the membership changed": a playlist whose
+        // stamp is unknown is read every run, and saying "updated" then would be a lie
         val listPart = when {
             playlists.playlists == 0 -> null
-            changed == 0 -> "${playlists.playlists} playlists unchanged"
-            else -> "$changed of ${playlists.playlists} playlists updated"
+            playlists.written == 0 -> "${playlists.playlists} playlists unchanged"
+            playlists.written == changed -> "$changed of ${playlists.playlists} playlists updated"
+            else -> "$changed of ${playlists.playlists} playlists checked"
         }
         listPart?.let { parts += it }
         if (playlists.songs > 0) parts += "${playlists.songs} playlist songs"

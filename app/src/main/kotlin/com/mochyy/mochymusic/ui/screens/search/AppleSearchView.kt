@@ -162,12 +162,15 @@ fun AppleMusicSearchPage(
 
     val visible = remember(hits, chip) {
         val all = hits ?: return@remember emptyList()
-        if (chip.kind == null) {
+        val picked = if (chip.kind == null) {
             // Apple's own order: songs, then artists, albums, playlists, videos
             AppleAdopt.Kind.entries.flatMap { all[it].orEmpty() }
         } else {
             all[chip.kind].orEmpty()
         }
+        // the same recording is on the album, the single and the compilation: a list of five
+        // identical "Espresso" rows reads as broken rather than thorough
+        picked.distinctBy { "${'$'}{it.kind}/${'$'}{it.title.lowercase()}/${'$'}{it.subtitle?.lowercase()}" }
     }
 
     val insets = WindowInsets.statusBars.asPaddingValues()

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.applesync.CoverOverrides
 import com.mochyy.mochymusic.applesync.ui.CoverImages
+import com.mochyy.mochymusic.ui.player.menu.MenuRow
 import com.mochyy.mochymusic.ui.component.SheetSearchField
 import com.mochyy.mochymusic.ui.component.TopToaster
 import kotlinx.coroutines.launch
@@ -82,17 +81,17 @@ fun CoverSheet(
             modifier = Modifier.padding(start = 8.dp, bottom = 10.dp),
         )
 
-        TextButton(
+        // the same rows a menu uses: a cover is an action, not a form
+        MenuRow(
+            icon = R.drawable.image,
+            title = stringResource(R.string.cover_sheet_pick),
             enabled = !busy,
             onClick = {
                 picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             },
-            modifier = Modifier.padding(horizontal = 8.dp),
-        ) {
-            Text(text = stringResource(R.string.cover_sheet_pick), fontSize = 14.sp)
-        }
+        )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(10.dp))
 
         SheetSearchField(
             value = url,
@@ -100,7 +99,10 @@ fun CoverSheet(
             placeholder = stringResource(R.string.cover_sheet_url),
         )
         Spacer(Modifier.height(10.dp))
-        TextButton(
+
+        MenuRow(
+            icon = R.drawable.link,
+            title = stringResource(R.string.cover_sheet_use),
             enabled = url.isNotBlank(),
             onClick = {
                 val chosen = url.trim()
@@ -115,11 +117,12 @@ fun CoverSheet(
                     onDismiss()
                 }
             },
-            modifier = Modifier.padding(horizontal = 8.dp),
-        ) {
-            Text(text = stringResource(R.string.cover_sheet_use), fontSize = 14.sp)
-        }
-        TextButton(
+        )
+
+        MenuRow(
+            icon = R.drawable.apple_music_me,
+            title = stringResource(R.string.cover_sheet_apple),
+            enabled = true,
             onClick = {
                 scope.launch {
                     if (CoverImages.isStored(context, CoverOverrides.get(context, kind, id))) {
@@ -131,9 +134,6 @@ fun CoverSheet(
                     onDismiss()
                 }
             },
-            modifier = Modifier.padding(horizontal = 8.dp),
-        ) {
-            Text(text = stringResource(R.string.cover_sheet_apple), fontSize = 14.sp)
-        }
+        )
     }
 }
