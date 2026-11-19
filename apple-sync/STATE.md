@@ -39,9 +39,9 @@ Read this first. It is the state of the fork, what is proven, and what is next.
 - Songs added from other providers default to **not** syncing; adds to the library or to an Apple playlist sync both ways.
 - The UI follows Mochy's own patterns: settings groups for settings, playlist menus for playlist actions, import cards for progress.
 
-## Where this stopped (2026‑11‑19, uncommitted work in the tree)
+## Where this stopped (2026‑11‑19, all of it committed)
 
-Built today, **not committed yet**:
+Built today, in the commits named in `git log upstream/main..HEAD`:
 
 - **Buttons reach Apple.** `AppleSongWrites` pushes the heart (PUT/DELETE `api.music.apple.com/v1/me/ratings/songs/{id}`) and the library add/remove (`amp-api` `POST /v1/me/library?ids[songs]=…`, `DELETE /v1/me/library/songs/{id}`) with the captured token pair, behind `AppleGuard`, each verified by a read and an audit row. Ratings are no longer "mutating" in the guard: a heart removes nothing, so the epoch does not refuse it; removing a song from the library still is, and must stay that way.
   Proven on the account: `RATING_SET 1858248614 ALLOW 200 verified=1` then Apple answering `value:1`; `RATING_CLEARED … 204 verified=1` then `404`; a library remove refused as `PRE_EXISTING_OBJECT` with Apple untouched.
