@@ -75,6 +75,9 @@ class App : Application(), SingletonImageLoader.Factory {
         com.mochyy.mochymusic.playback.StoragePlaces.cleanUpLeftovers(this)
         super.onCreate()
 
+        // MOCHY-APPLE: a linked playlist goes to Apple soon after it changes here
+        com.mochyy.mochymusic.applesync.ApplePlaylistPush.start(this)
+
         AppLanguage.initialize(this)
         CrashHandler.install(this)
 
