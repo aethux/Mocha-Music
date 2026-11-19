@@ -2776,7 +2776,10 @@ class MusicService :
 
     fun toggleLibrary() {
         scope.launch {
-            val songToToggle = currentSong.first()
+            // the player's own current item, not the mirror of it: currentMediaMetadata is written
+            // from queue callbacks, so a song played straight from search left it pointing at the
+            // previous song and the button wrote to that one instead
+            val songToToggle = player.currentMediaItem?.mediaId?.let { id -> database.getSongById(id) }
             songToToggle?.let {
                 val isInLibrary = it.song.inLibrary != null
                 // MOCHY-APPLE: an Apple song's flag is Apple's, and its row follows Apple's answer
@@ -2797,7 +2800,8 @@ class MusicService :
 
     fun toggleLike() {
         scope.launch {
-            val songToToggle = currentSong.first()
+            // same as toggleLibrary: the item the player is on, not a stale mirror of it
+            val songToToggle = player.currentMediaItem?.mediaId?.let { id -> database.getSongById(id) }
             songToToggle?.let {
                 val song = it.song.toggleLike()
                 database.query {
