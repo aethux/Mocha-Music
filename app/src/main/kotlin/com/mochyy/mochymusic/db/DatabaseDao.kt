@@ -687,6 +687,15 @@ interface DatabaseDao {
     ): Flow<List<Song>>
 
     @Transaction
+    // MOCHY-APPLE: backfill a cover without touching anything else on the row
+    @Query("UPDATE song SET thumbnailUrl = :url WHERE id = :songId AND (thumbnailUrl IS NULL OR thumbnailUrl = '')")
+    suspend fun setSongThumbnailIfMissing(songId: String, url: String)
+
+    // MOCHY-APPLE: the ids this fork imports, so a repeat import skips what it already added
+    // without one query per song
+    @Query("SELECT id FROM song WHERE id GLOB 'AM_*'")
+    suspend fun appleSongIds(): List<String>
+
     @Query("SELECT * FROM song WHERE id = :songId")
     fun song(songId: String?): Flow<Song?>
 
@@ -840,7 +849,8 @@ interface DatabaseDao {
             ArtistSortType.PLAY_TIME -> artistsByPlayTimeAsc()
         }.map { artists ->
             artists
-                .filter { it.artist.isYouTubeArtist || it.artist.isLocal }
+                // MOCHY-APPLE: an Apple artist is neither a YouTube nor a local one, but it has songs
+                .filter { it.artist.isYouTubeArtist || it.artist.isLocal || it.songCount > 0 }
                 .reversed(descending)
         }
 
@@ -1059,6 +1069,20 @@ interface DatabaseDao {
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Query("SELECT * FROM album WHERE id = :id")
     fun album(id: String): Flow<Album?>
+
+    // MOCHY-APPLE: the album import reads the whole set in one query instead of one per album, and
+    // updates a song's album with an UPDATE instead of reading and rewriting the row
+    @Query("SELECT * FROM album WHERE id LIKE 'AM_ALB_%'")
+    suspend fun appleAlbums(): List<AlbumEntity>
+
+    @Query("SELECT id, albumId FROM song WHERE id LIKE 'AM_%'")
+    suspend fun appleAlbumLinks(): List<com.mochyy.mochymusic.applesync.db.AppleAlbumLink>
+
+    @Query("SELECT id FROM song WHERE id LIKE 'AM_%' AND thumbnailUrl IS NULL")
+    suspend fun appleSongsWithoutArtwork(): List<String>
+
+    @Query("SELECT id FROM song WHERE id LIKE 'AM_%' AND inLibrary IS NULL")
+    suspend fun appleSongsOutsideTheLibrary(): List<String>
 
     // The outer ORDER BY is needed because SQLite can flatten the sorted view's join.
     @Transaction
