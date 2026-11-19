@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Local commit-msg hook: keep apple-sync history readable and rebase-friendly.
+# Installed by scripts/install-hooks.sh. Not part of the repo's build.
+set -euo pipefail
+
+msg_file="$1"
+subject=$(head -n1 "$msg_file")
+
+if ! printf '%s' "$subject" | grep -qE '^apple-sync(\([a-z0-9-]+\))?: [a-z0-9].+'; then
+  cat >&2 <<'EOF'
+commit-msg: bad subject.
+
+  expected: apple-sync: <imperative, lowercase>
+  or:       apple-sync(scope): <imperative, lowercase>
+
+Examples:
+  apple-sync: add the sidecar database and its entities
+  apple-sync(page-host): load music.apple.com and expose addToLibrary
+  apple-sync(seam): pass catalog ids through TrackQuery
+
+Merges and reverts are exempt.
+EOF
+  exit 1
+fi
+
+if [ "${#subject}" -gt 72 ]; then
+  echo "commit-msg: subject is ${#subject} chars, cap is 72." >&2
+  exit 1
+fi
+
+# a body is optional, but if present it must be separated by a blank line
+if [ "$(wc -l < "$msg_file")" -gt 1 ]; then
+  second=$(sed -n '2p' "$msg_file")
+  if [ -n "$second" ]; then
+    echo "commit-msg: second line must be blank (subject, then body)." >&2
+    exit 1
+  fi
+fi
+
+# seam commits should name what they touched, so a rebase review can find them
+if grep -qE '^seam:' "$msg_file"; then
+  :
+fi
+
+case "$subject" in
+  "Merge "*|"Revert "*|Reapply*) exit 0 ;;
+esac

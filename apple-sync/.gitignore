@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# the repo ignores *.py for its own scripts; keep ours
+!spike/*.py

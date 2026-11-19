@@ -1,0 +1,57 @@
+{
+  "run_at": "2026-11-18T14:34:38+00:00",
+  "storefront": "in",
+  "playlist": "mochy spike 20261118-143357",
+  "checks": [
+    {
+      "check": "session",
+      "ok": true,
+      "detail": "storefront=in"
+    },
+    {
+      "check": "catalog search",
+      "ok": true,
+      "detail": "'Bohemian Rhapsody' / 'Bohemian Rhapsody (Operatic Section / 2011 A Cappella Mix)'"
+    },
+    {
+      "check": "create playlist",
+      "ok": true,
+      "detail": "id=p.NJZrrL1COrrg6qR"
+    },
+    {
+      "check": "add tracks",
+      "ok": true,
+      "detail": "HTTP 204, playlist now holds 2 entr(y/ies)",
+      "library_ids": [
+        "i.eoDzgErhMJJ1Qzl",
+        "i.GEG7aM2HQ99O5g1"
+      ]
+    },
+    {
+      "check": "remove track via PUT",
+      "ok": true,
+      "detail": "HTTP 204, 2 -> 1 entr(y/ies)"
+    },
+    {
+      "check": "add to library",
+      "ok": true,
+      "detail": "HTTP 202, appears in library: True"
+    },
+    {
+      "check": "remove from library",
+      "ok": true,
+      "detail": "HTTP 204, gone from library: True"
+    },
+    {
+      "check": "library delete cascades into playlists",
+      "ok": true,
+      "detail": "cascade=yes (playlist entry also vanished)"
+    },
+    {
+      "check": "delete playlist (undocumented)",
+      "ok": true,
+      "detail": "HTTP 204"
+    }
+  ],
+  "cascade": "yes"
+}
