@@ -89,7 +89,18 @@ object ApplePlaylistPush {
                 val now = System.currentTimeMillis()
                 if (now - (lastAttempt[link.playlistId] ?: 0L) < RetryAfterMs) return@withLock
                 lastAttempt[link.playlistId] = now
-                ApplePlaylistWrites.push(context, link.playlistId, quiet = true)
+                val sent = ApplePlaylistWrites.push(context, link.playlistId, quiet = true)
+                // an edit made by hand should answer; the cooldown keeps this from becoming noise
+                if (sent.refusal == null) {
+                    runCatching {
+                        com.mochyy.mochymusic.ui.component.TopToaster.show(
+                            text = context.getString(
+                                com.mochyy.mochymusic.R.string.apple_playlist_pushed_short,
+                            ),
+                            iconRes = com.mochyy.mochymusic.R.drawable.sync,
+                        )
+                    }
+                }
                 // remembered either way: the same content is not attempted again just because the
                 // answer was bad, and a person's next edit still gets through
                 lastSent[link.playlistId] = signature

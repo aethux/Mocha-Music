@@ -79,7 +79,9 @@ object ApplePlaylistWrites {
         for (map in maps) {
             val libraryId = runCatching { dao.track(map.songId)?.libraryId }.getOrNull()
                 ?: runCatching {
-                    val catalogId = dao.track(map.songId)?.catalogId
+                    // catalogIdOf knows an AM_ id and a hand-made pin; the track row is sparse and
+                    // was the reason a playlist of imported songs pushed an empty list
+                    val catalogId = AppleSongWrites.catalogIdOf(dao, map.songId)
                     catalogId?.let { dao.librarySong(it)?.libraryId }
                 }.getOrNull()
             if (libraryId == null) skipped++ else libraryIds += libraryId

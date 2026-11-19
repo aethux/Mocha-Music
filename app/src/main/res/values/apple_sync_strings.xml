@@ -193,4 +193,5 @@
     <string name="apple_removed_keep_all">Keep all</string>
     <string name="apple_removed_remove_all">Remove all here</string>
     <string name="apple_removed_working">Talking to Apple Music…</string>
+    <string name="apple_playlist_pushed_short">Playlist sent to Apple Music</string>
 </resources>

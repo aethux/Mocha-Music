@@ -10,6 +10,7 @@
 package com.mochyy.mochymusic.ui.applesync
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -99,15 +100,25 @@ fun AppleUnmatchedScreen(navController: NavController) {
             // than beside it, because a settings row squeezes a name into a column too narrow
             rows.orEmpty().forEach { song ->
                 ImportInfoCard(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = song.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Text(
-                        text = song.artists,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        com.mochyy.mochymusic.ui.screens.library.LibraryGridArtwork(
+                            url = song.thumbnailUrl,
+                            corner = 10.dp,
+                            modifier = Modifier.size(48.dp),
+                        )
+                        Spacer(Modifier.size(12.dp))
+                        Column {
+                            Text(
+                                text = song.title,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                text = song.artists,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
