@@ -346,8 +346,7 @@ class MusicService :
     @Inject
     lateinit var sourceModules: com.mochyy.mochymusic.modules.SourceModules
 
-    @Inject
-    lateinit var appleRematch: com.mochyy.mochymusic.applesync.AppleRematch
+    @Inject lateinit var appleRematch: com.mochyy.mochymusic.applesync.AppleRematch
     @Inject
     lateinit var widgetManager: MochyWidgetManager
 
@@ -5190,14 +5189,13 @@ class MusicService :
 
     /** the song as a module looks for it: its saved row, or the queue's own copy for a song played straight from search that isn't saved yet */
     private suspend fun trackQueryOf(mediaId: String): com.mochyy.mochymusic.module.TrackQuery? {
-        val picked = appleRematch.externalId(mediaId)
         database.song(mediaId).first()?.let {
             return com.mochyy.mochymusic.module.TrackQuery(
                 title = it.song.title,
                 artists = it.artists.map { a -> a.name },
                 album = it.song.albumName ?: it.album?.title,
                 durationMs = it.song.duration.takeIf { d -> d > 0 }?.times(1000L),
-                externalId = picked,
+                externalId = appleRematch.externalId(mediaId),
             )
         }
         // only the youtube path saves a new song, so without this every module was passed over for it
@@ -5207,7 +5205,7 @@ class MusicService :
             artists = queued.artists.map { it.name },
             album = queued.album?.title,
             durationMs = queued.duration.takeIf { it > 0 }?.times(1000L),
-            externalId = picked,
+            externalId = appleRematch.externalId(mediaId),
         )
     }
 
