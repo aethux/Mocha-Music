@@ -56,6 +56,15 @@ Unverified on device: the picker's UI and the rematch-aware re-import (compiles,
 
 Traps hit again today: Room rejects a hand-written migration whose entity doesn't declare the index it creates; `adb input tap` on a skin player's heart lands on the seekbar.
 
+## Deferred on purpose
+
+- **Creating a playlist on Apple.** Today a local playlist can only be *linked* to an existing
+  Apple playlist, and "Send to Apple Music" replaces that playlist's tracks - so the first push of
+  a new playlist would overwrite one of the account's own. The call is already known (`POST
+  /v1/me/library/playlists`, in `AppleWrites`' sandbox stage): give the unlinked state of the menu
+  row a create path, link what Apple answers with, then verify the ordered ids by re-read like
+  every other write.
+
 ## Not built yet, in the order I would do them
 
 0. **What was asked for next, in their words:**
