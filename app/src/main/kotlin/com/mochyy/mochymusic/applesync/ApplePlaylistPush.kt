@@ -90,20 +90,27 @@ object ApplePlaylistPush {
                 if (now - (lastAttempt[link.playlistId] ?: 0L) < RetryAfterMs) return@withLock
                 lastAttempt[link.playlistId] = now
                 val sent = ApplePlaylistWrites.push(context, link.playlistId, quiet = true)
-                // an edit made by hand should answer; the cooldown keeps this from becoming noise
-                if (sent.refusal == null) {
-                    runCatching {
+                // an edit made by hand should answer, refusal included: a silent watcher is how a
+                // playlist stopped syncing for a day without anyone being able to tell why
+                runCatching {
+                    val refusal = sent.refusal
+                    if (refusal == null) {
                         com.mochyy.mochymusic.ui.component.TopToaster.show(
                             text = context.getString(
                                 com.mochyy.mochymusic.R.string.apple_playlist_pushed_short,
                             ),
                             iconRes = com.mochyy.mochymusic.R.drawable.sync,
                         )
+                    } else {
+                        com.mochyy.mochymusic.ui.component.TopToaster.error(refusal)
                     }
                 }
-                // remembered either way: the same content is not attempted again just because the
-                // answer was bad, and a person's next edit still gets through
-                lastSent[link.playlistId] = signature
+                // only a send that happened is remembered as sent: a refusal is retried on the
+                // next edit instead of being treated as the new baseline
+                if (sent.refusal == null) {
+                    lastSent[link.playlistId] = signature
+                    runCatching { dao.saveLink(link.copy(lastSignature = signature)) }
+                }
             }
         }
     }
