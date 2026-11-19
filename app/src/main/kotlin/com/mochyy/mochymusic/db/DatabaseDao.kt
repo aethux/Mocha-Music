@@ -1084,9 +1084,6 @@ interface DatabaseDao {
     @Query("SELECT id FROM song WHERE id LIKE 'AM_%' AND inLibrary IS NULL")
     suspend fun appleSongsOutsideTheLibrary(): List<String>
 
-    // MOCHY-APPLE: what a refresh compares against Apple's own list, to notice what left
-    @Query("SELECT id FROM song WHERE id LIKE 'AM_%' AND inLibrary IS NOT NULL")
-    suspend fun appleSongsInTheLibrary(): List<String>
 
     // The outer ORDER BY is needed because SQLite can flatten the sorted view's join.
     @Transaction

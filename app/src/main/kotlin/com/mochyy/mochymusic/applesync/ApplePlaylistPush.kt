@@ -60,7 +60,9 @@ object ApplePlaylistPush {
     private suspend fun tick(context: Context, database: MusicDatabase, dao: AppleSyncDao) {
         val linked = runCatching { dao.links().first() }.getOrDefault(emptyList())
         linked.forEach { link ->
-            if (!link.playlistId.startsWith("AM_PL_")) return@forEach
+            // a link row is the permission, whichever way the playlist was linked: an imported one
+            // (AM_PL_...) or one made here and pointed at an Apple playlist. Filtering on the id
+            // meant the second kind never sent anything, so edits in Mochy never reached Apple.
             val signature = runCatching {
                 database.playlistSongMaps(link.playlistId, 0).joinToString(",") { it.songId }
             }.getOrNull() ?: return@forEach
