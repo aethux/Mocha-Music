@@ -208,13 +208,18 @@ object ApplePlaylistImport {
             val current = runCatching { database.playlist(playlistId).first() }.getOrNull()?.playlist
             val alreadyRight = current != null &&
                 current.name == remote.name &&
-                current.thumbnailUrl == artwork &&
                 current.isEditable == remote.canEdit &&
                 current.remoteSongCount == merged.size &&
                 existing.map { it.songId } == merged
+            // the artwork is one column, the membership is a thousand rows: a drifted cover must not
+            // be allowed to look like a changed playlist and rewrite all of them
+            val artworkMoved = current != null && current.thumbnailUrl != artwork
 
             // nothing about this playlist moved: keep the rows, skip the link write, say so
             if (alreadyRight) {
+                if (artworkMoved) {
+                    runCatching { database.query { update(current.copy(thumbnailUrl = artwork)) } }
+                }
                 dao.link(playlistId)?.let { link ->
                     if (link.lastSignature != signature) dao.saveLink(link.copy(lastSignature = signature))
                 }

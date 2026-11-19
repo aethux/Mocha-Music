@@ -100,6 +100,16 @@ object AppleSongWrites {
                 updatedAt = now,
             ),
         )
+        // Apple already has this recording as a row of its own: one song, and Apple's is the row
+        val entry = entry(context)
+        if (songId != "AM_$catalogId") {
+            runCatching {
+                val target = entry.database().song("AM_$catalogId").first()
+                if (target != null) {
+                    AppleMerge.absorb(entry.database(), dao, songId, "AM_$catalogId", catalogId)
+                }
+            }
+        }
         dao.saveTrack(
             AppleTrackEntity(
                 songId = songId,

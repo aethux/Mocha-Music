@@ -178,4 +178,6 @@
     <string name="apple_unmatched_match">Match…</string>
     <string name="apple_unmatched_keep">Keep on YouTube</string>
     <string name="apple_unmatched_footnote">A song you match plays from Apple from then on; one you keep stays on YouTube and is not asked about again.</string>
+    <string name="menu_apple_ask_again">Ask about Apple Music again</string>
+    <string name="menu_apple_ask_again_desc">Puts this song back in the list Apple doesn’t have</string>
 </resources>

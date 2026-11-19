@@ -60,6 +60,10 @@ interface AppleSyncDao {
     @Query("SELECT * FROM rematch WHERE source = :source")
     suspend fun rematchRows(source: String): List<AppleRematchEntity>
 
+    /** Observed, so a song matched by hand stops counting as "on YouTube" where it is matched. */
+    @Query("SELECT songId FROM rematch WHERE source = :source")
+    fun rematchSongIdsFlow(source: String): Flow<List<String>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveRematch(row: AppleRematchEntity)
 

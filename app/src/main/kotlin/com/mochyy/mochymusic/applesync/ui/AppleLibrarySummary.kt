@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,7 +60,10 @@ fun AppleLibrarySummary(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val onApple = songs.count { it.id.startsWith(APPLE_PREFIX) }
+    // a song matched by hand is not an AM_ row, but it plays from Apple, so the sentence counts it
+    // there - otherwise matching one made the YouTube number stay and the Apple one not move
+    val pinned = pinnedToApple()
+    val onApple = songs.count { it.id.startsWith(APPLE_PREFIX) || it.id in pinned }
     val numbers = NumberFormat.getIntegerInstance(Locale.getDefault())
     val lastSync = lastSyncLine()
 
@@ -119,6 +123,7 @@ private fun SentenceLink(label: String, onClick: () -> Unit) {
         color = SearchColors.Primary,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
+            .minimumInteractiveComponentSize()
             .clickable(onClick = onClick)
             .padding(vertical = 4.dp),
     )
@@ -138,6 +143,22 @@ private fun SentenceDot() {
  * "synced 3 min ago", observed from the sidecar. The sync writes the timestamp when it finishes, and
  * a Flow means the footer moves the moment it does instead of when the screen is next opened.
  */
+@Composable
+private fun pinnedToApple(): Set<String> {
+    val context = LocalContext.current
+    val dao = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ApplePlaylistEntryPoint::class.java,
+        ).dao()
+    }
+    val ids by remember(dao) {
+        dao.rematchSongIdsFlow(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE)
+    }.collectAsState(initial = emptyList())
+    return remember(ids) { ids.toSet() }
+}
+
+/** "synced 3 min ago", observed from the sidecar. */
 @Composable
 private fun lastSyncLine(): String? {
     val context = LocalContext.current

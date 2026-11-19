@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,8 +41,12 @@ import dagger.hilt.android.EntryPointAccessors
  * library's header carries one line of fork code and not two.
  */
 @Composable
-fun appleStatusCards(songs: List<Song>, navController: NavController, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
+fun appleStatusCards(songs: List<Song>, navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 8.dp),
+    ) {
         AppleSyncCard()
         AppleUnmatchedCard(songs = songs, navController = navController)
     }
@@ -56,11 +61,15 @@ fun AppleUnmatchedCard(songs: List<Song>, navController: NavController, modifier
             ApplePlaylistEntryPoint::class.java,
         ).dao()
     }
-    // observed, so "keep on YouTube" makes the row - and the card - disappear where it is tapped
+    // observed, so "keep on YouTube" - or a match picked on the review screen - makes the row and
+    // the card disappear where it was answered
     val decided by remember(dao) { dao.decidedSongIdsFlow() }.collectAsState(initial = emptyList())
-    val count = remember(songs, decided) {
+    val pinned by remember(dao) {
+        dao.rematchSongIdsFlow(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE)
+    }.collectAsState(initial = emptyList())
+    val count = remember(songs, decided, pinned) {
         songs.count { song ->
-            !song.id.startsWith("AM_") && !song.id.startsWith("LOCAL_") && song.id !in decided
+            com.mochyy.mochymusic.applesync.AppleReconcile.stillInQuestion(song.id, decided, pinned)
         }
     }
 

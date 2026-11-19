@@ -44,17 +44,26 @@ object AppleReconcile {
 
     private const val LIMIT = 40
 
+    /**
+     * Whether a row is still part of the question. One rule, used by the pass and by the library's
+     * card: Apple's own rows and local files are not in question, and neither is a song someone has
+     * already answered - matched to an Apple recording, or kept on YouTube.
+     */
+    fun stillInQuestion(
+        songId: String,
+        decided: Collection<String>,
+        pinned: Collection<String>,
+    ): Boolean = !songId.startsWith("AM_") &&
+        !songId.startsWith("LOCAL_") &&
+        songId !in decided &&
+        songId !in pinned
+
     /** The songs that could still be unmatched: not Apple's, not local, not already answered. */
     suspend fun candidates(database: MusicDatabase, dao: AppleSyncDao): List<Song> {
         val answered = runCatching { dao.decidedSongIds() }.getOrDefault(emptyList()).toSet()
         val pinned = runCatching { dao.rematches().map { it.songId } }.getOrDefault(emptyList()).toSet()
         val songs = runCatching { database.songsByNameAsc().first() }.getOrDefault(emptyList())
-        return songs.filter { song ->
-            !song.id.startsWith("AM_") &&
-                !song.id.startsWith("LOCAL_") &&
-                song.id !in answered &&
-                song.id !in pinned
-        }
+        return songs.filter { song -> stillInQuestion(song.id, answered, pinned) }
     }
 
     /** How many songs are waiting for an answer. Reads the database only: no network. */

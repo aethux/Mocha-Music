@@ -112,7 +112,14 @@ fun AppleUnmatchedScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                     ) {
-                        TextButton(onClick = { navController.navigate(appleMatchRoute(song.songId)) }) {
+                        TextButton(
+                            onClick = {
+                                // matching goes through the picker, which merges on the way out;
+                                // the row is answered either way, so it leaves the list now
+                                rows = rows.orEmpty().filterNot { it.songId == song.songId }
+                                navController.navigate(appleMatchRoute(song.songId))
+                            },
+                        ) {
                             Text(stringResource(R.string.apple_unmatched_match))
                         }
                         TextButton(
