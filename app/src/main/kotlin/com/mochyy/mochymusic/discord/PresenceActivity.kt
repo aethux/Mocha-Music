@@ -87,7 +87,12 @@ data class PresenceActivity(
                 // the name is the one line Discord insists on
                 name = PresenceText.line(settings.name, track) ?: PresenceText.AppName,
                 details = PresenceText.line(settings.details, track),
-                detailsUrl = PresenceButtonTarget.YOUTUBE_MUSIC.linkFor(track).takeIf { track.isYouTube },
+                detailsUrl = when {
+                    track.isYouTube -> PresenceButtonTarget.YOUTUBE_MUSIC.linkFor(track)
+                    // an Apple song links to itself on Apple Music, not to a search for its name
+                    track.appleCatalogId != null -> PresenceButtonTarget.APPLE_MUSIC.linkFor(track) // MOCHY-APPLE:
+                    else -> null
+                },
                 state = PresenceText.line(settings.state, track),
                 largeImage = PresenceImages.pick(settings.largeImage, track, nowMs, settings.spin, settings.largeCustomImage) ?: PresencePicture.Logo,
                 largeText = PresenceText.line(settings.largeText, track),
@@ -95,7 +100,10 @@ data class PresenceActivity(
                 smallText = PresenceText.line(settings.smallText, track),
                 startMs = start,
                 endMs = end,
-                buttons = listOf(settings.button1, settings.button2).mapNotNull { button ->
+                buttons = listOfNotNull( // MOCHY-APPLE:
+                    settings.button1.takeIf { settings.button1Enabled },
+                    settings.button2.takeIf { settings.button2Enabled },
+                ).mapNotNull { button ->
                     PresenceText.line(button.text, track, maxLength = 32)
                         ?.let { Link(label = it, url = button.target.linkFor(track)) }
                 },
@@ -124,7 +132,9 @@ fun PresenceButtonTarget.linkFor(track: NowPlaying): String {
             if (track.isYouTube) "https://music.youtube.com/watch?v=${track.mediaId}"
             else "https://music.youtube.com/search?q=$query"
         PresenceButtonTarget.SPOTIFY -> "https://open.spotify.com/search/$query"
-        PresenceButtonTarget.APPLE_MUSIC -> "https://music.apple.com/search?term=$query"
+        PresenceButtonTarget.APPLE_MUSIC ->
+            track.appleCatalogId?.let { "https://music.apple.com/song/$it" }
+                ?: "https://music.apple.com/search?term=$query"
         PresenceButtonTarget.TIDAL -> "https://listen.tidal.com/search?q=$query"
         PresenceButtonTarget.MOCHY -> GithubRepoUrl
     }

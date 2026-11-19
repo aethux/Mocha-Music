@@ -9,8 +9,10 @@ import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.constants.DiscordActivityNameKey
 import com.mochyy.mochymusic.constants.DiscordActivityTypeKey
 import com.mochyy.mochymusic.constants.DiscordButton1TargetKey
+import com.mochyy.mochymusic.constants.DiscordButton1EnabledKey
 import com.mochyy.mochymusic.constants.DiscordButton1TextKey
 import com.mochyy.mochymusic.constants.DiscordButton2TargetKey
+import com.mochyy.mochymusic.constants.DiscordButton2EnabledKey
 import com.mochyy.mochymusic.constants.DiscordButton2TextKey
 import com.mochyy.mochymusic.constants.DiscordClearOnPauseKey
 import com.mochyy.mochymusic.constants.DiscordDetailsKey
@@ -80,6 +82,9 @@ data class PresenceSettings(
     val smallText: String = "{quality}",
     val largeImage: PresenceImage = PresenceImage.ARTWORK,
     val smallImage: PresenceImage = PresenceImage.PLAYBACK_STATUS,
+    /** a button switched off keeps its label and target, and simply is not sent */
+    val button1Enabled: Boolean = true, // MOCHY-APPLE:
+    val button2Enabled: Boolean = true,
     val button1: PresenceButton = PresenceButton("See on YouTube Music", PresenceButtonTarget.YOUTUBE_MUSIC),
     val button2: PresenceButton = PresenceButton("Open Mochy", PresenceButtonTarget.MOCHY),
     /** how long one full turn of the rotating artwork takes */
@@ -105,6 +110,8 @@ data class PresenceSettings(
         prefs[DiscordSmallTextKey] = smallText
         prefs[DiscordLargeImageKey] = largeImage.name
         prefs[DiscordSmallImageKey] = smallImage.name
+        prefs[DiscordButton1EnabledKey] = button1Enabled
+        prefs[DiscordButton2EnabledKey] = button2Enabled
         prefs[DiscordButton1TextKey] = button1.text
         prefs[DiscordButton1TargetKey] = button1.target.name
         prefs[DiscordButton2TextKey] = button2.text
@@ -147,6 +154,8 @@ data class PresenceSettings(
             largeImage = enumOf(prefs[DiscordLargeImageKey], Defaults.largeImage).takeIf { it.forLargeImage }
                 ?: Defaults.largeImage,
             smallImage = enumOf(prefs[DiscordSmallImageKey], Defaults.smallImage),
+            button1Enabled = prefs[DiscordButton1EnabledKey] ?: Defaults.button1Enabled,
+            button2Enabled = prefs[DiscordButton2EnabledKey] ?: Defaults.button2Enabled,
             button1 = PresenceButton(
                 text = prefs[DiscordButton1TextKey] ?: Defaults.button1.text,
                 target = enumOf(prefs[DiscordButton1TargetKey], Defaults.button1.target),

@@ -465,11 +465,19 @@ private fun CustomPictureRow(
 internal fun DiscordButtonCard(
     title: String,
     button: PresenceButton,
+    enabled: Boolean = true, // MOCHY-APPLE:
+    onEnabledChange: (Boolean) -> Unit = {},
     onChange: (PresenceButton) -> Unit,
 ) {
     val context = LocalContext.current
     DiscordCard {
-        DiscordCardTitle(title)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Box(modifier = Modifier.weight(1f)) { DiscordCardTitle(title) }
+            androidx.compose.material3.Switch(checked = enabled, onCheckedChange = onEnabledChange)
+        }
         FieldLabel(stringResource(R.string.discord_field_label))
         DiscordTextField(
             value = button.text,

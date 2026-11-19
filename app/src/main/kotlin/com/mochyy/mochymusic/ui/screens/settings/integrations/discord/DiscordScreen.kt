@@ -342,9 +342,19 @@ private fun CustomizeSection(
     )
 
     DiscordSectionTitle(stringResource(R.string.discord_section_buttons))
-    DiscordButtonCard(stringResource(R.string.discord_first_button), settings.button1) { button -> edit { copy(button1 = button) } }
+    DiscordButtonCard(
+        stringResource(R.string.discord_first_button),
+        settings.button1,
+        enabled = settings.button1Enabled, // MOCHY-APPLE:
+        onEnabledChange = { on -> edit { copy(button1Enabled = on) } },
+    ) { button -> edit { copy(button1 = button) } }
     Spacer(gap)
-    DiscordButtonCard(stringResource(R.string.discord_second_button), settings.button2) { button -> edit { copy(button2 = button) } }
+    DiscordButtonCard(
+        stringResource(R.string.discord_second_button),
+        settings.button2,
+        enabled = settings.button2Enabled,
+        onEnabledChange = { on -> edit { copy(button2Enabled = on) } },
+    ) { button -> edit { copy(button2 = button) } }
     Text(
         text = stringResource(R.string.discord_buttons_note),
         color = DiscordColors.Secondary,

@@ -20,6 +20,8 @@ data class NowPlaying(
     val quality: String?,
     /** a YouTube video id, so links can open this exact song */
     val isYouTube: Boolean,
+    /** Apple's catalogue id for an AM_ song, so its link opens that song rather than a search */
+    val appleCatalogId: String? = null, // MOCHY-APPLE:
 ) {
     fun positionAt(nowMs: Long): Long {
         if (!isPlaying) return positionMs
@@ -46,6 +48,7 @@ data class NowPlaying(
             isPlaying = true,
             quality = "OPUS · 160 kbps",
             isYouTube = false,
+            appleCatalogId = null,
         )
     }
 }
