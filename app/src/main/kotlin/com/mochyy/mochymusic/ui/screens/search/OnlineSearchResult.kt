@@ -157,6 +157,9 @@ fun OnlineSearchResult(
         SearchCategories.indexOfFirst { it.second?.value == searchFilter?.value }.coerceAtLeast(0)
     }
 
+    // MOCHY-APPLE: where the search looks - the app's own results, or Apple's catalogue
+    var searchSource by remember { mutableStateOf(SearchSource.All) }
+
     LaunchedEffect(searchFilter) { listState.scrollToItem(0) }
 
     LaunchedEffect(listState, itemsPage) {
@@ -234,6 +237,16 @@ fun OnlineSearchResult(
         summary?.let { pickTopResult(it.summaries.flatMap { section -> section.items }, viewModel.query) }
     }
 
+    if (searchSource == SearchSource.AppleMusic) {
+        AppleMusicSearchPage(
+            query = viewModel.query,
+            pureBlack = pureBlack,
+            source = searchSource,
+            onSourceChange = { searchSource = it },
+        )
+        return
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -255,6 +268,14 @@ fun OnlineSearchResult(
                     bottom = bottomInset + 24.dp,
                 ),
             ) {
+                // MOCHY-APPLE: All, YouTube Music, Apple Music - the chips in the Library's style
+                item(key = "search_source") {
+                    SearchSourceChips(
+                        current = searchSource,
+                        onSelect = { searchSource = it },
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
                 if (searchFilter == null) {
 
                     val page = summary

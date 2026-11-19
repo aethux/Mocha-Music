@@ -973,6 +973,8 @@ fun PlaylistHeader(
     below: (@Composable () -> Unit)? = null,
     // opens the list's own song search, from a round button beside shuffle
     onSearchClick: (() -> Unit)? = null,
+    // MOCHY-APPLE: a shared playlist's people, from a round button beside shuffle
+    onCollaboratorsClick: (() -> Unit)? = null,
 ) {
     val playlistStyle by rememberEnumPreference(PlaylistStyleKey, defaultValue = PlaylistStyle.FLOW)
     val framedCover = LocalPlaylistFramedCover.current
@@ -1042,6 +1044,14 @@ fun PlaylistHeader(
                     onClick = onShuffleClick,
                     spinOnClick = true,
                 )
+                if (onCollaboratorsClick != null) { // MOCHY-APPLE
+                    Spacer(Modifier.width(4.dp))
+                    CircleAction(
+                        icon = com.mochyy.mochymusic.R.drawable.group_filled,
+                        contentDescription = "Collaborators",
+                        onClick = onCollaboratorsClick,
+                    )
+                }
                 if (onSearchClick != null) {
                     Spacer(Modifier.width(4.dp))
                     CircleAction(

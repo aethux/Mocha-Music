@@ -76,6 +76,7 @@ import com.mochyy.mochymusic.ui.component.SheetDownloadCard
 import com.mochyy.mochymusic.ui.component.SheetHeaderGap
 import com.mochyy.mochymusic.ui.component.SheetIcon
 import com.mochyy.mochymusic.ui.menu.AddToPlaylistDialog
+import com.mochyy.mochymusic.ui.menu.SongInfoFooter
 import com.mochyy.mochymusic.ui.utils.resize
 import com.mochyy.mochymusic.utils.rememberPreference
 import kotlinx.coroutines.flow.flowOf
@@ -202,8 +203,17 @@ fun PlayerActionMenu(
 
                 Spacer(modifier = Modifier.height(SheetHeaderGap))
 
-                // Opened from the lyrics page, the lyrics tools are what the menu is for, so they
-                // come first and take the two big cards.
+                // the song's four main verbs, in one order wherever this menu is opened from
+                com.mochyy.mochymusic.ui.menu.SongActionTiles(
+                    metadata = currentMetadata,
+                    downloadState = download?.state,
+                    playerConnection = playerConnection,
+                    onDismiss = onDismiss,
+                    onAddToPlaylist = { showChoosePlaylistDialog = true },
+                )
+
+                // Opened from the lyrics page, the lyrics tools follow the four: the song's own verbs
+                // do not move because the menu was opened somewhere else.
                 if (fromLyrics) {
                     SheetActionCardRow {
                         SheetActionCard(
@@ -254,69 +264,6 @@ fun PlayerActionMenu(
                     Spacer(modifier = Modifier.height(SectionGap))
                 }
 
-                // what people open this menu for most, as a two by two grid of big cards
-                SheetActionCardRow {
-                    // the song keeps playing and everything after it becomes songs like it, as spotify and apple music do; a file on the phone has no station
-                    SheetActionCard(
-                        icon = R.drawable.radio,
-                        title = androidx.compose.ui.res.stringResource(R.string.start_radio),
-                        enabled = currentMetadata != null && currentMetadata?.localUri == null,
-                        onClick = {
-                            playerConnection.startRadioSeamlessly()
-                            onDismiss()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    SheetActionCard(
-                        icon = R.drawable.playlist_add,
-                        title = stringResource(R.string.add_to_playlist),
-                        enabled = currentMetadata != null,
-                        onClick = { showChoosePlaylistDialog = true },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                SheetActionCardRow {
-                    SheetDownloadCard(
-                        downloadState = download?.state,
-                        onDownload = {
-                            currentMetadata?.let { metadata ->
-                                // The song has to be in the database for the download to be
-                                // listed and played back from there.
-                                database.transaction { insert(metadata) }
-                                val request = DownloadRequest.Builder(metadata.id, metadata.id.toUri())
-                                    .setCustomCacheKey(metadata.id)
-                                    .setData(metadata.title.toByteArray())
-                                    .build()
-                                DownloadService.sendAddDownload(
-                                    context, ExoDownloadService::class.java, request, false,
-                                )
-                            }
-                        },
-                        // Done, or on its way: tapping takes it back out.
-                        onRemove = {
-                            currentMetadata?.let { metadata ->
-                                DownloadService.sendRemoveDownload(
-                                    context, ExoDownloadService::class.java, metadata.id, false,
-                                )
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    // opens the song share over everything: a card, its lyrics, a video with the song, or the link
-                    SheetActionCard(
-                        icon = R.drawable.share,
-                        title = androidx.compose.ui.res.stringResource(R.string.share),
-                        enabled = currentMetadata != null,
-                        onClick = {
-                            currentMetadata?.let { metadata ->
-                                onDismiss()
-                                com.mochyy.mochymusic.ui.player.share.song.SongShare.open(metadata)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
 
                 if (onFullVideo != null) {
                     Spacer(modifier = Modifier.height(SectionGap))
@@ -379,20 +326,8 @@ fun PlayerActionMenu(
 
                 Spacer(modifier = Modifier.height(SectionGap))
 
-                MenuRow(
-                    icon = if (trackInfo.liked) R.drawable.ic_untitled_heart else R.drawable.ic_untitled_heart_unfill,
-                    title = if (trackInfo.liked) stringResource(R.string.menu_remove_from_liked) else stringResource(R.string.menu_add_to_liked),
-                    onClick = { playerConnection.toggleLike() },
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                val inLibrary = librarySong?.song?.inLibrary != null
-                MenuRow(
-                    icon = if (inLibrary) R.drawable.library_add_check else R.drawable.library_add,
-                    title = if (inLibrary) stringResource(R.string.remove_from_library) else stringResource(R.string.add_to_library),
-                    enabled = currentMetadata != null,
-                    onClick = { playerConnection.toggleLibrary() },
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                // the heart and the library button are two of the four tiles above: asking again
+                // down here made the same tap twice in one sheet
                 MenuRow(
                     icon = R.drawable.edit,
                     title = androidx.compose.ui.res.stringResource(R.string.song_edit_menu),
@@ -423,6 +358,13 @@ fun PlayerActionMenu(
                 )
 
                 ModuleMenuRows(currentMetadata, onDismiss, onOpenRoute, onCustomise = { showSkinCustomise = true })
+
+                // MOCHY-APPLE: the same two lines the song menu ends with - what Apple makes of
+                // this song, and where its cover came from
+                SongInfoFooter(
+                    songId = currentMetadata?.id,
+                    inLibrary = librarySong?.song?.inLibrary != null,
+                )
             }
     }
 

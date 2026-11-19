@@ -92,6 +92,9 @@ data class TrackQuery(
     val album: String? = null,
     val durationMs: Long? = null,
     val isrc: String? = null,
+    // MOCHY-APPLE: the exact recording, as "<provider id>:<remote id>", when Mochy knows it (a
+    // manual rematch). A module that can address a track by id should use it instead of searching.
+    val externalId: String? = null,
 )
 
 /**

@@ -896,7 +896,14 @@ private fun PlayerSheet(
                     showActionMenu = true
                 }
                 com.mochyy.mochymusic.ui.player.studio.PlayerMenuAction.SLEEP_TIMER -> showSleepTimer = true
-                com.mochyy.mochymusic.ui.player.studio.PlayerMenuAction.SEE_VIDEO -> seeVideo = !seeVideo
+                com.mochyy.mochymusic.ui.player.studio.PlayerMenuAction.SEE_VIDEO -> seeVideo =
+                    com.mochyy.mochymusic.applesync.ui.SeeVideo.toggle(
+                        show = seeVideo,
+                        scope = studioScope,
+                        context = studioContext,
+                        metadata = playerConnection.mediaMetadata.value,
+                        lookUp = { id, title, artist, isVideo -> lookUpVideo(id, title, artist, isVideo) },
+                    ) { seeVideo = false }  // MOCHY-APPLE: a dead button says why it is dead
                 com.mochyy.mochymusic.ui.player.studio.PlayerMenuAction.REPEAT -> playerConnection.player.toggleRepeatMode()
                 com.mochyy.mochymusic.ui.player.studio.PlayerMenuAction.SHUFFLE ->
                     playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
@@ -1123,7 +1130,7 @@ private fun PlayerSheet(
                     interactive = remember(state) { { landscapeOpen } },
                     expanded = remember(state) { { state.isExpanded } },
                     likeBurst = likeBurst,
-                    onChevron = { showExpandMenu = !showExpandMenu },
+                    onChevron = { showActionMenu = true },
                     onChevronPlaced = { chevronButtonRect = it },
                     onSongInfo = { if (!studioEngaged) showSongDetails = true },
                     onSwitchLyricsSource = { showLyricsSource = true },
@@ -1453,7 +1460,7 @@ private fun PlayerSheet(
                             onChevronPositioned = { if (!isTurntable) chevronButtonRect = it },
                             isExpandMenuOpen = showExpandMenu,
                             hideChevron = lyricsMounted,
-                            onToggleExpandMenu = { showExpandMenu = !showExpandMenu },
+                            onToggleExpandMenu = { showActionMenu = true },
                             likeBurst = likeBurst,
                             sideAction = menuLayout.side,
                             sideActive = menuActionActive(menuLayout.side),
@@ -1707,7 +1714,7 @@ private fun PlayerSheet(
             if (isTurntable) {
                 TurntableControls(
                     isExpandMenuOpen = showExpandMenu,
-                    onToggleExpandMenu = { showExpandMenu = !showExpandMenu },
+                    onToggleExpandMenu = { showActionMenu = true },
                     hideChevron = lyricsMounted,
                     onTitlePositioned = { if (state.isExpanded) songInfoSourceRect = it },
                     onChevronPositioned = { chevronButtonRect = it },

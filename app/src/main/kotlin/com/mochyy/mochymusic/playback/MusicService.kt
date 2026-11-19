@@ -347,6 +347,8 @@ class MusicService :
     lateinit var sourceModules: com.mochyy.mochymusic.modules.SourceModules
 
     @Inject
+    lateinit var appleRematch: com.mochyy.mochymusic.applesync.AppleRematch
+    @Inject
     lateinit var widgetManager: MochyWidgetManager
 
     private lateinit var audioManager: AudioManager
@@ -2151,7 +2153,7 @@ class MusicService :
         }
 
         if (player.shuffleModeEnabled) {
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
             applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
         }
     }
@@ -2559,7 +2561,7 @@ class MusicService :
         removeUpcomingExceptManual()
         player.addMediaItems(player.mediaItemCount, radioItems)
         if (player.shuffleModeEnabled) {
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
             applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
         }
         currentQueue = moreFrom
@@ -2777,6 +2779,8 @@ class MusicService :
             val songToToggle = currentSong.first()
             songToToggle?.let {
                 val isInLibrary = it.song.inLibrary != null
+                // MOCHY-APPLE: an Apple song's flag is Apple's, and its row follows Apple's answer
+                if (com.mochyy.mochymusic.applesync.AppleSongWrites.pushLibraryThen(this@MusicService, it, !isInLibrary) { currentMediaMetadata.value = player.currentMetadata }) return@let
                 val token = if (isInLibrary) it.song.libraryRemoveToken else it.song.libraryAddToken
 
                 token?.let { feedbackToken ->
@@ -3148,7 +3152,7 @@ class MusicService :
 
             if (player.mediaItemCount == 0) return
 
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
+            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, true)
             val currentIndex = player.currentMediaItemIndex
             val totalCount = player.mediaItemCount
 
@@ -3798,7 +3802,9 @@ class MusicService :
                 // buffering with play pressed still counts as playing, so the status doesn't flicker
                 isPlaying = player.playWhenReady,
                 quality = facts?.describe(song?.format?.takeIf { !facts.fromModule }),
-                isYouTube = song?.song?.isLocal != true && metadata.localUri == null,
+                // MOCHY-APPLE: AM_ ids are Apple's songs; a /watch?v=AM_… link goes nowhere
+                isYouTube = com.mochyy.mochymusic.applesync.ApplePresenceFacts.isYouTube(song, metadata),
+                appleCatalogId = com.mochyy.mochymusic.applesync.ApplePresenceFacts.appleCatalogId(metadata),
             ),
         )
     }
@@ -5116,6 +5122,12 @@ class MusicService :
         val skip = recentFailures(mediaId)
         // a fresh lookup: a notice from one that never got to play no longer holds
         if (skip.isEmpty()) decoderNotices.remove(mediaId)
+        // MOCHY-APPLE: a pinned song plays the recording it was matched to, ahead of the provider order
+        appleRematch.pin(mediaId)?.let { pin ->
+            if (pin.source == com.mochyy.mochymusic.modules.SourceModules.YouTubeId) return youTubeRoute(mediaId)
+            val module = sourceModules.module(pin.source)?.takeIf { pin.source !in skip && sourceModules.isUsable(pin.source) } ?: return@let
+            runCatching { resolveWith(module, mediaId) }.getOrNull()?.let { return moduleStream(mediaId, module, it) }
+        }
         // songs that only YouTube has (and the common case of YouTube first) need no lookup
         val first = sourceModules.order.value.firstOrNull { it !in skip && sourceModules.isUsable(it) }
         if (first == com.mochyy.mochymusic.modules.SourceModules.YouTubeId) return youTubeRoute(mediaId)
@@ -5178,12 +5190,14 @@ class MusicService :
 
     /** the song as a module looks for it: its saved row, or the queue's own copy for a song played straight from search that isn't saved yet */
     private suspend fun trackQueryOf(mediaId: String): com.mochyy.mochymusic.module.TrackQuery? {
+        val picked = appleRematch.externalId(mediaId)
         database.song(mediaId).first()?.let {
             return com.mochyy.mochymusic.module.TrackQuery(
                 title = it.song.title,
                 artists = it.artists.map { a -> a.name },
                 album = it.song.albumName ?: it.album?.title,
                 durationMs = it.song.duration.takeIf { d -> d > 0 }?.times(1000L),
+                externalId = picked,
             )
         }
         // only the youtube path saves a new song, so without this every module was passed over for it
@@ -5193,6 +5207,7 @@ class MusicService :
             artists = queued.artists.map { it.name },
             album = queued.album?.title,
             durationMs = queued.duration.takeIf { it > 0 }?.times(1000L),
+            externalId = picked,
         )
     }
 

@@ -465,7 +465,9 @@ fun MorphingCover(
     // video here on its own; songs only get one when the video background setting asks for it
     val songIsVideo = currentMetadata?.id == trackInfo.mediaId && currentMetadata?.isVideoSong == true
     val trackIsVideo = !disableVideoAutoplay && songIsVideo
-    val playVideoBackground = if (alternateStyle) miniVideo else forceVideoBackground || playVideoPref || trackIsVideo
+    // MOCHY-APPLE: "See video" is a button in every style, so a skin honours it too (it used to be
+    // ignored there, which made the button look dead)
+    val playVideoBackground = if (alternateStyle) miniVideo || forceVideoBackground else forceVideoBackground || playVideoPref || trackIsVideo
     // the audio of a track that is a video is that very video, so its own stream lines up exactly and needs no search;
     // the full video mode asked for the video itself, so it plays its own even with autoplay off, as the mode does
     val videoInfo = rememberSongVideo(
@@ -479,6 +481,8 @@ fun MorphingCover(
     val miniVideoShown by remember(alternateStyle, miniVideo) {
         derivedStateOf {
             when {
+                // MOCHY-APPLE: the button asked for the video, so it is kept whatever the style draws
+                forceVideoBackground -> true
                 alternateStyle -> progressProvider() < MiniVideoUntil
                 miniVideo -> true
                 else -> progressProvider() > 0.02f && lyricsProgressProvider() < 0.99f
@@ -1062,11 +1066,12 @@ fun MorphingCover(
                     cardShape = if (squaredCards) artShape else null,
                     cardGap = if (squaredCards) SquaredCardGap else 0.dp,
                 ) { url, pictureModifier ->
-                    CoverPicture(
-                        thumbnailUrl = url,
+                    // MOCHY-APPLE: an Apple song's motion cover, drawn in the same box as its still
+                    com.mochyy.mochymusic.applesync.ui.AppleCover(
+                        songId = if (url == trackInfo.thumbnailUrl) trackInfo.mediaId else null,
                         modifier = (if (squaredCards) pictureModifier.then(cardGreyFilter) else pictureModifier)
                             .graphicsLayer { if (pictureHidden(url)) alpha = 0f },
-                    )
+                    ) { coverModifier -> CoverPicture(thumbnailUrl = url, modifier = coverModifier) }
                 }
 
                 // Each song's canvas rides on its own cover's page, pinned to that song's place in the

@@ -115,6 +115,8 @@ fun PlaylistMenu(
 
     val isPinned by remember(database, playlist.id) { database.speedDialDao.isPinned(playlist.id) }.collectAsState(initial = false)
     val resync = rememberPlaylistResync(playlist.id, playlist.playlist.browseId, navController, onDismiss)
+    // MOCHY-APPLE: Apple Music sits next to Re-sync, in the same list and the same shape
+    val appleSync = rememberPlaylistAppleSync(playlist.id, onDismiss)
 
     LaunchedEffect(songs) {
         if (songs.isEmpty()) return@LaunchedEffect
@@ -396,6 +398,8 @@ fun PlaylistMenu(
         item {
             Material3MenuGroup(
                 items = buildList {
+                    // MOCHY-APPLE: the cover, chosen here or taken from Apple again
+                    if (autoPlaylist != true) add(playlistCoverMenuItem(playlist, database, menuState))
                     if (editable && autoPlaylist != true) {
                         add(
                             Material3MenuItemData(
@@ -454,6 +458,7 @@ fun PlaylistMenu(
                         )
                     )
                     resync.menuItem()?.let(::add)
+                    appleSync.menuItem()?.let(::add)  // MOCHY-APPLE
                     if (downloadPlaylist != true) {
                         add(
                             when (downloadState) {

@@ -72,7 +72,10 @@ private fun qualityLabelRes(quality: AudioQuality): Int = when (quality) {
 /** "force change": plays this song from another of the providers that are switched on, at the quality picked */
 @Composable
 fun ForceProviderSheet(currentProviderId: String?, onDismiss: () -> Unit) {
-    val service = LocalPlayerConnection.current?.service ?: return
+    val connection = LocalPlayerConnection.current ?: return
+    val service = connection.service ?: return
+    // MOCHY-APPLE: what is playing, for the manual search at the bottom of the sheet
+    val nowPlaying by connection.mediaMetadata.collectAsState()
     val modules = service.sourceModules
     val order by modules.order.collectAsState()
     val youTubeOn by modules.youTubeEnabled.collectAsState()
@@ -131,6 +134,17 @@ fun ForceProviderSheet(currentProviderId: String?, onDismiss: () -> Unit) {
                         },
                     )
                     Spacer(Modifier.height(8.dp))
+                }
+                // MOCHY-APPLE: when the lookup above guesses wrong, YouTube Music can be searched by hand
+                val playing = nowPlaying
+                if (playing != null) {
+                    Spacer(Modifier.height(10.dp))
+                    com.mochyy.mochymusic.ui.pick.ManualYouTubePick(
+                        songId = playing.id,
+                        title = playing.title,
+                        artist = playing.artists.joinToString(", ") { it.name },
+                        onPicked = { close() },
+                    )
                 }
             }
         }

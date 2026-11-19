@@ -117,6 +117,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mochyy.mochymusic.applesync.ui.openAsPage
 import com.mochyy.mochymusic.ui.player.menu.MenuRowSurface
 import com.mochyy.mochymusic.ui.player.menu.MenuSurface
 import kotlinx.coroutines.CoroutineScope
@@ -162,6 +163,9 @@ class PopupSheetState {
         val surface: Color?,
         val content: @Composable ColumnScope.() -> Unit,
     ) {
+        /** A menu opened from inside this sheet, drawn in its place; Back steps back to what it covered. */
+        internal val pages = com.mochyy.mochymusic.applesync.ui.SheetPages(content)
+
         /** Shown unlocked = keeps its handle row even while [locked], so locking can't shift the content. */
         val hasHandle = !locked
 
@@ -216,6 +220,9 @@ class PopupSheetState {
         surface: Color? = null,
         content: @Composable ColumnScope.() -> Unit,
     ): PopupSheetHandle {
+        // MOCHY-APPLE: a menu opened from inside a menu replaces it, and Back returns to it
+        frames.lastOrNull { !it.closing }?.let { front -> if (front.openAsPage(locked, fullBleed, surface, content)) return PopupSheetHandle(front) }
+
         // A frame already on its way out stays on top until it's gone, so the new one slides in
         // underneath it rather than over a sheet that's leaving.
         var index = frames.size
@@ -228,7 +235,8 @@ class PopupSheetState {
 
     /** Closes the front sheet: it plays its exit, then is popped, and the one behind comes forward. */
     fun dismiss() {
-        frames.lastOrNull { !it.closing }?.closing = true
+        // MOCHY-APPLE: a page pushed over the sheet's own content is stepped back through first
+        frames.lastOrNull { !it.closing }?.let { if (!it.pages.back()) it.closing = true }
     }
 
     // closes every sheet in the stack at once when an action navigates to another screen
@@ -809,12 +817,14 @@ private fun SheetBody(
                 )
             }
 
+            com.mochyy.mochymusic.applesync.ui.SheetPageBack(frame.pages)
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(contentModifier)
                     .then(if (frame.fullBleed) Modifier else Modifier.padding(horizontal = 20.dp)),
-                content = frame.content,
+                content = frame.pages.content,
             )
         }
 

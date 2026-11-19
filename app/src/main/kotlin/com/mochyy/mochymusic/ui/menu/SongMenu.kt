@@ -267,19 +267,7 @@ fun SongMenu(
         thumbnailUrl = song.song.thumbnailUrl,
         title = song.song.title,
         subtitle = song.artists.joinToString(", ") { it.name },
-        trailing = {
-            SheetHeaderButton(
-                icon = if (song.song.liked) R.drawable.favorite else R.drawable.favorite_border,
-                tint = if (song.song.liked) MaterialTheme.colorScheme.error else Color.White,
-                onClick = {
-                    val s = song.song.toggleLike()
-                    database.query {
-                        update(s)
-                    }
-                    syncUtils.likeSong(s)
-                },
-            )
-        },
+        // MOCHY-APPLE: the heart is one of the four tiles now, so it is not a header button too
     )
 
     Spacer(Modifier.height(SheetHeaderGap))
@@ -297,45 +285,9 @@ fun SongMenu(
         ),
     ) {
         item {
-            // Download and Play next are what people open a song's menu for, so they get the two
-            // big cards. Then the song-menu mock's four rows - add to playlist, share, album,
-            // artist - and the rest.
-            SheetActionCardRow {
-                SheetDownloadCard(
-                    downloadState = download?.state,
-                    onDownload = {
-                        val downloadRequest = DownloadRequest
-                            .Builder(song.id, song.id.toUri())
-                            .setCustomCacheKey(song.id)
-                            .setData(song.song.title.toByteArray())
-                            .build()
-                        DownloadService.sendAddDownload(
-                            context,
-                            ExoDownloadService::class.java,
-                            downloadRequest,
-                            false,
-                        )
-                    },
-                    onRemove = {
-                        DownloadService.sendRemoveDownload(
-                            context,
-                            ExoDownloadService::class.java,
-                            song.id,
-                            false,
-                        )
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-                SheetActionCard(
-                    icon = R.drawable.playlist_play,
-                    title = stringResource(R.string.play_next),
-                    onClick = {
-                        onDismiss()
-                        playerConnection.playNext(song.toMediaItem())
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-            }
+            // MOCHY-APPLE: the same four tiles the player's menu opens with. The library button and
+            // the heart used to be a row and a small header button, which made one menu look like two
+            SongRowActionGrid(song, download?.state, coroutineScope) { showChoosePlaylistDialog = true }
         }
 
         item { Spacer(modifier = Modifier.height(10.dp)) }
@@ -343,16 +295,11 @@ fun SongMenu(
         item {
             Material3MenuGroup(
                 items = listOfNotNull(
-                    Material3MenuItemData(
-                        title = { Text(text = stringResource(R.string.add_to_an_playlist)) },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.playlist_add),
-                                contentDescription = null,
-                            )
-                        },
-                        onClick = { showChoosePlaylistDialog = true }
-                    ),
+                    // MOCHY-APPLE: the playlist tile owns "add to playlist", so it is not a row too
+                    // MOCHY-APPLE: which recording this song plays, and the Apple one it is
+                    *appleSongMenuItems(song.id, navController, onDismiss),
+                    // MOCHY-APPLE: a cover of your own, or Apple's back
+                    songCoverMenuItem(song, menuState, database),
                     Material3MenuItemData(
                         title = { Text(text = stringResource(R.string.share)) },
                         icon = {
@@ -461,6 +408,8 @@ fun SongMenu(
                             }
                         )
                     } else null,
+                    // it lost its card to the four tiles, and it is a queue action like the next row
+                    playNextMenuItem(song, playerConnection, onDismiss),
                     if (true) {
                         Material3MenuItemData(
                             title = { Text(text = stringResource(R.string.add_to_queue)) },
@@ -517,44 +466,6 @@ fun SongMenu(
                                     }
                                 }
                                 onDismiss()
-                            }
-                        )
-                    )
-                    add(
-                        Material3MenuItemData(
-                            title = {
-                                Text(
-                                    text = stringResource(
-                                        if (song.song.inLibrary == null) R.string.add_to_library
-                                        else R.string.remove_from_library
-                                    )
-                                )
-                            },
-                            description = { Text(text = stringResource(R.string.add_to_library_desc)) },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(
-                                        if (song.song.inLibrary == null) R.drawable.library_add
-                                        else R.drawable.library_add_check
-                                    ),
-                                    contentDescription = null,
-                                )
-                            },
-                            onClick = {
-                                val currentSong = song.song
-                                val isInLibrary = currentSong.inLibrary != null
-                                val token =
-                                    if (isInLibrary) currentSong.libraryRemoveToken else currentSong.libraryAddToken
-
-                                token?.let {
-                                    coroutineScope.launch {
-                                        YouTube.feedback(listOf(it))
-                                    }
-                                }
-
-                                database.query {
-                                    update(song.song.toggleLibrary())
-                                }
                             }
                         )
                     )
@@ -710,6 +621,14 @@ fun SongMenu(
                         )
                     )
                 }
+            )
+        }
+
+        // MOCHY-APPLE: what Apple makes of this song and where its cover came from
+        item {
+            SongInfoFooter(
+                songId = song.id,
+                inLibrary = song.song.inLibrary != null,
             )
         }
     }

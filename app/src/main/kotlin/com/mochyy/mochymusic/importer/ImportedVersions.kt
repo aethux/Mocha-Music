@@ -59,7 +59,8 @@ object ImportedVersions {
         return found
     }
 
-    private suspend fun replace(context: Context, database: MusicDatabase, oldId: String, song: SongItem) {
+    // MOCHY-APPLE: the provider picker swaps a row the same way, so it is not written twice
+    internal suspend fun replace(context: Context, database: MusicDatabase, oldId: String, song: SongItem) {
         if (oldId == song.id) return
         // read before the transaction: a room flow waited on inside one never answers
         val playlistMaps = database.playlistIdsContainingSongs(listOf(oldId))

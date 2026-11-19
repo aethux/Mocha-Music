@@ -563,16 +563,21 @@ fun librarySwipeAction(song: SongEntity): SwipeAction {
         color = SwipeSaveColor,
         label = stringResource(if (inLibrary) R.string.remove_from_library else R.string.add_to_library),
     ) {
-        // the same as the song menu's library item: the feedback token, then the local flag
-        // (which also tells YouTube)
-        val token = if (inLibrary) song.libraryRemoveToken else song.libraryAddToken
-        token?.let { SwipeScope.launch { YouTube.feedback(listOf(it)) } }
-        database.query { update(song.toggleLibrary()) }
-        TopToaster.show(
-            text = context.getString(if (inLibrary) R.string.removed_from_library else R.string.added_to_library),
-            thumbnail = song.thumbnailUrl,
-            iconRes = R.drawable.library_add_check,
-        )
+        // MOCHY-APPLE: a swipe is a tap like any other; on an Apple song it goes to Apple first and
+        // the row follows Apple's answer, instead of flipping locally and telling YouTube nothing
+        SwipeScope.launch {
+            if (com.mochyy.mochymusic.applesync.AppleSongWrites.pushLibrary(context, song.id, !inLibrary)) return@launch
+            // the same as the song menu's library item: the feedback token, then the local flag
+            // (which also tells YouTube)
+            val token = if (inLibrary) song.libraryRemoveToken else song.libraryAddToken
+            token?.let { feedbackToken -> YouTube.feedback(listOf(feedbackToken)) }
+            database.query { update(song.toggleLibrary()) }
+            TopToaster.show(
+                text = context.getString(if (inLibrary) R.string.removed_from_library else R.string.added_to_library),
+                thumbnail = song.thumbnailUrl,
+                iconRes = R.drawable.library_add_check,
+            )
+        }
     }
 }
 

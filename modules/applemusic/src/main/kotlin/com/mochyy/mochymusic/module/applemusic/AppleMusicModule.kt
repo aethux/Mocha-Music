@@ -176,13 +176,17 @@ class AppleMusicModule : SourceModule {
         val region = picks[ChoiceRegion]?.takeIf { it != RegionAuto } ?: storefront ?: "us"
         val quality = picks[ChoiceQuality] ?: OptionAac256
         val key = "$region|${track.title}|${track.artists.joinToString(",")}"
+        // MOCHY-APPLE: a manual rematch names the recording, so it is fetched by id, not searched
+        val pinned = track.externalId?.takeIf { it.startsWith("$Id:") }?.substringAfter(':')
         val missedAt = misses[key]
-        if (missedAt != null && System.currentTimeMillis() - missedAt < MissMemoryMs) {
+        if (pinned == null && missedAt != null && System.currentTimeMillis() - missedAt < MissMemoryMs) {
             report(DiagnosticStep("Find the song", false, "Not on Apple Music"))
             return ResolveResult.NotFound("Not on Apple Music")
         }
         report(DiagnosticStep("Find the song", null, "Searching Apple Music ($region)…"))
-        val ranked = matches[key]?.let { listOf(TrackMatcher.Scored(it, 1f)) } ?: match(track, region)
+        val ranked = pinned?.let { id -> catalogSong(id, region)?.let { listOf(TrackMatcher.Scored(it, 1f)) } }
+            ?: matches[key]?.let { listOf(TrackMatcher.Scored(it, 1f)) }
+            ?: match(track, region)
         if (ranked.isEmpty()) {
             misses[key] = System.currentTimeMillis()
             report(DiagnosticStep("Find the song", false, "No matching recording of “${track.title}” in $region"))
@@ -283,6 +287,13 @@ class AppleMusicModule : SourceModule {
         durationMs = song.durationMs,
         confidence = TrackMatcher.score(track, song),
     )
+
+    /** One catalogue song by its id, for a pinned recording; null when this account can't have it. */
+    private fun catalogSong(id: String, region: String): CatalogTrack? {
+        val response = api("/v1/catalog/$region/songs/$id")
+        if (!response.ok) return null
+        return songsIn(parse(response)["data"] as? JsonArray).firstOrNull()
+    }
 
     private fun match(track: TrackQuery, region: String): List<TrackMatcher.Scored> {
         val isrc = track.isrc

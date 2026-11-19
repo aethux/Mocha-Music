@@ -579,16 +579,32 @@ fun LocalPlaylistScreen(
             }
         } else if (!isSearching) {
             item(key = "playlist_header") {
+                val credit = com.mochyy.mochymusic.applesync.ui.rememberPlaylistCredit(
+                    currentPlaylist.playlist.id,
+                    accountName,
+                    creatorAvatar,
+                )
                 val isThisQueue = queueTitle == currentPlaylist.playlist.name
                 val savedRemote = currentPlaylist.playlist.browseId != null && !currentPlaylist.playlist.isEditable
                 PlaylistHeader(
                     onSearchClick = { isSearching = true },
                     title = currentPlaylist.playlist.name,
-                    creators = if (accountName.isNotBlank()) listOf(CreatorUi(name = accountName, avatarUrl = creatorAvatar)) else emptyList(),
+                    // MOCHY-APPLE: credited to the playlist's own owner, and "collaborative" said in words
+                    creators = credit.creators,
                     stats = playlistStats(
                         context.resources.getQuantityString(R.plurals.n_song, songs.size, songs.size),
                         playlistLength,
                     ),
+                    // MOCHY-APPLE: who else is on it, behind an icon beside shuffle
+                    onCollaboratorsClick = if (credit.collaborative) {
+                        {
+                            navController.navigate(
+                                com.mochyy.mochymusic.ui.applesync.appleCollaboratorsRoute(currentPlaylist.playlist.id),
+                            )
+                        }
+                    } else {
+                        null
+                    },
                     isPlaying = isThisQueue && isPlaying,
                     onPlayClick = {
                         if (isThisQueue) playerConnection.togglePlayPause() else play(songs)

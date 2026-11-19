@@ -115,14 +115,18 @@ class MonochromeModule : SourceModule, ServerListModule {
 
     private fun resolveOn(server: Server, track: TrackQuery, report: (DiagnosticStep) -> Unit): ResolveResult {
         val key = "${server.url}|${track.title}|${track.artists.joinToString(",")}"
+        // MOCHY-APPLE: a pasted Monochrome link pins the track, so its id is opened instead of searched
+        val pinned = track.externalId?.takeIf { it.startsWith("$Id:") }?.substringAfter(':')?.let {
+            CatalogTrack(it, track.title, track.artists.joinToString(", "), track.album, track.durationMs, track.isrc)
+        }
         val missedAt = misses[key]
-        if (missedAt != null && System.currentTimeMillis() - missedAt < MissMemoryMs) {
+        if (pinned == null && missedAt != null && System.currentTimeMillis() - missedAt < MissMemoryMs) {
             report(DiagnosticStep("Find the song", false, "Not on ${server.name}"))
             return ResolveResult.NotFound("Not on Monochrome")
         }
 
-        report(DiagnosticStep("Find the song", null, "Searching ${server.name}…"))
-        val found = matches[key] ?: run {
+        report(DiagnosticStep("Find the song", null, if (pinned != null) "Opening the pinned track…" else "Searching ${server.name}…"))
+        val found = pinned ?: matches[key] ?: run {
             val query = "${track.artists.firstOrNull().orEmpty()} ${TrackMatcher.core(track.title)}".trim()
             val response = runCatching { host.http(searchRequest(server, query, SearchLimit)) }.getOrElse {
                 val reason = "${server.name} didn't answer"

@@ -59,6 +59,8 @@ fun ArtistMenu(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
+    // MOCHY-APPLE: the sheet a chosen picture opens in, as a page of this menu
+    val menuState = com.mochyy.mochymusic.ui.component.LocalMenuState.current
     val artistState = remember(database, originalArtist.id) { database.artist(originalArtist.id) }.collectAsState(initial = originalArtist)
     val artist = artistState.value ?: originalArtist
     val isPinned by remember(database, artist.id) { database.speedDialDao.isPinned(artist.id) }.collectAsState(initial = false)
@@ -220,6 +222,7 @@ fun ArtistMenu(
         item {
             Material3MenuGroup(
                 items = listOf(
+                    artistCoverMenuItem(artist, menuState, database),
                     Material3MenuItemData(
                         title = {
                             Text(text = if (artist.artist.bookmarkedAt != null) stringResource(R.string.subscribed) else stringResource(R.string.subscribe))

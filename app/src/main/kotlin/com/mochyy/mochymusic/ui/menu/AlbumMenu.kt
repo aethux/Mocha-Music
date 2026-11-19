@@ -101,6 +101,8 @@ fun AlbumMenu(
     val downloadUtil = LocalDownloadUtil.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val scope = rememberCoroutineScope()
+    // MOCHY-APPLE: the sheet a chosen cover opens in, as a page of this menu
+    val menuState = com.mochyy.mochymusic.ui.component.LocalMenuState.current
     val libraryAlbum by remember(database, originalAlbum.id) { database.album(originalAlbum.id) }.collectAsState(initial = originalAlbum)
     val album = libraryAlbum ?: originalAlbum
     var songs by remember {
@@ -407,6 +409,7 @@ fun AlbumMenu(
         item {
             Material3MenuGroup(
                 items = listOfNotNull(
+                    albumCoverMenuItem(album, menuState, database),
                     if (true) {
                         Material3MenuItemData(
                             title = { Text(text = stringResource(R.string.play_next)) },
