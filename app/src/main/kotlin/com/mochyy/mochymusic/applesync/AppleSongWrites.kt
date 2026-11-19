@@ -315,7 +315,33 @@ object AppleSongWrites {
                 )
                 true
             } else {
-                val libraryId = libraryIdOf(AppleClient(tokens), dao, catalogId, title)
+                // An absence is not a failure. A song can be in Mochy's library without being in
+                // Apple's - imported from a playlist, or added before the sync existed - and there
+                // is then nothing on Apple to take out. Refusing left the row stuck in the
+                // library forever; removing it here and saying so is the honest answer.
+                val found = runCatching { libraryIdOf(AppleClient(tokens), dao, catalogId, title) }
+                if (found.isSuccess && found.getOrNull() == null) {
+                    dao.audit(
+                        AppleAuditEntity(
+                            at = System.currentTimeMillis(),
+                            op = op,
+                            target = catalogId,
+                            decision = "ALLOW",
+                            reason = "NO_APPLE_ROW",
+                            verified = true,
+                        ),
+                    )
+                    setLocalLibrary(entry, songId, false)
+                    // the Apple row for the same recording is the same song: it leaves too, or the
+                    // library keeps showing it as saved while this row says it is gone
+                    if (songId != "AM_$catalogId") setLocalLibrary(entry, "AM_$catalogId", false)
+                    TopToaster.show(
+                        text = context.getString(R.string.apple_write_removed_locally),
+                        iconRes = R.drawable.delete,
+                    )
+                    return true
+                }
+                val libraryId = found.getOrNull()
                     ?: throw AppleSyncException("Apple has no library row for this song")
                 val decision = AppleGuard.decide(
                     op = AppleOp(
@@ -372,6 +398,7 @@ object AppleSongWrites {
                 dao.disown(AppleKind.LIBRARY_SONG.name, libraryId)
                 if (gone) {
                     setLocalLibrary(entry, songId, false)
+                    if (songId != "AM_$catalogId") setLocalLibrary(entry, "AM_$catalogId", false)
                     TopToaster.show(
                         text = context.getString(R.string.apple_write_removed),
                         iconRes = R.drawable.delete,
