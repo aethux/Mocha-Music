@@ -64,6 +64,28 @@ object AppleSongWrites {
             ?: dao.track(songId)?.catalogId
     }
 
+    /**
+     * Whether taking this song out of the library needs the person's yes. The guard refuses
+     * anything that predates the fork, and a toast that vanishes before it is tapped left the row
+     * in the library with no way to say yes - so the caller can ask in a dialog instead.
+     */
+    suspend fun removalNeedsConfirmation(context: Context, song: Song): Boolean {
+        val entry = entry(context)
+        val dao = entry.dao()
+        val catalogId = catalogIdOf(dao, song.song.id) ?: return false
+        val libraryId = runCatching { dao.librarySong(catalogId)?.libraryId }.getOrNull() ?: return false
+        val decision = AppleGuard.decide(
+            op = AppleOp(
+                write = AppleWrite.REMOVE_FROM_LIBRARY,
+                targets = listOf(AppleRef(AppleKind.LIBRARY_SONG, libraryId)),
+                confirmed = false,
+            ),
+            context = guardContext(context, dao),
+        )
+        return decision is AppleDecision.Refused &&
+            (decision.reason == AppleRefusal.PRE_EXISTING_OBJECT || decision.reason == AppleRefusal.NOT_OWNED)
+    }
+
     /** [catalogIdOf], for callers that only have a Context. */
     suspend fun appleIdFor(context: Context, songId: String): String? = catalogIdOf(entry(context).dao(), songId)
 
@@ -319,8 +341,15 @@ object AppleSongWrites {
                 // Apple's - imported from a playlist, or added before the sync existed - and there
                 // is then nothing on Apple to take out. Refusing left the row stuck in the
                 // library forever; removing it here and saying so is the honest answer.
-                val found = runCatching { libraryIdOf(AppleClient(tokens), dao, catalogId, title) }
-                if (found.isSuccess && found.getOrNull() == null) {
+                // The replica can hold a library id Apple has moved on from (a row that was
+                // re-added, a playlist song that became a library song). Deleting that id answers
+                // 204 and removes nothing, so Apple is asked first and the replica is the fallback.
+                val client = AppleClient(tokens)
+                val live = runCatching { searchLibrary(client, catalogId, title) }
+                val liveId = live.getOrNull()
+                val replicaId = runCatching { dao.librarySong(catalogId)?.libraryId }.getOrNull()
+                val found: String? = liveId ?: replicaId
+                if (live.isSuccess && found == null) {
                     dao.audit(
                         AppleAuditEntity(
                             at = System.currentTimeMillis(),
@@ -341,7 +370,7 @@ object AppleSongWrites {
                     )
                     return true
                 }
-                val libraryId = found.getOrNull()
+                val libraryId = found
                     ?: throw AppleSyncException("Apple has no library row for this song")
                 val decision = AppleGuard.decide(
                     op = AppleOp(
@@ -380,11 +409,24 @@ object AppleSongWrites {
                     return true
                 }
                 val answer = request("DELETE", "$LibraryHost/v1/me/library/songs/$libraryId", tokens.headers)
-                if (answer.status !in 200..299) throw AppleSyncException(describe(answer))
+                // 404 is the row already being gone, which is the answer this call wanted
+                if (answer.status != 404 && answer.status !in 200..299) {
+                    throw AppleSyncException(describe(answer))
+                }
+                // the replica is what used to make this check pass for a song it no longer held
+                dao.deleteLibrarySong(catalogId)
                 // a delete that lands is a delete the next read no longer shows; a failed read
-                // proves nothing, so it is not treated as gone
-                val after = runCatching { libraryIdOf(AppleClient(tokens), dao, catalogId, title) }
-                val gone = after.isSuccess && after.getOrNull() == null
+                // proves nothing, so it is not treated as gone. Apple's library is not always
+                // consistent on the next request, so it is asked more than once.
+                var gone = false
+                for (attempt in 0 until 3) {
+                    val after = runCatching { searchLibrary(client, catalogId, title) }
+                    if (after.isSuccess && after.getOrNull() == null) {
+                        gone = true
+                        break
+                    }
+                    if (attempt < 2) delay(700)
+                }
                 dao.audit(
                     AppleAuditEntity(
                         at = System.currentTimeMillis(),

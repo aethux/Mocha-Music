@@ -6,7 +6,12 @@ import android.content.Context
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -219,6 +224,9 @@ fun SongRowActionGrid(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val syncUtils = LocalSyncUtils.current
+    // a removal the guard refuses is asked here, in a dialog: the toast's action vanished before
+    // it could be tapped, and the song stayed in the library with no way to say yes
+    var askToRemove by remember(song.id) { mutableStateOf(false) }
 
     SongActionTileGrid(
         metadata = song.toMediaMetadata(),
@@ -226,6 +234,10 @@ fun SongRowActionGrid(
         onLibrary = {
             val isInLibrary = song.song.inLibrary != null
             coroutineScope.launch {
+                if (isInLibrary && AppleSongWrites.removalNeedsConfirmation(context, song)) {
+                    askToRemove = true
+                    return@launch
+                }
                 // an Apple song's flag is Apple's; its row follows Apple's answer
                 if (AppleSongWrites.pushLibrary(context, song, !isInLibrary)) return@launch
                 val token = if (isInLibrary) song.song.libraryRemoveToken else song.song.libraryAddToken
@@ -252,6 +264,33 @@ fun SongRowActionGrid(
             syncUtils.likeSong(toggled)
         },
     )
+
+    if (askToRemove) {
+        com.mochyy.mochymusic.ui.component.DefaultDialog(
+            onDismiss = { askToRemove = false },
+            title = { Text(stringResource(R.string.apple_write_remove_anyway)) },
+            buttons = {
+                TextButton(onClick = { askToRemove = false }) {
+                    Text(stringResource(com.mochyy.mochymusic.R.string.yt_sync_cancel))
+                }
+                TextButton(
+                    onClick = {
+                        askToRemove = false
+                        coroutineScope.launch {
+                            AppleSongWrites.pushLibrary(context, song, false, confirmed = true)
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.apple_write_remove_anyway))
+                }
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.apple_write_remove_confirm, song.song.title),
+                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+            )
+        }
+    }
 }
 
 /** the song has to be a row before its download can be listed or played back from there */

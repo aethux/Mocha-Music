@@ -60,7 +60,12 @@ object AppleReconcile {
 
     /** The songs that could still be unmatched: not Apple's, not local, not already answered. */
     suspend fun candidates(database: MusicDatabase, dao: AppleSyncDao): List<Song> {
-        val answered = runCatching { dao.decidedSongIds() }.getOrDefault(emptyList()).toSet()
+        // answered: kept on YouTube, matched by hand, or already carrying an Apple track row -
+        // a song the add path matched landed on Apple and must not come back to the card
+        val answered = (
+            runCatching { dao.decidedSongIds() }.getOrDefault(emptyList()) +
+                runCatching { dao.trackedSongIds() }.getOrDefault(emptyList())
+            ).toSet()
         val pinned = runCatching { dao.rematches().map { it.songId } }.getOrDefault(emptyList()).toSet()
         val songs = runCatching { database.songsByNameAsc().first() }.getOrDefault(emptyList())
         return songs.filter { song -> stillInQuestion(song.id, answered, pinned) }

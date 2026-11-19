@@ -56,6 +56,15 @@ object AppleMerge {
                     if (alreadyThere) database.delete(map) else database.update(map.copy(songId = toId))
                 }
             }
+            // the rows keyed to the song id are the app's own tables, and they are what makes a
+            // merge lose lyrics, a speed-dial entry and the play history if they are not moved
+            val db = database.openHelper.writableDatabase
+            for (table in listOf("lyrics", "event", "speed_dial_item", "song_edit")) {
+                runCatching {
+                    db.execSQL("UPDATE OR IGNORE $table SET songId = ? WHERE songId = ?", arrayOf(toId, fromId))
+                    db.execSQL("DELETE FROM $table WHERE songId = ?", arrayOf(fromId))
+                }
+            }
             moved = true
         }
         if (!moved) return false

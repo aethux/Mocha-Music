@@ -67,9 +67,15 @@ fun AppleUnmatchedCard(songs: List<Song>, navController: NavController, modifier
     val pinned by remember(dao) {
         dao.rematchSongIdsFlow(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE)
     }.collectAsState(initial = emptyList())
-    val count = remember(songs, decided, pinned) {
+    // a song the add path matched on Apple has a track row: it is answered, not pending
+    val tracked by remember(dao) { dao.trackedSongIdsFlow() }.collectAsState(initial = emptyList())
+    val count = remember(songs, decided, pinned, tracked) {
         songs.count { song ->
-            com.mochyy.mochymusic.applesync.AppleReconcile.stillInQuestion(song.id, decided, pinned)
+            com.mochyy.mochymusic.applesync.AppleReconcile.stillInQuestion(
+                song.id,
+                decided + tracked,
+                pinned,
+            )
         }
     }
 

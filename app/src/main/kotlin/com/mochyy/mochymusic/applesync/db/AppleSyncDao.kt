@@ -39,6 +39,17 @@ interface AppleSyncDao {
     @Query("SELECT * FROM library_song WHERE catalogId = :catalogId")
     suspend fun librarySong(catalogId: String): AppleLibrarySongEntity?
 
+    /** Songs with an Apple identity: the ones the card must never ask about. */
+    @Query("SELECT songId FROM track WHERE libraryId IS NOT NULL")
+    suspend fun trackedSongIds(): List<String>
+
+    @Query("SELECT songId FROM track WHERE libraryId IS NOT NULL")
+    fun trackedSongIdsFlow(): Flow<List<String>>
+
+    /** Apple's row is gone: the replica must stop answering with its library id. */
+    @Query("DELETE FROM library_song WHERE catalogId = :catalogId")
+    suspend fun deleteLibrarySong(catalogId: String)
+
     /** Local songs that already have an Apple copy: the ones that must not show the red dot. */
     @Query("SELECT t.songId FROM track t INNER JOIN library_song l ON l.catalogId = t.catalogId")
     suspend fun syncedSongIds(): List<String>
