@@ -56,6 +56,15 @@ Unverified on device: the picker's UI and the rematch-aware re-import (compiles,
 
 Traps hit again today: Room rejects a hand-written migration whose entity doesn't declare the index it creates; `adb input tap` on a skin player's heart lands on the seekbar.
 
+## Known broken (2026-11-20)
+
+- **Add to playlist does nothing from a song's menu.** Reproduced: the sheet closes on the tile
+  tap and no picker appears. `AddToPlaylistDialog` is hosted *inside* `SongMenu`, which is the
+  sheet's content, so it is unmounted with the sheet before it can draw. Changing its state from
+  `rememberSaveable` to `remember` did not help. It needs a host outside the sheet - one shared
+  request state (song id) plus `AddToPlaylistDialog` in the root composition - or a picker drawn as
+  a `SheetPages` page, which the cover sheet already proves works.
+
 ## Deferred on purpose
 
 - **Creating a playlist on Apple.** Today a local playlist can only be *linked* to an existing
