@@ -58,6 +58,15 @@ object AppleSyncFlow {
         AppleSyncStatus.start("Importing playlists…")
         val playlists = ApplePlaylistImport.run(context.applicationContext, onPlaylistProgress)
 
+        // what this library still holds on Apple, but Apple no longer has
+        runCatching {
+            AppleRemoved.record(
+                entry.dao(),
+                entry.database(),
+                pulled.remote.mapNotNull { it.catalogId },
+            )
+        }
+
         // Apple wins a duplicate, so the refresh itself folds any it can find instead of leaving
         // that until someone opens the review screen. Capped, and never fatal to the refresh.
         AppleSyncStatus.start("Matching what Apple has…")

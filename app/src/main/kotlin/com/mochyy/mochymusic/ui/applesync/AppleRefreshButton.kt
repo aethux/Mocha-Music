@@ -39,6 +39,8 @@ fun AppleRefreshButton(tint: Color = Color.Unspecified) {
                 ApplePlaylistEntryPoint::class.java,
             )
             runCatching { entry.dao().syncedSongIds().toSet() }.onSuccess(AppleSyncStatus::setSynced)
+            // a song the add path matched has a track row and no replica row: still Apple's
+            runCatching { entry.dao().trackedSongIds().toSet() }.onSuccess(AppleSyncStatus::setTracked)
             // a manually matched song is on Apple too; without this its dot would come back on every start
             runCatching {
                 entry.dao().rematchedSongIds(com.mochyy.mochymusic.applesync.db.AppleRematchEntity.SOURCE_APPLE).toSet()

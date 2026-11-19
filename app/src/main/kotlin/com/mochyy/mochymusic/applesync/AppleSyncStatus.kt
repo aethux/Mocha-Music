@@ -46,6 +46,13 @@ object AppleSyncStatus {
     var manualAppleSongIds by mutableStateOf<Set<String>>(emptySet())
         private set
 
+    /**
+     * Songs with an Apple track row. A song added from Mochy and matched on Apple has one but no
+     * replica row, so `syncedSongIds` alone still dotted it - the last three songs of this library.
+     */
+    var trackedAppleSongIds by mutableStateOf<Set<String>>(emptySet())
+        private set
+
     /** True once a pull has run, so the list does not dot every song before Apple is connected. */
     var known by mutableStateOf(false)
         private set
@@ -57,7 +64,12 @@ object AppleSyncStatus {
      */
     fun isSynced(songId: String): Boolean = songId in syncedSongIds ||
         songId in manualAppleSongIds ||
+        songId in trackedAppleSongIds ||
         songId.startsWith("AM_")
+
+    fun setTracked(ids: Set<String>) {
+        trackedAppleSongIds = ids
+    }
 
     /** Should this row carry the "not on Apple yet" dot. */
     fun shouldMark(songId: String): Boolean = known && !isSynced(songId)

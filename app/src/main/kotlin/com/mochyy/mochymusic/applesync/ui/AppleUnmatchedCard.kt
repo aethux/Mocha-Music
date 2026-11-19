@@ -49,6 +49,7 @@ fun appleStatusCards(songs: List<Song>, navController: NavController) {
     ) {
         AppleSyncCard()
         AppleUnmatchedCard(songs = songs, navController = navController)
+        AppleRemovedCard(navController = navController)
     }
 }
 

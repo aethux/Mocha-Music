@@ -181,4 +181,16 @@
     <string name="menu_apple_ask_again">Ask about Apple Music again</string>
     <string name="menu_apple_ask_again_desc">Puts this song back in the list Apple doesn’t have</string>
     <string name="apple_write_removed_locally">Removed here — it wasn’t in your Apple Music library</string>
+    <!-- Songs Apple has taken away since they were imported -->
+    <string name="apple_removed_card">%1$d songs are no longer on Apple Music</string>
+    <string name="apple_removed_card_desc">Keep them, take them out here, or put them back.</string>
+    <string name="apple_removed_title">No longer on Apple Music</string>
+    <string name="apple_removed_blurb">These were in your library, and Apple’s library no longer has them. Nothing is deleted here: removing one just takes it out of this library.</string>
+    <string name="apple_removed_none">Nothing has gone missing.</string>
+    <string name="apple_removed_keep">Keep</string>
+    <string name="apple_removed_remove">Remove here</string>
+    <string name="apple_removed_readd">Put back</string>
+    <string name="apple_removed_keep_all">Keep all</string>
+    <string name="apple_removed_remove_all">Remove all here</string>
+    <string name="apple_removed_working">Talking to Apple Music…</string>
 </resources>
