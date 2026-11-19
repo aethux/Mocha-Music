@@ -1069,6 +1069,12 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
+        <!-- MOCHY-APPLE: a refresh keeps running in the background, with its own progress bar -->
+        <service
+            android:name=".applesync.AppleSyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <service
             android:name=".playback.MusicService"
             android:exported="true"
