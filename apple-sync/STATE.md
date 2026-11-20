@@ -70,6 +70,21 @@ Traps hit again today: Room rejects a hand-written migration whose entity doesn'
   verified=1` with the signature back to the original 16 ids. Each push landed about a second after
   the tap, and `verified` is Apple's own list re-read and compared in order, not the 2xx.
 
+## Open: the add from a search result (2026-11-20, unproven)
+
+`YouTubeSongMenu`'s "Add to library" only ever called `YouTube.toggleSongLibrary` and inserted a
+local row — Apple was never asked. It now asks `AppleSongWrites.pushLibrary` first and falls back to
+YouTube when the catalogue cannot name the recording (seam-tagged, 9 added lines, `seams.sh` 0).
+
+**Not proven, and the tap proves nothing yet**: on device (8.4.5 debug, `writes` on, session live)
+tapping it leaves *no* `audit` row at all — not `LIBRARY_ADD`, not a `BLOCK`, not a refusal — and no
+`song` row, while the menu's own label flips to "Remove from library" and the fork's card then says
+"2 songs aren't on Apple Music". Two candidate causes, both cheap to tell apart with one log line in
+`pushLibrary`: (a) the sheet's `coroutineScope` is cancelled by the dismiss before the launch body
+runs, so nothing is attempted; (b) `matchOnApple` throws and `runCatching` swallows it. Read the DB
+with `tar -cf - databases/mochy.db databases/mochy.db-wal` in one stream — copying the two files
+separately makes SQLite silently ignore the WAL, which is how the first read of this looked empty.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is

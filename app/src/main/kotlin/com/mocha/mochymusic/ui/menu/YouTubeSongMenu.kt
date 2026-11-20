@@ -447,6 +447,17 @@ fun YouTubeSongMenu(
                                 val isInLibrary = librarySong?.song?.inLibrary != null
 
                                 coroutineScope.launch {
+                                    // MOCHY-APPLE: an add goes to Apple whenever the catalogue can
+                                    // name the recording; YouTube's own library is only the fallback
+                                    val asSong = com.mocha.mochymusic.db.entities.Song(
+                                        song.toMediaMetadata().toSongEntity(),
+                                        song.artists.map {
+                                            com.mocha.mochymusic.db.entities.ArtistEntity(it.id ?: "", it.name)
+                                        },
+                                    )
+                                    if (!isInLibrary && com.mocha.mochymusic.applesync.AppleSongWrites
+                                            .pushLibrary(context, asSong, true)
+                                    ) return@launch
                                     YouTube.toggleSongLibrary(song.id, !isInLibrary)
                                 }
 
