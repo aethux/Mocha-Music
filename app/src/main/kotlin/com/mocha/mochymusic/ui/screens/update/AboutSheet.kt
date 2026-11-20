@@ -102,23 +102,24 @@ private data class ContributorEntry(
 
 private val LeadDevs =
     listOf(
+        // MOCHY-APPLE: the fork's own dev, first - this app is Aeth's fork of Mochy
+        LeadDevEntry(
+            name = "Aeth",
+            githubUser = "aethux",
+            devSpaceIndex = 0,
+            fallbackAvatar = R.drawable.frame_51_3,
+        ),
         LeadDevEntry(
             name = "Roo",
             githubUser = "realidkroo",
-            devSpaceIndex = 0,
+            devSpaceIndex = 1,
             fallbackAvatar = R.drawable.frame_51_3,
         ),
         LeadDevEntry(
             name = "key",
             githubUser = "realkeichi",
-            devSpaceIndex = 1,
+            devSpaceIndex = 2,
             fallbackAvatar = R.drawable.dev_keycii,
-        ),
-        // MOCHY-APPLE: the fork's own dev, credited beside upstream's
-        LeadDevEntry(
-            name = "Aeth",
-            githubUser = "aethux",
-            fallbackAvatar = R.drawable.frame_51_3,
         ),
     )
 

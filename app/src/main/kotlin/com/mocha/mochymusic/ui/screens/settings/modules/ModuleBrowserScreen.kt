@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mocha.mochymusic.R
-import com.mocha.mochymusic.core.updater.DiscordUrl
 import com.mocha.mochymusic.modules.ModuleRegistry.LinkCheck
 import com.mocha.mochymusic.modules.browser.FeedKind
 import com.mocha.mochymusic.modules.browser.FeedModule
@@ -145,7 +144,7 @@ fun ModuleBrowserScreen(
                     title = stringResource(R.string.module_browser_join_title),
                     body = name?.let { stringResource(R.string.module_browser_join_body_named, it) } ?: stringResource(R.string.module_browser_join_body),
                     primary = stringResource(R.string.module_browser_join),
-                    onPrimary = { context.openDevUrl(current.invite ?: DiscordUrl) },
+                    onPrimary = { context.openDevUrl(current.invite.orEmpty()) },  // MOCHY-APPLE: no fork-wide discord fallback
                     secondary = stringResource(R.string.module_browser_check_again),
                     onSecondary = viewModel::reload,
                 )

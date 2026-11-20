@@ -47,7 +47,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.transformations
 import com.mocha.mochymusic.R
-import com.mocha.mochymusic.core.updater.DiscordUrl
 import com.mocha.mochymusic.core.updater.InstagramUrl
 import com.mocha.mochymusic.core.updater.ThreadsUrl
 import com.mocha.mochymusic.ui.component.LocalZoomOutOverlayState
@@ -69,6 +68,12 @@ internal data class DevPerson(
 )
 
 internal val DevPeople = listOf(
+    // MOCHY-APPLE: the fork's own dev comes first here too
+    DevPerson(
+        name = "Aeth",
+        bio = "the fork this app is - Apple Music as the library of record, and a lot of patience with playlists",
+        avatar = R.drawable.frame_51_3,
+    ),
     DevPerson(
         name = "idkroo",
         bio = "ui ux guy here uhh idk what to write here, pls star the repo",
@@ -76,7 +81,6 @@ internal val DevPeople = listOf(
         takesDonations = true,
         socials = listOf(
             DevSocial("Instagram", InstagramUrl),
-            DevSocial("Discord", DiscordUrl),
             DevSocial("Threads", ThreadsUrl),
         ).filter { it.url.isNotBlank() },
     ),

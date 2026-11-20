@@ -281,29 +281,6 @@ private fun ColumnScope.UpdateSheetContent(
                         )
                     }
                 }
-                if (channel == UpdateChannel.Release) {
-                    ActionRow(
-                        icon = R.drawable.bedtime,
-                        label = stringResource(R.string.channel_switch_to_nightly),
-                        onClick = { popup.showPathChangeSheet(toNightly = true) { switchTo(UpdateChannel.Nightly) } },
-                    )
-                } else {
-                    val canLeave = canLeaveNightly(latestRelease)
-                    ActionRow(
-                        icon = R.drawable.update,
-                        label = stringResource(R.string.channel_switch_to_release),
-                        hint = if (canLeave) null else stringResource(R.string.channel_release_waits),
-                        enabled = canLeave,
-                        onClick = {
-                            // nothing nightly installed yet, so there's nothing to warn about
-                            if (installedIsNightly) {
-                                popup.showPathChangeSheet(toNightly = false) { switchTo(UpdateChannel.Release) }
-                            } else {
-                                switchTo(UpdateChannel.Release)
-                            }
-                        },
-                    )
-                }
                 ActionRow(
                     icon = R.drawable.info,
                     label = stringResource(R.string.about_app),

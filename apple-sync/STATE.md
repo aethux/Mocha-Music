@@ -212,6 +212,23 @@ at a slow tempo ran to 9.6 s. It was considered for a PR to `realidkroo/Mochy-Mu
 is: **keep it in this fork**. No upstream PR is planned from here, so nothing about it needs the
 upstream repo's permission and the fork stops tracking it as a pending errand.
 
+## Whose app this is, and which links it keeps (2026-11-20)
+
+**Aeth is first everywhere a dev is named**: the About sheet's lead devs (Aeth, Roo, key — and the dev
+space pages were re-indexed to match, 0/1/2), and the dev space itself, whose first page is Aeth.
+
+**Links that pointed at Mochy's community are gone**: the "Switch to nightly" row in the update sheet
+(the whole nightly/release branch, so no upstream nightlies are reachable), the Discord card on the
+profile, the Discord row on the dev pages, Mochy's server as a module-browser fallback, and the
+`DiscordUrl` constant itself. Credits are untouched — that is a separate rule.
+
+**Discord rich presence is wired but cannot work in this build**, and the screen says so ("Not set up
+in this build of Mocha"). `DiscordAuth.ClientId` is `BuildConfig.DISCORD_CLIENT_ID`, which the build
+fills from `local.properties`/env and which is **empty here**. With an id it needs, in the Developer
+Portal: OAuth redirect `discord-<client id>:/authorize/callback`, and the Social SDK / Rich Presence
+bundle enabled (the scopes are `openid identify sdk.social_layer_presence`). Nothing else in the
+pipeline is missing — `MusicService` already pushes play state into `DiscordPresence`.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
