@@ -60,6 +60,44 @@ class AppleClient(private val tokens: AppleTokens.Pair) {
         )
 
     /**
+     * How many tracks Apple itself says a playlist holds, before any paging of ours: `meta.total`
+     * on the library copy, `attributes.trackCount` on the catalogue counterpart.
+     *
+     * Imported counts were compared only against themselves, so a read that stopped early looked
+     * exactly like a playlist that is that short.
+     */
+    suspend fun playlistTrackTotal(playlistId: String): Int? =
+        runCatching {
+            page("/v1/me/library/playlists/$playlistId/tracks?limit=1")
+                ?.get("meta").obj()?.long("total")?.toInt()
+        }.getOrNull()
+
+    suspend fun catalogPlaylistTotal(catalogId: String, storefront: String): Int? =
+        runCatching {
+            page("/v1/catalog/$storefront/playlists/$catalogId")
+                ?.get("data").array()?.firstOrNull()?.obj()
+                ?.get("attributes").obj()?.long("trackCount")?.toInt()
+        }.getOrNull()
+
+    /**
+     * The shapes a library playlist's entries can be asked for, counted, so a short import can be
+     * told apart from a short playlist: `tracks` is the endpoint the import uses, `inline` is the
+     * resource's own relationship, `rel` is the relationship endpoint.
+     */
+    suspend fun probePlaylistShapes(playlistId: String): String {
+        val tracks = runCatching { page("/v1/me/library/playlists/$playlistId/tracks?limit=100") }.getOrNull()
+        val inline = runCatching { page("/v1/me/library/playlists/$playlistId?include=tracks") }.getOrNull()
+        val relationship = runCatching {
+            page("/v1/me/library/playlists/$playlistId/relationships/tracks?limit=100")
+        }.getOrNull()
+        val inlineTracks = inline?.get("data").array()?.firstOrNull()?.obj()
+            ?.get("relationships").obj()?.get("tracks").obj()
+        return "tracks " + tracks?.get("data").array()?.size + "/" + tracks?.get("meta").obj()?.long("total") +
+            " · inline " + inlineTracks?.get("data").array()?.size + "/" + inlineTracks?.get("meta").obj()?.long("total") +
+            " · relationship " + relationship?.get("data").array()?.size + "/" + relationship?.get("meta").obj()?.long("total")
+    }
+
+    /**
      * Every song in the library. A 9k library is about 90 pages, so the default cap is generous.
      *
      * [onPage] reports after each hundred, which is what keeps a long read honest: a counter that

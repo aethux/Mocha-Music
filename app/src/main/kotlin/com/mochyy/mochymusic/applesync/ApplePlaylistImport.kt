@@ -11,6 +11,7 @@
 package com.mochyy.mochymusic.applesync
 
 import android.content.Context
+import com.mochyy.mochymusic.applesync.db.AppleAuditEntity
 import com.mochyy.mochymusic.applesync.db.AppleLinkEntity
 import com.mochyy.mochymusic.applesync.db.AppleStateEntity
 import com.mochyy.mochymusic.applesync.di.AppleSongWritesEntryPoint
@@ -46,7 +47,7 @@ object ApplePlaylistImport {
 
     /** Bumped when an import starts meaning something new; the stamp only skips work for a version. */
     private const val IMPORT_VERSION_KEY = "playlist_import_version"
-    private const val IMPORT_VERSION = "10"
+    private const val IMPORT_VERSION = "12"
 
     /** How many playlists are read at once. Apple's API is latency-bound, not throughput-bound. */
     private const val Reads = 4
@@ -167,6 +168,28 @@ object ApplePlaylistImport {
             val loaded = tracks[remote.id] ?: run {
                 skipped++
                 return@forEach
+            }
+            // What Apple says this playlist holds, against what that read produced. A read that
+            // stopped early used to look exactly like a playlist that is that short.
+            runCatching {
+                val libraryTotal = client.playlistTrackTotal(remote.id)
+                val catalogTotal = metas[playlistId]?.catalogId?.let { catalog ->
+                    storefront?.let { sf -> client.catalogPlaylistTotal(catalog, sf) }
+                }
+                val said = maxOf(libraryTotal ?: 0, catalogTotal ?: 0)
+                if (said > loaded.size || loaded.size <= 3) {
+                    val shapes = runCatching { client.probePlaylistShapes(remote.id) }.getOrNull()
+                    dao.audit(
+                        AppleAuditEntity(
+                            at = System.currentTimeMillis(),
+                            op = "PLAYLIST_READ",
+                            target = remote.id,
+                            decision = if (said > loaded.size) "MISMATCH" else "SMALL",
+                            reason = remote.name + ": read " + loaded.size + " of " + said +
+                                " (library " + libraryTotal + ", catalogue " + catalogTotal + ") " + shapes,
+                        ),
+                    )
+                }
             }
             val chosen = CoverOverrides.get(context, CoverOverrides.Kind.PLAYLIST, playlistId)
             val artwork = chosen ?: AppleCovers.sized(remote.artworkUrl)
