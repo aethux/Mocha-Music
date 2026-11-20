@@ -196,9 +196,12 @@ did die with the recomposition a tap causes.
 Proven on the device with the real label: the pill appears, typing enables it, tapping creates the
 playlist — `Aeth Fixed` (`LPDTWNucyl`) and then `Aeth Shipped` (`LPoIIgodzx`), both deleted again after.
 
-**Still wrong, and small:** the freshly created playlist is empty. `AddToPlaylistDialog` opens the
-create sheet without `onPlaylistCreated`, so the song that started the flow is never added to the
-playlist it just made. Needs the picker to hand its ids to the create sheet and add them on success.
+**And the playlist is not empty any more:** the picker opened the create sheet without
+`onPlaylistCreated`, so the song that started the flow never joined the playlist it made. It now
+passes `topSongId` through `copySongsToPlaylist` (a fork file, so the upstream picker gains one line
+and stays inside its 20-line seam budget). Proven: `Aeth Song2` (`LPjOBKDEYC`) was created with its
+song at position 0. A multi-select flow still has no `topSongId` to hand over — nothing to add there
+yet.
 
 ## Known broken (2026-11-20)
 

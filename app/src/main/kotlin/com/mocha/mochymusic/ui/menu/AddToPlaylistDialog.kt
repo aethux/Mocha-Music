@@ -216,6 +216,10 @@ fun AddToPlaylistDialog(
             allowSyncing = allowSyncing,
             topSongId = topSongId,
             topSongArtworkUrl = topSongArtworkUrl,
+            // MOCHY-APPLE: the song this flow started with belongs in the playlist it just made
+            onPlaylistCreated = { newId ->
+                com.mocha.mochymusic.applesync.ui.copySongsToPlaylist(database, newId, listOfNotNull(topSongId))
+            },
         )
     }
 
