@@ -36,8 +36,8 @@ object AppleRemoved {
     suspend fun record(dao: AppleSyncDao, database: MusicDatabase, remoteCatalogIds: Collection<String>) {
         val remote = remoteCatalogIds.toSet()
         // the ids the fork imported, minus the ones it knows are outside the library
-        val everyApple = runCatching { database.appleSongIds() }.getOrDefault(emptyList())
-        val outside = runCatching { database.appleSongsOutsideTheLibrary() }.getOrDefault(emptyList()).toSet()
+        val everyApple = runCatching { database.appleSongDao.appleSongIds() }.getOrDefault(emptyList())
+        val outside = runCatching { database.appleSongDao.appleSongsOutsideTheLibrary() }.getOrDefault(emptyList()).toSet()
         val local = everyApple.filterNot { it in outside }.map { it.removePrefix("AM_") }
         val gone = local.filter { it !in remote }.sorted()
         dao.saveState(AppleStateEntity(key = KEY, value = gone.joinToString(",")))

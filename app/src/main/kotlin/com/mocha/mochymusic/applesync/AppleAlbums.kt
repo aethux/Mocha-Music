@@ -84,8 +84,8 @@ object AppleAlbums {
 
         // Three reads for the whole pass, not one per album and one per song. A failed read is a
         // failed read: it is allowed to fail the import rather than pass for "no albums yet".
-        val existing = database.appleAlbums().associateBy { it.id }
-        val linked = database.appleAlbumLinks().associate { it.id to it.albumId }
+        val existing = database.appleSongDao.appleAlbums().associateBy { it.id }
+        val linked = database.appleSongDao.appleAlbumLinks().associate { it.id to it.albumId }
         val covers = runCatching { dao.coverOverrides() }.getOrNull()
             ?.associate { it.key to it.value }
             ?: emptyMap()

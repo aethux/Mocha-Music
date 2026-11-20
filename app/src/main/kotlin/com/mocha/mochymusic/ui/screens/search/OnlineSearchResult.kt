@@ -270,10 +270,7 @@ fun OnlineSearchResult(
             ) {
                 // MOCHY-APPLE: All, YouTube Music, Apple Music - the chips in the Library's style
                 item(key = "search_source") {
-                    SearchSourceChips(
-                        current = searchSource,
-                        onSelect = { searchSource = it },
-                    )
+                    SearchSourceChips(searchSource, { searchSource = it })
                     Spacer(modifier = Modifier.height(10.dp))
                 }
                 if (searchFilter == null) {

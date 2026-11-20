@@ -395,8 +395,7 @@ fun PlayerActionMenu(
 
                 ModuleMenuRows(currentMetadata, onDismiss, onOpenRoute, onCustomise = { showSkinCustomise = true })
 
-                // MOCHY-APPLE: the same two lines the song menu ends with - what Apple makes of
-                // this song, and where its cover came from
+                // MOCHY-APPLE: the same footer the song menu ends with - Apple's take on this song, and its cover
                 SongInfoFooter(
                     songId = currentMetadata?.id,
                     inLibrary = librarySong?.song?.inLibrary != null,

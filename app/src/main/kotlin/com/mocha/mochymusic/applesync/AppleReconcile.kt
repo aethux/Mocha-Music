@@ -97,7 +97,7 @@ object AppleReconcile {
             ?: return Outcome(emptyList(), library.take(limit).map(::asUnmatched))
         val matcher = AppleMatcher(AppleClient(pair))
 
-        val known = runCatching { database.appleSongIds() }.getOrDefault(emptyList()).toSet()
+        val known = runCatching { database.appleSongDao.appleSongIds() }.getOrDefault(emptyList()).toSet()
         val merged = mutableListOf<String>()
         val unmatched = mutableListOf<Unmatched>()
 

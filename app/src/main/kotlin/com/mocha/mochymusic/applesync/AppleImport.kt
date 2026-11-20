@@ -89,18 +89,18 @@ class AppleImport(
 
         // One read each, up front. What this fork already imported is known before the loop, which is
         // also what makes a refresh cheap once the library has been imported once.
-        val known = runCatching { database.appleSongIds().toSet() }.getOrDefault(emptySet())
+        val known = runCatching { database.appleSongDao.appleSongIds().toSet() }.getOrDefault(emptySet())
         val tracks = runCatching { dao.tracks() }.getOrNull()
             ?.associateBy { it.songId }
             .orEmpty()
         val cachedCovers: MutableSet<String> = runCatching { dao.covers() }.getOrNull()
             ?.mapTo(HashSet()) { it.songId }
             ?: HashSet()
-        val withoutArtwork = runCatching { database.appleSongsWithoutArtwork().toSet() }
+        val withoutArtwork = runCatching { database.appleSongDao.appleSongsWithoutArtwork().toSet() }
             .getOrDefault(emptySet())
         // rows that came in with a playlist and are not in the library yet: if Apple's library has
         // them now, this import is where they get their place in it
-        val outsideLibrary = runCatching { database.appleSongsOutsideTheLibrary().toSet() }
+        val outsideLibrary = runCatching { database.appleSongDao.appleSongsOutsideTheLibrary().toSet() }
             .getOrDefault(emptySet())
         val covers = runCatching { dao.coverOverrides() }.getOrNull()
             ?.associate { it.key to it.value }
@@ -183,7 +183,7 @@ class AppleImport(
                 noteTrack(mapped.songId, catalogId, song, AppleTrackEntity.STATE_MANUAL)
                 if (mapped.songId in withoutArtwork) {
                     runCatching {
-                        artwork(song.artworkUrl)?.let { database.setSongThumbnailIfMissing(mapped.songId, it) }
+                        artwork(song.artworkUrl)?.let { database.appleSongDao.setSongThumbnailIfMissing(mapped.songId, it) }
                     }
                 }
                 // it came back from Apple: the chosen recording goes back into the library
@@ -217,7 +217,7 @@ class AppleImport(
                 // being touched in any other way
                 if (songId in withoutArtwork) {
                     runCatching {
-                        artwork(song.artworkUrl)?.let { database.setSongThumbnailIfMissing(songId, it) }
+                        artwork(song.artworkUrl)?.let { database.appleSongDao.setSongThumbnailIfMissing(songId, it) }
                     }
                 }
                 applyFavourite(songId, favourite, songId in likedNow)

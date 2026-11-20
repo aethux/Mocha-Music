@@ -79,9 +79,9 @@ object ApplePlaylistImport {
 
         // one read for the whole pass: asking per track which songs exist was 742 queries on this
         // account, and every one of them was a round trip in the middle of the import
-        val known = runCatching { database.appleSongIds() }.getOrDefault(emptyList()).toMutableSet()
+        val known = runCatching { database.appleSongDao.appleSongIds() }.getOrDefault(emptyList()).toMutableSet()
         // songs a playlist brought in but the library does not hold: they live outside the library
-        val outside = runCatching { database.appleSongsOutsideTheLibrary() }.getOrDefault(emptyList()).toSet()
+        val outside = runCatching { database.appleSongDao.appleSongsOutsideTheLibrary() }.getOrDefault(emptyList()).toSet()
         // who the account is, for the playlists that are the account's own
         val accountLabel = runCatching { dao.account().first()?.label }.getOrNull()
 

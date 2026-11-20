@@ -31,14 +31,36 @@ norm() {
 }
 
 # A seam is a change to a file upstream owns. New files this fork adds are not seams even
-# when they sit in an upstream directory (scripts/, docs/), so only M, D and R count; a rename
-# is the package move and is read at its new path.
+# when they sit in an upstream directory (scripts/, docs/).
 git diff --name-status -M "$base"...HEAD -- . ':(exclude)*applesync*' ':(exclude)apple-sync/*' > "$tmp/status"
 
-fork_files=$(awk -F'\t' '$1=="A"{print $2}' "$tmp/status")
-if [ -n "$fork_files" ]; then
+# A package move, read as a rename: git pairs most of them itself, but a file this fork
+# rewrote heavily falls under its similarity cut-off and arrives as a delete and an add.
+declare -A added=() orphans=() pairs=()
+declare -a changed=()
+
+while IFS=$'\t' read -r kind old new; do
+  case "$kind" in
+    A) added["$old"]=1 ;;
+    D) orphans["$old"]=1 ;;
+    R*) changed+=("$old"$'\t'"$new") ;;
+    *)  changed+=("$old"$'\t'"$old") ;;
+  esac
+done < "$tmp/status"
+
+for old in "${!orphans[@]}"; do
+  moved="${old/\/com\/mochyy\/mochymusic\//\/com\/mocha\/mochymusic\/}"
+  if [ -n "${added[$moved]:-}" ]; then
+    unset 'added[$moved]'
+    changed+=("$old"$'\t'"$moved")
+  else
+    pairs+=("$old")
+  fi
+done
+
+if [ "${#added[@]}" -gt 0 ]; then
   echo "added by this fork (not seams):"
-  printf '  %s\n' $fork_files
+  printf '  %s\n' "${!added[@]}" | sort
   echo
 fi
 
@@ -46,41 +68,35 @@ status=0
 table="$tmp/table"
 : > "$table"
 
-while IFS=$'\t' read -r kind old new; do
-  [ -n "${kind:-}" ] || continue
-  case "$kind" in
-    A) continue ;;
-    D)
-      printf '%-70s %6s %6s %5s\n' "$old" "(deleted)" "-" "-" >> "$table"
-      status=1
-      continue
-      ;;
-    R*)
-      from="$old"; to="$new"
-      ;;
-    *)
-      from="$old"; to="$old"
-      ;;
-  esac
+for old in "${pairs[@]:-}"; do
+  [ -n "$old" ] || continue
+  printf '%-70s %6s %6s %5s\n' "$old" "(deleted)" "-" "-" >> "$table"
+  status=1
+done
+
+for entry in "${changed[@]:-}"; do
+  [ -n "$entry" ] || continue
+  from="${entry%%$'\t'*}"
+  to="${entry##*$'\t'}"
 
   git show "$base:$from" | norm > "$tmp/a"
   norm < "$to" > "$tmp/b"
-  added=$(diff "$tmp/a" "$tmp/b" | grep -c '^>' || true)
-  removed=$(diff "$tmp/a" "$tmp/b" | grep -c '^<' || true)
-  [ "$added" -eq 0 ] && [ "$removed" -eq 0 ] && continue
+  added_lines=$(diff "$tmp/a" "$tmp/b" | grep -c '^>' || true)
+  removed_lines=$(diff "$tmp/a" "$tmp/b" | grep -c '^<' || true)
+  [ "$added_lines" -eq 0 ] && [ "$removed_lines" -eq 0 ] && continue
 
   tags=$(grep -c 'MOCHY-APPLE:' "$to" || true)
-  printf '%-70s %6s %6s %5s\n' "$to" "$added" "$removed" "$tags" >> "$table"
+  printf '%-70s %6s %6s %5s\n' "$to" "$added_lines" "$removed_lines" "$tags" >> "$table"
 
-  if [ "$added" -gt 20 ]; then
+  if [ "$added_lines" -gt 20 ]; then
     printf '  ^ over budget (20 added lines): %s\n' "$to" >&2
     status=1
   fi
-  if [ "$tags" -eq 0 ]; then
+  if [ "$added_lines" -gt 0 ] && [ "$tags" -eq 0 ]; then
     printf '  ^ no // MOCHY-APPLE: tag: %s\n' "$to" >&2
     status=1
   fi
-done < "$tmp/status"
+done
 
 if [ -s "$table" ]; then
   printf '%-70s %6s %6s %5s\n' FILE ADDED REMOVED TAGS

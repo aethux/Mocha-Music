@@ -57,6 +57,10 @@ class MusicDatabase(
     val speedDialDao: SpeedDialDao
         get() = delegate.speedDialDao
 
+    // MOCHY-APPLE: the fork's own dao, for the Apple-only reads
+    val appleSongDao: com.mocha.mochymusic.applesync.db.AppleSongDao
+        get() = delegate.appleSongDao
+
     /**
      * Pins [item], evicting the oldest pin first if that would push the count past
      * [com.mocha.mochymusic.db.daos.SpeedDialDao.Companion.MaxPinned].
@@ -148,6 +152,8 @@ const val MusicDatabaseVersion = 45
 abstract class InternalDatabase : RoomDatabase() {
     abstract val dao: DatabaseDao
     abstract val speedDialDao: SpeedDialDao
+    // MOCHY-APPLE: the Apple-only reads live in the fork's own dao
+    abstract val appleSongDao: com.mocha.mochymusic.applesync.db.AppleSongDao
 
     companion object {
         const val DB_NAME = "mochy.db"

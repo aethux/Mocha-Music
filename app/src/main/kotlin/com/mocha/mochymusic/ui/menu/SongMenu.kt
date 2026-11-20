@@ -267,9 +267,7 @@ fun SongMenu(
         ),
     ) {
         item {
-            // MOCHY-APPLE: the same four tiles the player's menu opens with. The library button and
-            // the heart used to be a row and a small header button, which made one menu look like two
-            // MOCHY-APPLE: the picker is drawn at the app's root - pushed here, its own host unmounts
+            // MOCHY-APPLE: the player's four tiles; the picker is drawn at the app's root, since pushed here its host unmounts
             SongRowActionGrid(song, download?.state, coroutineScope) { AddToPlaylistAsk.ask(song); onDismiss() }
         }
 
