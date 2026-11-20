@@ -187,6 +187,10 @@ object ApplePlaylistPush {
                 when {
                     !sent.verified -> TopToaster.error(context.getString(R.string.apple_playlist_unverified))
                     tookSomethingOut -> Unit
+                    sent.skipped > 0 -> TopToaster.show(
+                        text = context.getString(R.string.apple_playlist_pushed_skipped, sent.pushed, sent.skipped),
+                        iconRes = R.drawable.sync,
+                    )
                     else -> TopToaster.show(
                         text = context.getString(R.string.apple_playlist_pushed_short),
                         iconRes = R.drawable.sync,
