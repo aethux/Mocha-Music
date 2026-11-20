@@ -12,6 +12,29 @@ because the same three techniques keep coming back:
 3. **The sidecar database** (`apple_sync.db`) for anything the sync has to remember, so the app's own
    schema is never rewritten for fork state.
 
+## The fork's own name
+
+The fork ships as **Mocha**: `com.mocha.mochymusic` in the manifest and the namespace, `Mocha` in
+every string a person reads, and the JNI symbols in `app/src/main/cpp/*` renamed with the package —
+those are derived from the class name, so they compile under the old package and fail at runtime.
+
+What deliberately keeps upstream's spelling: the `MOCHY-APPLE` seam tags, the `mochyymodule` zip
+marker, the `X-Mochy-Auth`/`X-Mochy-Key` headers, the `mochy.db` file, resource ids such as
+`Theme.mochy`, and the `aethux/Mochy-Music` repo slug. They are wire formats, file names and what the
+rewritten `scripts/seams.sh` normalises away.
+
+That check now compares both sides with the rename undone and pairs a package move's old and new
+path, so a file that only wears the new name is not a seam; without it every import in the tree read
+as an added line.
+
+Two side effects of the budget the rename exposed: the All songs page moved into
+`applesync/ui/LibrarySongsPage.kt` (upstream has since rewritten `LibrarySongsScreen.kt`), and the
+Apple-only reads moved into `applesync/db/AppleSongDao.kt`, registered on the same database, leaving
+`DatabaseDao` room for real seams.
+
+Updates, the changelog and the commit list read `aethux/Mochy-Music`; the donate prompt and its two
+rows are gone; Aeth is credited beside the upstream lead devs.
+
 ## The shape of the fork
 
 - 80 Kotlin files under `app/.../applesync/**` are fork-owned: engine, sidecar entities and DAO,

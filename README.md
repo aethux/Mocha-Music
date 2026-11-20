@@ -1,170 +1,118 @@
-<img width="1799" height="927" alt="Frame 420" src="https://github.com/user-attachments/assets/c5e1d307-ecc4-4c26-a88f-f4f468c8e434" />
+# Mocha Music
 
-<div align="center">
+A fork of [Mochy Music](https://github.com/realidkroo/Mochy-Music) where **Apple Music is the library
+of record**, and YouTube Music only supplies what Apple does not have. Android, Kotlin, Compose,
+Media3, GPL-3.0.
 
-  <sub>What is Mocha Music? its a sleek modern cool music player for android, open source, packed with features and doesn’t collect ur data >_< !! oh and, still in beta! so please expect some bug :)</sub>
-  <br/>
-<p align="center">
-<a href="https://trendshift.io/repositories/305501?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-305501" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/305501" alt="realidkroo%2FMochy-Music | Trendshift" width="250" height="55"/>
-</a>
+The app is called **Mocha** (`com.mocha.mochymusic`). Upstream's spelling survives only where it is a
+wire format: the `mochyymodule` zip marker, the `X-Mochy-Auth` header, the `mochy.db` file, and the
+`// MOCHY-APPLE:` tags this fork uses to mark its seams in upstream files.
 
-<br/>
-<p align="center">
+> [!NOTE]
+> This is one person's fork, not a product. It is built and tested on a Nothing Phone (2a) Plus.
+> Report bugs that are not about Apple Music or the fork's UI to
+> [upstream](https://github.com/realidkroo/Mochy-Music/issues).
 
-<a href="https://github.com/realidkroo/mochy-music/releases">
-    <img src="https://shieldcn.dev/github/downloads/realidkroo/mochy-music.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logoColor=fab387" alt="Downloads">
-</a>
-  <a href="https://github.com/realidkroo/mochy-music/stargazers">
-    <img src="https://shieldcn.dev/github/stars/realidkroo/mochy-music.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logoColor=f9e2af" alt="Stars">
-  </a>
-  <a href="https://github.com/realidkroo/mochy-music/network/members">
-    <img src="https://shieldcn.dev/github/forks/realidkroo/mochy-music.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logoColor=89b4fa" alt="Forks">
-      <a href="https://github.com/realidkroo/mochy-music/releases">
-    <img src="https://shieldcn.dev/badge/Android-8.0%2B-313244.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logo=android&logoColor=94e2d5" alt="Android 8.0+">
-  </a>
-  <a href="https://github.com/realidkroo/mochy-music/releases/latest">
-    <img src="https://shieldcn.dev/github/release/realidkroo/mochy-music.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logoColor=cba6f7" alt="Release">
-  </a>
-  <a href="https://www.figma.com/board/NWTElXRZ21LaaJotjuOe8D/Untitled?node-id=0-1&t=bMsq80RJXYybjXsh-1">
-    <img src="https://shieldcn.dev/badge/Roadmap-View-313244.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logoColor=b4befe" alt="Roadmap">
-  </a>
-  <a href="https://discord.gg/4DAafDMxZb">
-  <img src="https://shieldcn.dev/badge/Discord-Join%20Server-313244.svg?mode=dark&radius=999&font=geist&split=true&height=28&fontSize=13&labelColor=1e1e2e&labelTextColor=ffffff&color=313244&valueColor=ffffff&logo=discord&logoColor=b4befe" alt="Mocha's Bar">
-</a>
+---
 
-</a>
-</p>
-</div>
+## What the fork adds
 
+- **The Apple Music library is imported and kept in step.** Songs arrive as `AM_<catalogueId>`, albums
+  and playlists come with them, and a refresh records what changed on Apple's side instead of
+  deleting quietly.
+- **Apple wins when a song exists on both sides.** The duplicate is merged, and YouTube keeps only
+  what Apple has nothing for — after the person says so.
+- **Writes go both ways** through the app's own music.apple.com session: library add/remove, likes
+  and playlist edits. Every write leaves an audit row, and `AppleGuard` refuses anything it does not
+  own.
+- **A playlist made here pushes to Apple within the second** once it is linked; a playlist Apple
+  keeps to itself (a mix, or one the account only follows) is marked and refused, never replaced.
+- **Ordering and sorting on All songs**, animated Apple covers in the player, a cover picker, and the
+  fork's own song menu with the four tiles.
+- **Updates come from this repo** (`aethux/Mochy-Music`), not upstream.
+
+The engine, its tables and the traps already hit are written down in
+[`README-APPLE-SYNC.md`](README-APPLE-SYNC.md) and [`apple-sync/STATE.md`](apple-sync/STATE.md);
+[`apple-sync/CHANGELOG.md`](apple-sync/CHANGELOG.md) explains how each change was made.
+
+---
+
+## Install
+
+1. Open the [releases page](https://github.com/aethux/Mochy-Music/releases) and download the APK for
+   your phone: **arm64-v8a** is almost every phone from the last eight years, **universal** runs
+   anywhere and is bigger.
+2. Install it. Android asks to allow installs from the browser or file manager you used.
+3. Open **Mocha**. No account is needed to start listening.
+
+Updating works the same way: install the new APK over the old one and the library stays. The app
+notifies when a newer build is published here.
+
+> [!IMPORTANT]
+> **Mocha is a separate app from Mochy.** The package id is `com.mocha.mochymusic`, so installing it
+> does not replace Mochy Music and does not carry its data across. The library, the playlists and the
+> Apple Music session start empty, and the old app stays installed until you remove it.
 
 > [!WARNING]
-> This app still on beta!, expect some bugs! reporting it will be useful too!!!
+> The APKs published here are signed with the fork's **local debug key** unless the build machine had
+> `keystore/release.keystore` plus `STORE_PASSWORD` / `KEY_ALIAS` / `KEY_PASSWORD` set (see below).
+> That is fine for sideloading on your own phone; it is not an identity to trust for anything else.
+
+Android 8.0+ (API 24). Android 7 works unofficially.
 
 ---
 
-## Hhhh-how to install? :3
+## Build it
 
-1. On your phone, open the [latest release](https://github.com/realidkroo/mochy-music/releases/latest).
-2. Download the `.apk` that matches your phone. If you are not sure, pick **arm64**, that is almost every phone from the last 8 years. The **universal** one works everywhere but is bigger.
-3. Open the downloaded file. Android will ask you to allow installs from your browser or file manager, say yes (you can turn it off again after).
-4. Open Mocha. You are done, no account needed to start listening.
+You need JDK 21 and an Android SDK with the platform and NDK the build asks for.
 
-Updating works the same way: install the new apk over the old one and your library stays.
-
-> [!TIP]
-> Only download Mocha from the releases page of this repo. A random mediafire or telegram link could be a modified app, and then your logins would not be safe, pls avoid those
-
-> [!BTW]
-> We support android 7 unofficially.
-
----
-
-## Some Prview 
-
-<img width="1799" height="927" alt="Frame 289" src="https://github.com/user-attachments/assets/c4c122ed-b86c-44e4-a618-417f5287bc98" />
-<img width="1799" height="927" alt="Frame 287" src="https://github.com/user-attachments/assets/186be8ac-ff3e-4e2a-ab7e-ae80bc9da7e7" />
-<img width="1799" height="927" alt="Frame 290" src="https://github.com/user-attachments/assets/c394603c-7aa7-4d78-8688-38a6c6e42232" />
-<img width="1799" height="927" alt="Frame 288" src="https://github.com/user-attachments/assets/06f5c13a-b8f1-4ecf-85aa-b17d020db5c8" />
-<img width="1799" height="927" alt="Frame 331" src="https://github.com/user-attachments/assets/71c5ee7e-75c1-479f-8075-039bab4f7fe7" />
-<img width="1799" height="927" alt="Frame 332" src="https://github.com/user-attachments/assets/e8c2084f-68ec-4959-a881-03a3b93df292" />
-<img width="1799" height="927" alt="Frame 333" src="https://github.com/user-attachments/assets/50580702-6bc9-4204-8665-b7d6c6390f78" />
-
-
----
-# FAQ
-Q - Is it safe to log in? (read this before signing in)
-
-A - Tbh, you never have to log in to use this thing btw. Search, play, lyrics and downloads work without an account. Signing in is only for syncing your YouTube Music library, importing playlists from Spotify / Apple Music / Tidal, and Discord status
-
-**How the sign-in works**
-- Mocha opens the real login page of the service (for example accounts.google.com or open.spotify.com) inside the app. You type your password into **their** page, not into a Mocha form.
-- After you log in, the app keeps the session token or cookie that the service gives out, so you stay signed in. Your password is not what gets saved.
-- That session stays on your phone, in the app's private storage. Mocha has no account system of its own and does not run a server that collects logins.
-- The tokens are meant to be used only to talk to the service you signed in to (for example Spotify's own site to read your playlists).
-- The app is open source under GPL-3.0 so you do not have to take my word for it, you can always read exactly what it does with them :)
-
-
-Q - Pls add liquid glass
-
-A - No, and not now. maybe in form of modules created by someone in the future
-
-
-Q - Monochrome/flac stream doesnt work
-
-A - The server down, its on their side not us. use other anvailable sources, join our discord
-
-
-Q - Animation is too slow, can you speed it up?
-
-A - You can speed it up on customize page.
-
-
-Q - Official Desktop app?
-
-A - Later
-
-
-Q - App too laggy, how to fix?
-
-A - Disabling blur will helps
-
-
-Q - Can i contribute?
-
-A - Ofc
-
-
-Q - Can you add less spacing for the player
-
-A - You can customize it yourself
-
-Q - I hate this app, i dont want to use it
-A - Nobody is forcing you to use this
-
----
-
-## How to build it yourself
-
-You only need this if you want to change the code. If you just want to use the app, use the install steps above.
-
-### What you need
-- A Mac, Linux or Windows computer with screen
-- [Android Studio](https://developer.android.com/studio) (latest stable). It brings JDK 21 and the Android SDK with it
-- Android SDK 36 and NDK `27.0.12077973`. Android Studio offers to download both the first time you open the project
-- About 10 gb free disk space, the first build downloads a lottt
-- A phone with USB debugging on, or an emulator.
-
-### Steps
 ```bash
-git clone https://github.com/realidkroo/mochy-music.git
-cd mochy-music
+export JAVA_HOME=$HOME/.local/jdk/jdk-21.0.13+9
+export PATH=$JAVA_HOME/bin:$PATH
+
+./gradlew :app:assembleUniversalFossDebug      # debug build, installs next to the release one
+./gradlew :app:assembleUniversalFossRelease    # release APK, universal
+./gradlew :app:assembleArm64FossRelease        # release APK, arm64 only
 ```
 
-1. Open the folder in Android Studio once and let it finish syncing. This also creates `local.properties` with your SDK path.
-2. Build and install on your connected phone:
-   ```bash
-   ./build.sh --debug -i
-   ```
-   First build takes a while, the next ones are much faster.
-3. Or build the apk only and install it by hand. The apk lands in `apk-generated/`:
-   ```bash
-   ./build.sh --debug
-   adb install -r apk-generated/*-debug.apk
-   ```
+Outputs land in `app/build/outputs/apk/<abi><flavour>/<variant>/`. `foss` has no Google Play
+services; `gms` is the flavour with Cast.
 
-Handy options (see `./build.sh --help` for all of them):
+`build.sh` wraps the same builds, bumps the build number, names the APKs and can publish them:
 
-| Command | What it does |
-|---|---|
-| `./build.sh --debug -i` | debug build, installs and opens it on your phone |
-| `./build.sh --release -cc` | release build for arm64 and universal |
-| `./build.sh -fd --release` | F-Droid flavor, without the self-update permission |
-| `./build.sh -k` | stops stuck Gradle builds |
+```bash
+./build.sh --debug -i                              # debug, installs and opens on the phone
+./build.sh --release -cc                           # release for arm64 and universal
+./build.sh --release -a -commit "what changed"     # all ABIs, published as a release here
+./build.sh --release -a -n 3 -commit "what changed" # nightly <version>.3, a GitHub prerelease
+./build.sh -k                                      # stop stuck Gradle daemons
+```
 
-Use **debug** while you are playing around, it builds much much faster. A debug build installs next to the real app (`com.example.mochy.debug`), so it will not touch your normal install, but it is also a bit slower to run.
+Install one by hand:
+
+```bash
+adb install -r app/build/outputs/apk/universalFoss/debug/app-universal-foss-debug.apk
+adb shell am start -n com.mocha.mochymusic.debug/com.mocha.mochymusic.MainActivity
+```
+
+### Signing a release
+
+`app/build.gradle.kts` uses `keystore/release.keystore` when it exists:
+
+```bash
+export STORE_PASSWORD=…
+export KEY_ALIAS=…
+export KEY_PASSWORD=…
+```
+
+Without it, `release` builds fall back to the debug keystore so that a release-quality build always
+installs locally. CI signs with the real key when the secrets are present. Nothing in this repo
+commits a keystore.
 
 ### Optional keys
-Mocha builds fine without these, only the matching feature is switched off. Put them in `local.properties` (it is never committed):
+
+The build works without these; only the matching feature switches off. Put them in
+`local.properties` (never committed):
 
 ```properties
 LASTFM_API_KEY=...
@@ -172,88 +120,117 @@ LASTFM_SECRET=...
 DISCORD_CLIENT_ID=...
 ```
 
-Never commit your keys. Libre.fm works without any key.
-
 ### If the build fails
-- `Unresolved reference` or Hilt errors that make no sense: delete the `build/` folders and `.gradle/` and build again.
-- Stuck or weird Gradle: `./build.sh -k`, then try again.
-- Wrong Java: make sure Gradle uses JDK 21 (Android Studio → Settings → Build Tools → Gradle → Gradle JDK).
-- Still stuck? Open an [issue](https://github.com/realidkroo/mochy-music/issues) with the error text.
 
-Want to send a fix? Read [CONTRIBUTING](.github/CONTRIBUTING.md) first.
-
----
-## How to build module?
-im working on it wait
+- `Unresolved reference` or impossible Hilt errors: delete `build/` folders and `.gradle/`, build
+  again. A package rename leaves generated Hilt classes behind and they must be cleared.
+- Stuck Gradle: `./build.sh -k`.
+- Wrong Java: Gradle must run on JDK 21.
 
 ---
-## Wants to help? bug report? report it on issues!
 
-Or read contribute.md there
+## Checks before a commit
+
+```bash
+./scripts/seams.sh          # must exit 0
+```
+
+The fork keeps its work out of upstream's files: new code lives in `applesync/` packages, and a
+change to an upstream file is a *seam* — under ~20 added lines and tagged `// MOCHY-APPLE:`. The
+check normalises the fork's package and name on both sides, so the rename itself costs nothing and a
+real change still counts.
+
+Apple-side unit tests:
+
+```bash
+./gradlew :app:testUniversalFossDebugUnitTest --tests "com.mocha.mochymusic.applesync.*"
+```
 
 ---
+
+## Known issues
+
+- **`CrossmixTest > everyday picks only, and blends stay short` fails**, and it fails on upstream
+  `main` too — the planner and the test are identical to upstream. A 16-beat Filter sweep (9.6 s) is
+  admitted when a tempo estimate exists even though the two tempos cannot lock, while the test
+  allows 8.5 s for a blend that is not beat-matched.
+- **Upstream's cover zoom is not adopted**: the fork's `AppleCover` has no `zoom` parameter, so the
+  player cover does not scale out the way upstream's does when it opens.
+- **The Discord row opens upstream's server**, because the fork has none.
+- **`core/updater/mochyupdater.kt` is dead upstream code** and still contains `realidkroo` URLs. The
+  live updater is `core/updater/GithubUpdates.kt`.
+
+---
+
+## FAQ
+
+**Is it safe to sign in?**
+
+You never have to sign in to listen: search, playback, lyrics and downloads work without an account.
+Signing in is only for syncing a YouTube Music library, importing playlists from Spotify / Apple
+Music / Tidal, Discord presence — and, in this fork, Apple Music sync.
+
+The app opens the service's own login page (accounts.google.com, music.apple.com, open.spotify.com)
+inside a WebView. Your password goes into *their* page, never into a form in the app. What is kept is
+the session token or cookie the service hands out, stored on the phone in the app's private
+storage. There is no account system of the app's own and no server it sends logins to. The code is
+GPL-3.0, so you can read exactly what happens to them.
+
+**Why is it called Mocha?**
+
+Because the fork is a rebrand of Mochy Music and the two have to be separable: different package,
+different app, different update channel.
+
+**Where did the "support the developer" popups go?**
+
+Removed in this fork. No donate prompt opens on its own, and neither the About sheet nor the update
+sheet carries a support row.
+
+---
+
 ## Disclaimer
 
-Mocha is an independent, unofficial project made for personal and educational use. It is provided as is, without warranty of any kind.
+Mocha is an independent, unofficial project made for personal and educational use, provided as is,
+without warranty of any kind.
 
-- Mocha is a fully open source project that is created purely for educationa and personal use. thats why, we dont sell this software, or monetize it. we do not have any intent to add commercial values in the future. thanks!
-- And were deeply respect the hardwork of artist musicians ajd contwnt creators. without them there is also no mochy: i strongly suggest that you, as user, subscribe to Apple music or youtube premium, to support the creators you listen. I do not intend to hurt creator with this app.
-- It is **not affiliated with, endorsed by, or sponsored by** YouTube, YouTube Music, Google, Spotify, Apple, Last.fm, Shazam, Discord or any other service it can connect to. All names, logos and brands belong to their respective owners.
-- Mocha does not host, store or distribute any music. Everything is fetched from third-party services when you ask for it, and those services can change or stop working at any time.
-- You are responsible for how you use the app, including the terms of service of the accounts and services you connect and the copyright laws where you live.
-- Importing from other services (Spotify, etc.) uses your own account. Don't share your login data or tokens with anyone.
-- Importing music MAY need your own account with its password. WE'RE NEVER see your password.
-
----
-
-<!-- mochy-credit:start · f208ad37 -->
-## Forking Mocha
-
-Forks are welcome, that's what open source is for! Just two asks:
-
-- **Keep the credit.** If you rename it, please keep credits of this app, the other project that helped mochy possible.
-- **Keep it free.** Mocha is not monetized and never will be. Please don't put features behind a paywall. A donation page is fine.
-
-<!-- mochy-credit:end -->
+- It is not affiliated with, endorsed by or sponsored by YouTube, YouTube Music, Google, Spotify,
+  Apple, Last.fm, Shazam, Discord or any other service it can connect to. All names, logos and brands
+  belong to their respective owners.
+- It does not host, store or distribute any music. Everything is fetched from third-party services
+  when you ask for it, and those services can change or stop working at any time.
+- You are responsible for how you use the app, including the terms of service of the accounts you
+  connect and the copyright law where you live.
+- Imports from other services use your own account. Never share your login data or tokens.
+  The app never sees your password.
 
 ---
 
-## These incredible project helped mochy a lot! check them out too :3
+## Forking
 
-- **ViviMusic** by [vivizzz007Z](https://github.com/vivizzz007Z) )[Their repo](https://github.com/vivizzz007/vivi-music)) -- For the base app. This app is a fork from this project.
-- **Metrolist** by [Mostafa Alagamy](https://github.com/mostafaalagamy) ([Repository](https://github.com/mostafaalagamy/Metrolist)) -- For the base framework.
-- **SimpMusic** by [maxrave-dev](https://github.com/maxrave-dev) ([Repository](https://github.com/maxrave-dev/SimpMusic)) -- For the lyrics API provider.
-- **Archivetune** by [Rukamori](https://github.com/rukamori) ([Repository](https://github.com/rukamori/ArchiveTune)) -- For design and architectural inspiration.
-- **RiMusic / InnerTube** by [fast4x](https://github.com/fast4x) ([Repository](https://github.com/fast4x/RiMusic)) -- For YouTube Music InnerTube API service wrapper.
-- **LRCLib** by [tranxuanthang](https://github.com/tranxuanthang) ([Repository](https://github.com/tranxuanthang/lrclib) / [Website](https://lrclib.net/)) -- For synchronized LRC lyrics provider integration.
-- **Monochrome Music** by [monochrome-music](https://github.com/monochrome-music) ([Repository](https://github.com/monochrome-music/monochrome) / ([Website](https://monochrome.st)) -- Flac streams, visit their web, very cool one.
-- **Auto Eq** ([Web](https://autoeq.app)) -- The equalizer database
-- **lrc.red** ([Web](https://lrc.red)) -- Word-timed lyrics for millions of songs, free for everyone
-- **InnertubeX** by [nyxireal](https://github.com/nyxiereal) [Their repo](https://github.com/metrolistGroup/innertubex) For The Youtube API Access
+Forks are welcome. Keep the credit, and keep it free — upstream asks the same, and this fork keeps
+both asks.
 
 ---
 
-## Open source APIs mochy talks to!!
+## Credits
 
-These are the open source apis and server we get gets its lyrics, streams and data from. They r free for everyone because of these good people, so go give them a star!
+Almost all of this app is other people's work.
 
-- **LyricsPlus** by [Ibra Al Tabian](https://github.com/ibratabian17) ([repos](https://github.com/ibratabian17/LyricsPlus)) s
-- **Better Lyrics API** by [Boidushya](https://github.com/boidushya) ([repos](https://github.com/better-lyrics/api)) 
-- **LRCLIB** by [tranxuanthang](https://github.com/tranxuanthang) ([repos](https://github.com/tranxuanthang/lrclib) / [Website](https://lrclib.net/)) 
-- **SimpMusic Lyrics** by [maxrave-dev](https://github.com/maxrave-dev) ([repos](https://github.com/maxrave-dev/SimpMusic)) 
+- [Mochy Music](https://github.com/realidkroo/Mochy-Music) — Roo and key; the app this is forked from.
+- [ViviMusic](https://github.com/vivizzz007/vivi-music) by vivizzz007 — the base app Mochy grew from.
+- [Metrolist](https://github.com/mostafaalagamy/Metrolist) by Mostafa Alagamy — the base framework.
+- [SimpMusic](https://github.com/maxrave-dev/SimpMusic) by maxrave-dev — lyrics API provider.
+- [ArchiveTune](https://github.com/rukamori/ArchiveTune) by Rukamori — design and architecture
+  inspiration.
+- [RiMusic](https://github.com/fast4x/RiMusic) by fast4x — YouTube Music InnerTube wrapper.
+- [LRCLib](https://github.com/tranxuanthang/lrclib) by tranxuanthang — synchronized lyrics.
+- [Monochrome](https://github.com/monochrome-music/monochrome) — FLAC streams.
+- [InnertubeX](https://github.com/metrolistGroup/innertubex) by nyxireal — YouTube API access.
+- [AutoEq](https://autoeq.app) — the equalizer database. [lrc.red](https://lrc.red) — word-timed
+  lyrics.
+- LyricsPlus, Better Lyrics API and SimpMusic Lyrics — the free lyric backends.
 
----
-## Star History
+The fork's own work — the Apple Music engine and the UI around it — is by Aeth
+([@aethux](https://github.com/aethux)).
 
-<a href="https://www.star-history.com/?repos=realidkroo%2Fmochy-music&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=realidkroo/mochy-music&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=realidkroo/mochy-music&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=realidkroo/mochy-music&type=date&legend=top-left" />
- </picture>
-</a>
-
-<div align="center">
-  <sub>star the repo plssss apreciate it!!!!!</sub>
-</div>
-
+GPL-3.0. See [LICENSE](LICENSE).
