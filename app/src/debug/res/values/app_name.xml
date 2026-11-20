@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">mochy Debug</string>
+    <!-- MOCHY-APPLE: the launcher label of this fork's debug build -->
+    <string name="app_name">Mocha Debug</string>
 </resources>
