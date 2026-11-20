@@ -151,6 +151,39 @@ object ApplePageScripts {
 
 
     /**
+     * What the web player's own playlist page lists: the header's song count, and every track link
+     * it has drawn. The REST copy of a library playlist answers with only the library's tracks, so
+     * this is what tells "the playlist is that short" from "the API hides the rest".
+     */
+    fun readPlaylistTracks(): String = """
+(function() {
+  var out = { href: String(location.href), title: String(document.title), header: 0, headerText: "", links: 0, ids: [], names: [], rows: 0 };
+  try {
+    var bodyText = document.body ? String(document.body.innerText || "") : "";
+    var m = bodyText.match(/([0-9]+)\s+songs?/);
+    if (m) { out.header = parseInt(m[1], 10); out.headerText = m[0]; }
+    var anchors = document.querySelectorAll('a[href*="/song/"]');
+    var seen = {};
+    for (var i = 0; i < anchors.length; i++) {
+      var href = String(anchors[i].getAttribute("href") || "");
+      var mm = href.match(/\/song\/([^\/?#]+)/);
+      if (!mm) continue;
+      var id = mm[1];
+      if (seen[id]) continue;
+      seen[id] = 1;
+      out.ids.push(id);
+      out.names.push(String(anchors[i].textContent || "").trim());
+    }
+    out.links = out.ids.length;
+    out.rows = document.querySelectorAll('[data-testid="track-list-item"], div[role="row"], li[role="row"]').length;
+  } catch (e) {
+    out.error = String(e);
+  }
+  return JSON.stringify(out);
+})()
+""".trimIndent()
+
+    /**
      * Who else is on a shared playlist, read from the page's own header.
      *
      * MusicKit has no answer for this (the relationship 404s and `include=collaborators` adds

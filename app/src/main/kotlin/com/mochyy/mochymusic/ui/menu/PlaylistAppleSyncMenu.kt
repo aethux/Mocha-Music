@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.applesync.ApplePlaylistLinker
 import com.mochyy.mochymusic.applesync.ApplePlaylistWrites
@@ -168,6 +169,21 @@ fun playlistCoverMenuItem(
     menuState = menuState,
     onApplied = coverApplier(CoverOverrides.Kind.PLAYLIST, playlist.id, playlist.playlist.thumbnailUrl) { chosen ->
         database.query { update(playlist.playlist.copy(thumbnailUrl = chosen)) }
+    },
+)
+
+@Composable
+fun playlistPageReadItem(
+    playlist: Playlist,
+    navController: NavController?,
+    onDismiss: () -> Unit,
+): Material3MenuItemData = Material3MenuItemData(
+    title = { Text(stringResource(R.string.apple_page_menu)) },
+    description = { Text(stringResource(R.string.apple_page_menu_desc)) },
+    icon = { Icon(painterResource(R.drawable.sync), contentDescription = null) },
+    onClick = {
+        onDismiss()
+        navController?.navigate(com.mochyy.mochymusic.ui.applesync.applePlaylistPageRoute(playlist.id))
     },
 )
 

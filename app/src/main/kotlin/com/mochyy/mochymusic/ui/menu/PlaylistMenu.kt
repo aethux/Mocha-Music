@@ -400,6 +400,8 @@ fun PlaylistMenu(
                 items = buildList {
                     // MOCHY-APPLE: the cover, chosen here or taken from Apple again
                     if (autoPlaylist != true) add(playlistCoverMenuItem(playlist, database, menuState))
+                    // MOCHY-APPLE: what the web player lists for this playlist, when the import looks short
+                    add(playlistPageReadItem(playlist, navController, menuState::dismiss))
                     if (editable && autoPlaylist != true) {
                         add(
                             Material3MenuItemData(

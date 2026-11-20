@@ -197,4 +197,13 @@
     <string name="apple_removed_working">Talking to Apple Music…</string>
     <string name="apple_playlist_pushed_short">Playlist sent to Apple Music</string>
     <string name="apple_playlist_pushed_skipped">%1$d songs sent to Apple Music · %2$d have no Apple Music copy</string>
+    <string name="apple_page_title">Read the playlist page</string>
+    <string name="apple_page_reading">Reading Apple\u2019s own page\u2026</string>
+    <string name="apple_page_found">What the page lists</string>
+    <string name="apple_page_header">Header says %1$d songs</string>
+    <string name="apple_page_links">%1$d song links drawn</string>
+    <string name="apple_page_none">Nothing read — try again</string>
+    <string name="apple_page_source">Read from music.apple.com in a page the app is signed in on. The REST copy of a library playlist lists only the songs saved to your library; this is what the player itself draws.</string>
+    <string name="apple_page_menu">Read the page</string>
+    <string name="apple_page_menu_desc">Compares what the Music app draws with what the import got</string>
 </resources>

@@ -47,6 +47,15 @@ fun NavGraphBuilder.appleSyncNavGraph(navController: NavController) {
             navController = navController,
         )
     }
+    composable(
+        route = com.mochyy.mochymusic.ui.applesync.ApplePlaylistPageRoute,
+        arguments = listOf(androidx.navigation.navArgument("playlistId") { type = androidx.navigation.NavType.StringType }),
+    ) {
+        com.mochyy.mochymusic.ui.applesync.ApplePlaylistPageScreen(
+            playlistId = it.arguments?.getString("playlistId").orEmpty(),
+            navController = navController,
+        )
+    }
     composable(com.mochyy.mochymusic.ui.applesync.AppleRemovedRoute) {
         com.mochyy.mochymusic.ui.applesync.AppleRemovedScreen(navController = navController)
     }
