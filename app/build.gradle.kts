@@ -27,8 +27,9 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.mocha.mochymusic"
         minSdk = 24
         targetSdk = 37
-        versionCode = 73
-        versionName = "8.4.3 build#1280"
+        // MOCHY-APPLE: this fork carries its own version, ahead of upstream 8.4.3
+        versionCode = 74
+        versionName = "8.4.4 build#1281"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
