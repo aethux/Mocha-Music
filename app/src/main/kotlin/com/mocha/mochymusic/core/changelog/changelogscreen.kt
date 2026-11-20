@@ -140,7 +140,7 @@ fun ChangelogScreen(
                     }
                 } else {
                     // MOCHY-APPLE: this build's own repo, not upstream's
-                    val changelogUrl = URL("https://github.com/aethux/Mochy-Music/releases/download/$tag/changelog.json")
+                    val changelogUrl = URL("https://github.com/aethux/Mocha-Music/releases/download/$tag/changelog.json")
                     val connection = changelogUrl.openConnection() as HttpURLConnection
                     connection.setRequestProperty("User-Agent", "Mocha-Changelog-App")
                     connection.setRequestProperty("Accept", "application/json")
@@ -213,7 +213,7 @@ fun ChangelogScreen(
         isFetchingOldReleases = true
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                val releasesUrl = URL("https://api.github.com/repos/aethux/Mochy-Music/releases")
+                val releasesUrl = URL("https://api.github.com/repos/aethux/Mocha-Music/releases")
                 val connection = releasesUrl.openConnection() as HttpURLConnection
                 connection.setRequestProperty("User-Agent", "Mocha-Changelog-App")
                 connection.setRequestProperty("Accept", "application/vnd.github+json")

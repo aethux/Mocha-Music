@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# MOCHY-APPLE: this fork ships as Mocha, built from aethux/Mochy-Music
+# MOCHY-APPLE: this fork ships as Mocha, built from aethux/Mocha-Music
 # BSD sed needs an empty backup suffix; GNU sed does not.
 sed_in_place() {
     if [[ "$OSTYPE" == darwin* ]]; then

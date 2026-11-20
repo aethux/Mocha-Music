@@ -41,7 +41,7 @@ It exits non-zero if a seam is untagged or over 20 added lines.
 
 | remote | repository | role |
 | --- | --- | --- |
-| `origin` | `aethux/Mochy-Music` | the fork. This is where work is pushed. |
+| `origin` | `aethux/Mocha-Music` | the fork. This is where work is pushed. |
 | `upstream` | `realidkroo/Mochy-Music` | where updates come from. Never pushed to. |
 
 `main` tracks `upstream/main`, `apple-sync` tracks `origin/apple-sync`. Pushing is never ambiguous:
