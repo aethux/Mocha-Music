@@ -23,6 +23,7 @@ import com.mocha.mochymusic.playlistcover.CoverChoice
 import com.mocha.mochymusic.playlistcover.PlaylistCoverStyle
 import com.mocha.mochymusic.playlistcover.PlaylistCovers
 import com.mocha.mochymusic.utils.rememberPreference
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -76,7 +77,9 @@ fun CreatePlaylistDialog(
         var sheet: PopupSheetHandle? = null
         sheet = menuState.showWithHandle(
             buttonBar = {
-                val scope = rememberCoroutineScope()
+                // MOCHY-APPLE: the sheet's own scope is cancelled by the recomposition the tap
+                // causes, so the create would never run; this one outlives the sheet
+                val scope = CoroutineScope(Dispatchers.IO)
                 val toastContext = LocalContext.current
                 SheetPillButton(
                     text = stringResource(if (form.busy) R.string.pc_creating else R.string.pc_create_playlist),
