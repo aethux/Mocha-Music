@@ -242,6 +242,8 @@ private val SettingsIndex = listOf(
     SettingsEntry("YouTube Music", "Audio Lab", "audio_quality", "youtube turn off disable provider only monochrome apple music"),
 
     // Integrations
+    // MOCHY-APPLE: the fork's Apple Music row, so search can find the screen
+    SettingsEntry("Apple Music", "Integrations", com.mocha.mochymusic.ui.applesync.AppleSyncRoute, "apple music sync library import playlists covers sign in audit"),
     SettingsEntry("Discord", "Integrations", DiscordRoute, "discord rich presence rpc status activity listening playing profile behaviour pause clear"),
     SettingsEntry("Last.fm", "Integrations", scrobbleServiceRoute(ScrobbleSite.LASTFM), "lastfm scrobble scrobbling history stats account sign in"),
     SettingsEntry("Libre.fm", "Integrations", scrobbleServiceRoute(ScrobbleSite.LIBREFM), "librefm scrobble scrobbling history stats account sign in"),
