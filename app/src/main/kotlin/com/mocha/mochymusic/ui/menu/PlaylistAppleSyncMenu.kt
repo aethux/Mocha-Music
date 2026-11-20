@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mocha.mochymusic.R
+import com.mocha.mochymusic.applesync.ApplePlaylistCreate
 import com.mocha.mochymusic.applesync.ApplePlaylistLinker
 import com.mocha.mochymusic.applesync.ApplePlaylistWrites
 import com.mocha.mochymusic.applesync.CoverOverrides
@@ -123,6 +124,26 @@ class PlaylistAppleSyncState internal constructor(
             linker.unlink(playlistId)
             linked = null
             message = null
+        }
+    }
+
+    /**
+     * A playlist with no Apple counterpart: make one there and take these songs with it.
+     *
+     * The picker only ever offered Apple's own playlists, and linking to one means every push
+     * replaces *that* list — so a playlist made here had nowhere to go. This is that place.
+     */
+    fun createOnApple() {
+        scope.launch {
+            busy = true
+            message = null
+            val result = runCatching { ApplePlaylistCreate.create(context, playlistId, quiet = true) }
+            linked = runCatching { linker.linked(playlistId) }.getOrNull()
+            pickerOpen = false
+            message = result.exceptionOrNull()?.message
+                ?: result.getOrNull()?.refusal
+                ?: context.getString(R.string.apple_playlist_created, linked?.remoteName.orEmpty())
+            busy = false
         }
     }
 
@@ -221,6 +242,19 @@ fun rememberPlaylistAppleSync(playlistId: String, onDismiss: () -> Unit): Playli
                     text = stringResource(R.string.menu_apple_pick_body),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                // first, because a playlist made here usually has nowhere else to go
+                MenuRow(
+                    icon = R.drawable.playlist_add,
+                    title = stringResource(R.string.menu_apple_create_title),
+                    enabled = !state.busy,
+                    onClick = { state.createOnApple() },
+                )
+                Text(
+                    text = stringResource(R.string.menu_apple_create_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                 )
                 for (playlist in state.candidates) {
                     // the same row shape as every other picker in the app

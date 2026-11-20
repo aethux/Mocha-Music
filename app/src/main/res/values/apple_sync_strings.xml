@@ -206,4 +206,11 @@
     <string name="apple_page_source">Read from music.apple.com in a page the app is signed in on. The REST copy of a library playlist lists only the songs saved to your library; this is what the player itself draws.</string>
     <string name="apple_page_menu">Read the page</string>
     <string name="apple_page_menu_desc">Compares what the Music app draws with what the import got</string>
+    <!-- creating a playlist on Apple -->
+    <string name="menu_apple_create_title">Create it on Apple Music</string>
+    <string name="menu_apple_create_desc">Apple gets a new playlist holding these songs, kept in step from then on</string>
+    <string name="apple_playlist_created">Created “%1$s” on Apple Music</string>
+    <string name="apple_playlist_create_failed">Could not create the playlist on Apple Music</string>
+    <string name="apple_playlist_create_refused">Apple won’t take a new playlist right now (%1$s)</string>
+    <string name="apple_playlist_create_unverified">Apple accepted the playlist but it has not appeared yet</string>
 </resources>

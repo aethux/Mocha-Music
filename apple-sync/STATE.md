@@ -98,6 +98,30 @@ never read these databases by copying `mochy.db` and `mochy.db-wal` as two files
 ignores the WAL and rows written seconds ago look absent. Stream them together
 (`tar -cf - databases/mochy.db databases/mochy.db-wal`).
 
+## Proven: a playlist made here can be made on Apple (2026-11-20)
+
+The picker in "Sync with Apple Music" only ever offered Apple's own playlists, and linking means every
+push replaces *that* list — so a playlist made in Mocha had nowhere to go, and the first push of a new
+one would have overwritten somebody else's. `ApplePlaylistCreate` (new) makes one instead: guard, then
+`POST /v1/me/library/playlists` with the local name, the id out of Apple's answer, the link row saved
+(so the watcher may push), then the songs through the same `ApplePlaylistWrites.push` every linked
+playlist uses. The row at the top of the picker is "Create it on Apple Music".
+
+Proven on the device:
+
+```
+PLAYLIST_CREATE  p.dl0kkO6IMvvD8VJ  201  verified=1
+PLAYLIST_REPLACE p.dl0kkO6IMvvD8VJ  204  verified=1
+```
+
+The first run of this (`p.NJZrr3rIOrrg6qR`) came back `verified=0` while its songs verified fine: the
+read-back used `playlistTrackTotal`, which reads `meta.total` — a brand-new **empty** playlist has
+none, so a good create was called unverified. It now asks Apple's playlist list for the id instead.
+
+Two test playlists were left on the account ("Aeth Apple Test", "Aeth Apple Test 2", one and two songs
+of real library songs) because the fork still has no delete-on-Apple action; remove them in Apple
+Music, or build that next and let the app do it.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
