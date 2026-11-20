@@ -37,12 +37,8 @@ fun IntegrationsScreen(navController: NavController) {
         onBack = { navController.navigateUp() },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IntegrationRow(
-                name = "Discord",
-                description = stringResource(R.string.integration_discord_desc),
-                icon = R.drawable.integration_discord,
-                onClick = { navController.navigate(DiscordRoute) },
-            )
+            // MOCHY-APPLE: Discord is hidden until presence can be shown at all - the gateway
+            // refuses an OAuth2 user token (4004), so the page could sign in and do nothing.
             IntegrationRow(
                 name = ScrobbleSite.LASTFM.label,
                 description = stringResource(R.string.integration_scrobbling_desc, ScrobbleSite.LASTFM.label),

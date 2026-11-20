@@ -62,6 +62,8 @@ internal data class DevPerson(
     val name: String,
     val bio: String,
     @DrawableRes val avatar: Int,
+    // MOCHY-APPLE: whose GitHub picture this page shows, so nobody wears somebody else's face
+    val githubUser: String? = null,
     /** the main dev takes donations, the donate section only shows for them */
     val takesDonations: Boolean = false,
     val socials: List<DevSocial> = emptyList(),
@@ -73,11 +75,13 @@ internal val DevPeople = listOf(
         name = "Aeth",
         bio = "the fork this app is - Apple Music as the library of record, and a lot of patience with playlists",
         avatar = R.drawable.frame_51_3,
+        githubUser = "aethux",
     ),
     DevPerson(
         name = "idkroo",
         bio = "ui ux guy here uhh idk what to write here, pls star the repo",
         avatar = R.drawable.frame_51_3,
+        githubUser = "realidkroo",
         takesDonations = true,
         socials = listOf(
             DevSocial("Instagram", InstagramUrl),
@@ -88,18 +92,24 @@ internal val DevPeople = listOf(
         name = "Keycii",
         bio = "Hi hello hi",
         avatar = R.drawable.dev_keycii,
+        githubUser = "realkeichi",
     ),
 )
 
 /** someone's picture, round, on the mock's light grey */
 @Composable
 internal fun DevAvatar(person: DevPerson, modifier: Modifier = Modifier) {
-    Image(
-        painter = rememberResourcePainter(person.avatar),
+    val face = modifier.clip(CircleShape).background(Color(0xFFD9D9D9))
+    val fallback = rememberResourcePainter(person.avatar)
+    // MOCHY-APPLE: each dev's own GitHub picture, the bundled one while it loads
+    if (person.githubUser != null) AsyncImage(
+        model = "https://github.com/${person.githubUser}.png?size=200",
         contentDescription = person.name,
+        modifier = face,
         contentScale = ContentScale.Crop,
-        modifier = modifier.clip(CircleShape).background(Color(0xFFD9D9D9)),
-    )
+        placeholder = fallback,
+        error = fallback,
+    ) else Image(fallback, person.name, face, contentScale = ContentScale.Crop)
 }
 
 private val AvatarSize = 84.dp

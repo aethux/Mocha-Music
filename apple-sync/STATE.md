@@ -229,6 +229,17 @@ Portal: OAuth redirect `discord-<client id>:/authorize/callback`, and the Social
 bundle enabled (the scopes are `openid identify sdk.social_layer_presence`). Nothing else in the
 pipeline is missing — `MusicService` already pushes play state into `DiscordPresence`.
 
+## Discord is hidden for now (2026-11-20)
+
+The Integrations row is gone — commented out in `IntegrationsScreen` with the reason — because the
+page could sign in and then do nothing: the gateway refuses an OAuth2 user token (4004). Its presence
+toggle is off on the test phone and the retry loop stops. The screens and the client-id/secret
+plumbing are left in place, so restoring it is uncommenting one row, not rebuilding the feature.
+
+Also fixed while in there: the dev pages wore the wrong face. Aeth's page showed the bundled picture
+for someone else; `DevPerson` now carries a `githubUser` and `DevAvatar` loads that person's own
+picture from GitHub, with the bundled one as placeholder and error.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
@@ -250,7 +261,61 @@ pipeline is missing — `MusicService` already pushes play state into `DiscordPr
   answer to "the automated playlists on Apple are not mine to change" - the same idea held locally.
   Needs: a rule model stored on the playlist row, one evaluation pass (the queries already exist),
   a create/edit sheet in Mocha's own card style, and an explicit "not synced" mark so nothing here
-  ever offers to link it.
+  ever offers to link it. **Asked for again on 2026-11-20 with the rule kinds named** — artist,
+  genre, "etc" — so the rule model wants at least artist, genre, liked, added-since and source, each
+  answered by a query the library already runs, and the pass has to be cheap enough to re-run on
+  every library change rather than on a button.
+
+- **Removing a song from the library must not take it out of playlists.** Locally it does not today:
+  "remove from library" only clears `song.inLibrary` (`SongEntity.toggleLibrary`) and the
+  `playlist_song_map` row is a separate table nothing deletes, so a playlist made here keeps the
+  song. What does lose it is Apple's side — Apple cascades a library removal into that account's own
+  playlists server-side — and then the fork's own reads and pushes bring the short list back: the
+  import rebuilds a linked playlist's membership from Apple's tracks, and the watcher pushes whatever
+  the local playlist now holds. Needs: confirm on the phone which of those two drops the row, then
+  keep membership by song id regardless of library state, mark a song Apple has dropped instead of
+  silently re-sending a playlist without it, and say so in the removal flow rather than leaving the
+  cascade as a surprise.
+
+- **The fork's own look: mascot, launcher icons, splash.** Nothing of it is Mocha's own yet — the
+  icon art is upstream's `ic_launcher_anime` / `ic_launcher_monochrome` (adaptive layers in
+  `mipmap-anydpi-v26`, foreground art in `drawable-nodpi`, the 15 styles the picker offers listed in
+  `utils/AppIcons.kt`, each one an activity alias in the manifest), the splash is
+  `drawable/ic_splash_mark.xml` with `LaunchIntro.kt` drawing the
+  same shapes in code to morph it into the home logo, and the TV welcome is `tv_mascot.webp`. Needs:
+  new art as foreground/background drawables plus a matching vector for the splash (the code-drawn
+  shapes must be re-pointed, not just the file replaced), a decision on whether the old icon set
+  stays in the picker or is replaced outright, the About/Profile art if it changes, and
+  `aapt2 dump badging` to confirm what the launcher and the store see.
+
+- **A small globe on every major page that opens that page on Apple Music.** Playlists, albums,
+  artists and songs all have a page on music.apple.com, and the fork already opens one: the
+  "Read the page" reader (`ApplePlaylistPageScreen`) is an attached WebView with the app's own
+  session and `captureHook`, which is the pattern to reuse rather than a new browser. Needs: a URL
+  builder per entity type (`music.apple.com/<storefront>/playlist/<id>`, `.../album/<id>?i=<songId>`,
+  `.../artist/<id>`), the catalogue id for each — a playlist's `p.…` from `link`/`playlist_meta`,
+  an album's and artist's from their `AM_`/`AM_ALB_` id, a song's from `AM_<catalogId>` — and the
+  honest case where there is none: a local-only, YouTube-only or unmatched song has no Apple page,
+  so the globe hides or says why instead of opening a search. One fork composable taking
+  (type, id) plus one tagged line in each header keeps it inside the seam budget.
+
+- **Discord rich presence, made to work.** The pipeline is already in the tree — `MusicService`
+  pushes play state into `DiscordPresence`, and the fork added Apple links (`music.apple.com/song/<id>`)
+  and a switch per button — but it has never been proven on the phone. `DiscordAuth.ClientId` reads
+  the id from the untracked `local.properties`, which now sets one, so the paragraph above calling it
+  empty predates that; another machine or a CI build still gets none. What is left is the Developer
+  Portal side (OAuth redirect `discord-<client id>:/authorize/callback`, the Social SDK / Rich
+  Presence bundle enabled, scopes `openid identify sdk.social_layer_presence`) and a device pass that
+  shows the card appearing and updating on a track change. Asked for as "add Discord RPC" — the
+  honest reading is finish and prove it, not build it from nothing.
+
+- **Anything else: suggestions and bug fixes welcome.** The standing request is that another session
+  picks from this list rather than inventing work, and that what testing turns up is written in
+  rather than fixed silently. Already open and known: duplicate artist rows when Apple's spelling
+  differs from an existing row (`artistByName` matches exactly), no draggable cover cropper (a chosen
+  cover is the centre 720 px square), Android Back inside a sheet closes it instead of stepping back
+  a page, three of the nine shared playlists still read no collaborator names, and a create from a
+  playlist screen was compile-checked but not driven on the phone.
 
 ## Not built yet, in the order I would do them
 
