@@ -44,6 +44,7 @@ import com.mocha.mochymusic.db.MusicDatabase
 import com.mocha.mochymusic.db.entities.Playlist
 import com.mocha.mochymusic.ui.component.DefaultDialog
 import com.mocha.mochymusic.ui.component.Material3MenuItemData
+import com.mocha.mochymusic.ui.component.TopToaster
 import com.mocha.mochymusic.ui.component.PopupSheetState
 import com.mocha.mochymusic.ui.player.menu.MenuRow
 import dagger.hilt.android.EntryPointAccessors
@@ -124,7 +125,11 @@ class PlaylistAppleSyncState internal constructor(
         scope.launch {
             linker.unlink(playlistId)
             linked = null
-            message = null
+            message = context.getString(R.string.menu_apple_unlinked)
+            TopToaster.show(
+                text = context.getString(R.string.menu_apple_unlinked),
+                iconRes = R.drawable.sync,
+            )
         }
     }
 
@@ -197,25 +202,59 @@ class PlaylistAppleSyncState internal constructor(
         },
     )
 
+    /**
+     * The one read that has to be certain.
+     *
+     * The menu it describes is a snapshot taken when the sheet opened, and the async prefetch can
+     * still be in flight at that moment - which is how a linked playlist came to be labelled "not
+     * synced". A single row lookup is cheap enough to take synchronously, once, and then cache.
+     */
+    private fun linkNow(): AppleLinkEntity? {
+        linked?.let { return it }
+        if (readOnce) return null
+        readOnce = true
+        val read = runCatching {
+            kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) { linker.linked(playlistId) }
+        }.getOrNull()
+        if (read != null) linked = read
+        return read
+    }
+
+    private var readOnce = false
+
     fun menuItem(): Material3MenuItemData? = Material3MenuItemData(
-        // linked, the row is the way to push by hand; unlinked, it is the way to choose the playlist
+        // linked, the row says so and sends by hand; unlinked, it is the way to choose a playlist
         title = {
             Text(
                 stringResource(
-                    if (linked != null) R.string.menu_apple_push_title else R.string.menu_apple_sync_title,
+                    if (linkNow() != null) R.string.menu_apple_connected else R.string.menu_apple_not_connected,
                 ),
             )
         },
         description = {
+            val link = linkNow()
             Text(
-                stringResource(
-                    if (linked != null) R.string.menu_apple_push_desc else R.string.menu_apple_sync_desc,
-                ),
+                if (link != null && link.lastSyncAt != null) {
+                    stringResource(R.string.menu_apple_connected_desc, ago(link.lastSyncAt))
+                } else {
+                    stringResource(R.string.menu_apple_not_connected_desc)
+                },
             )
         },
         icon = { Icon(painter = painterResource(R.drawable.sync), contentDescription = null) },
         onClick = ::open,
     )
+
+    /** "just now", "4 minutes ago", "2 days ago": the cue that a send landed and when. */
+    private fun ago(at: Long): String {
+        val minutes = ((System.currentTimeMillis() - at) / 60_000L).coerceAtLeast(0)
+        return when {
+            minutes < 1 -> context.getString(R.string.menu_apple_ago_now)
+            minutes < 60 -> context.getString(R.string.menu_apple_ago_minutes, minutes)
+            minutes < 60 * 24 -> context.getString(R.string.menu_apple_ago_hours, minutes / 60)
+            else -> context.getString(R.string.menu_apple_ago_days, minutes / (60 * 24))
+        }
+    }
 }
 
 /**

@@ -221,4 +221,16 @@
     <string name="apple_playlist_delete_refused">Apple Music did not delete the playlist (%1$s)</string>
     <string name="apple_playlist_delete_not_ours">“%1$s” was not made here, so Mocha will not delete it</string>
     <string name="apple_playlist_delete_unverified">Apple accepted the delete but the playlist is still there</string>
+    <!-- what the connection row says -->
+    <string name="menu_apple_connected">Connected to Apple Music</string>
+    <string name="menu_apple_not_connected">Not on Apple Music</string>
+    <string name="menu_apple_connected_desc">Sent %1$s · tap to send these songs again</string>
+    <string name="menu_apple_not_connected_desc">Tap to link one of Apple’s playlists, or make a new one</string>
+    <string name="menu_apple_unlinked">No longer connected to Apple Music</string>
+    <string name="menu_apple_ago_now">just now</string>
+    <string name="menu_apple_ago_minutes">%1$d min ago</string>
+    <string name="menu_apple_ago_hours">%1$d h ago</string>
+    <string name="menu_apple_ago_days">%1$d days ago</string>
+    <string name="menu_apple_connected_suffix">Connected to Apple Music</string>
+    <string name="menu_apple_not_connected_suffix">Not on Apple Music</string>
 </resources>

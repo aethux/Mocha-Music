@@ -146,6 +146,22 @@ so a row that only exists once an async read (`linked`) has finished never appea
 listed unconditionally now and the tap reads the link, which is also why the linked/unlinked title on
 the row next to it can read stale.
 
+## Cues: what the playlist says about Apple (2026-11-20)
+
+Every write ends in a toast, and the playlist itself says where it stands:
+
+- the line under its name reads "16 songs · 53m · **Connected to Apple Music**", or "0 songs · **Not on
+  Apple Music**" for a playlist Apple has never seen — read through `appleConnectionSuffix` in
+  `applesync/ui/PlaylistConnection.kt`, one keyed lookup, so it cannot lag behind like an async
+  prefetch;
+- the menu row reads **Connected to Apple Music** with "Sent N min ago", or **Not on Apple Music**;
+- toasts: "Sent 16 songs to Apple Music" (with a check), "Created “X” on Apple Music", "Deleted “X”
+  from Apple Music", "No longer connected to Apple Music", and an error sentence for every refusal.
+
+Wired without spending seam budget: the playlist screen was at 20 added lines, so the collaborators
+action moved into `appleCollaboratorsNav` (5 lines to 1) and the cue is one appended call. It now sits
+at 17.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is

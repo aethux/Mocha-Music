@@ -598,14 +598,10 @@ fun LocalPlaylistScreen(
                     stats = playlistStats(
                         context.resources.getQuantityString(R.plurals.n_song, songs.size, songs.size),
                         playlistLength,
-                    ),
+                    ) + com.mocha.mochymusic.applesync.ui.appleConnectionSuffix(context, currentPlaylist.playlist.id),
                     // MOCHY-APPLE: who else is on it, behind an icon beside shuffle
                     onCollaboratorsClick = if (credit.collaborative) {
-                        {
-                            navController.navigate(
-                                com.mocha.mochymusic.ui.applesync.appleCollaboratorsRoute(currentPlaylist.playlist.id),
-                            )
-                        }
+                        com.mocha.mochymusic.applesync.ui.appleCollaboratorsNav(navController, currentPlaylist.playlist.id)
                     } else {
                         null
                     },
