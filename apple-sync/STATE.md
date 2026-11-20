@@ -205,6 +205,13 @@ song at position 0. A playlist screen's "add every song of this one to another" 
 phone yet — the picker's create button was not reachable from that path in this session.
 `SelectionSongsMenu` is dead code (nothing calls it), so it was left alone.
 
+## The crossmix cap stays here (2026-11-20, decided)
+
+`CrossmixPlanner`'s unmatched-overlap cap is a genuine upstream bug fix — a blend that cannot beat-match
+at a slow tempo ran to 9.6 s. It was considered for a PR to `realidkroo/Mochy-Music` and the decision
+is: **keep it in this fork**. No upstream PR is planned from here, so nothing about it needs the
+upstream repo's permission and the fork stops tracking it as a pending errand.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
