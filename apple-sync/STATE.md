@@ -74,6 +74,14 @@ Traps hit again today: Room rejects a hand-written migration whose entity doesn'
   row a create path, link what Apple answers with, then verify the ordered ids by re-read like
   every other write.
 
+- **Unsynced playlists with rules, made in Mochy.** A playlist that lives only here, filled by a
+  rule the person sets (artist / liked / added-since / source), and never pushed: Apple has nowhere
+  for a playlist this app creates, and the ones it makes come from rules of its own. It is the
+  answer to "the automated playlists on Apple are not mine to change" - the same idea held locally.
+  Needs: a rule model stored on the playlist row, one evaluation pass (the queries already exist),
+  a create/edit sheet in Mochy's own card style, and an explicit "not synced" mark so nothing here
+  ever offers to link it.
+
 ## Not built yet, in the order I would do them
 
 0. **What was asked for next, in their words:**
