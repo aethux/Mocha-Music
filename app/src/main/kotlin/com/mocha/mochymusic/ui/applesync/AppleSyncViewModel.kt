@@ -79,6 +79,22 @@ class AppleSyncViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The session page writes the tokens while this page sits in the back stack, and the view model
+     * outlives it - so the state read once in [init] still says signed out when the person comes back.
+     */
+    fun refreshSession() {
+        if (state is State.SigningIn || state is State.Running || state is State.Done) return
+        viewModelScope.launch {
+            state = if (tokens.read() != null) State.Ready else State.SignedOut
+            accountLabel = runCatching { dao.account().first()?.label?.takeIf { it.isNotBlank() } }.getOrNull()
+                ?: runCatching {
+                    com.mocha.mochymusic.applesync.PlaylistCollaborators.selfName(dao.playlistMetas())
+                        ?.takeIf { it.isNotBlank() }
+                }.getOrNull()
+        }
+    }
+
     fun setWrites(on: Boolean) {
         viewModelScope.launch {
             AppleWritePrefs.set(context, on)

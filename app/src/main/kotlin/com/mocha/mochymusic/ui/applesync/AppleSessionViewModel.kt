@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.content.Context
 import org.json.JSONObject
+import com.mocha.mochymusic.applesync.AppleStorefronts
 import com.mocha.mochymusic.applesync.AppleTokens
 import com.mocha.mochymusic.applesync.AppleWritePrefs
 import com.mocha.mochymusic.applesync.AppleLibraryWrites
@@ -44,6 +45,10 @@ class AppleSessionViewModel @Inject constructor(
     // mismatch with "choose another country" instead of the library. A fresh session opens the plain
     // domain and lets Apple pick the country, then reads the account's own storefront back.
     var hasAccountStorefront by mutableStateOf(false)
+        private set
+
+    /** the listener's chosen storefront, else the account's own, else null: let Apple pick */
+    var region by mutableStateOf<String?>(null)
         private set
 
     var status by mutableStateOf("Opening music.apple.com…")
@@ -87,6 +92,7 @@ class AppleSessionViewModel @Inject constructor(
                 storefront = it
                 hasAccountStorefront = true
             }
+            region = AppleStorefronts.read(context) ?: storefront.takeIf { hasAccountStorefront }
             writesEnabled = AppleWritePrefs.enabled(context)
         }
     }
