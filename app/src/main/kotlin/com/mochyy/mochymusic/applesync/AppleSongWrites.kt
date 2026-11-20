@@ -512,6 +512,21 @@ object AppleSongWrites {
         return searchLibrary(client, catalogId, title)
     }
 
+    /**
+     * The `i.…` id Apple has for this catalogue song now: the replica first, then Apple's own
+     * library search.
+     *
+     * A playlist push needs it because `track.libraryId` is what the app wrote when the song was
+     * added, and Apple's library row can have moved on since - an id Apple no longer holds is
+     * accepted in a track list and then silently dropped, so the playlist ends up one song short.
+     */
+    suspend fun liveLibraryId(
+        client: AppleClient,
+        dao: AppleSyncDao,
+        catalogId: String,
+        title: String,
+    ): String? = libraryIdOf(client, dao, catalogId, title)
+
     /** The same, for an add: the row is not in the replica yet, so it is waited for. */
     private suspend fun awaitLibraryId(client: AppleClient, dao: AppleSyncDao, catalogId: String, title: String): String? {
         repeat(PollAttempts) { attempt ->

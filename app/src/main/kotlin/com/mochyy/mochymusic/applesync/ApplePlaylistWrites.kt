@@ -20,6 +20,8 @@ import com.mochyy.mochymusic.applesync.di.AppleSongWritesEntryPoint
 import com.mochyy.mochymusic.ui.component.TopToaster
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
@@ -27,6 +29,10 @@ import java.net.URL
 object ApplePlaylistWrites {
 
     private const val Host = "https://amp-api.music.apple.com"
+
+    /** A replace lands a moment after the 204, so the read that proves it is asked more than once. */
+    private const val ReadBackAttempts = 3
+    private const val ReadBackGapMs = 1_200L
 
     data class Result(
         val pushed: Int,
@@ -74,19 +80,32 @@ object ApplePlaylistWrites {
         // the songs that can be sent, in order: Apple takes its own library ids and nothing else
         val maps = database.playlistSongMaps(playlistId, 0)
         val signature = maps.joinToString(",") { it.songId }
+        // Apple's library as the last pull saw it, read once: the mapping's own library id can be
+        // one Apple has moved on from, and a replace that carries a dead id loses the song silently
+        val replica = runCatching {
+            dao.librarySongsReplica().first().associate { it.catalogId to it.libraryId }
+        }.getOrDefault(emptyMap())
+        val client = AppleClient(pair)
         val libraryIds = mutableListOf<String>()
         var skipped = 0
         for (map in maps) {
-            val libraryId = runCatching { dao.track(map.songId)?.libraryId }.getOrNull()
+            val catalogId = AppleSongWrites.catalogIdOf(dao, map.songId)
+            if (catalogId == null) {
+                skipped++
+                continue
+            }
+            val libraryId = replica[catalogId]
                 ?: runCatching {
-                    // catalogIdOf knows an AM_ id and a hand-made pin; the track row is sparse and
-                    // was the reason a playlist of imported songs pushed an empty list
-                    val catalogId = AppleSongWrites.catalogIdOf(dao, map.songId)
-                    catalogId?.let { dao.librarySong(it)?.libraryId }
+                    val title = database.getSongById(map.songId)?.song?.title.orEmpty()
+                    AppleSongWrites.liveLibraryId(client, dao, catalogId, title)
                 }.getOrNull()
             if (libraryId == null) skipped++ else libraryIds += libraryId
         }
-        if (libraryIds.isEmpty()) {
+        // An emptied playlist is a change like any other: `{"data":[]}` is what Apple takes, and
+        // refusing here is why removing the last song of a playlist never reached Apple. Only a
+        // playlist that had songs to send before may be emptied, so a fresh link cannot wipe one.
+        val emptying = libraryIds.isEmpty() && !link.lastSignature.isNullOrEmpty()
+        if (libraryIds.isEmpty() && !emptying) {
             return Result(0, skipped, refusal = context.getString(R.string.apple_playlist_nothing_to_send))
         }
 
@@ -131,13 +150,21 @@ object ApplePlaylistWrites {
             .getOrElse { error -> Answer(-1, error.message ?: "no answer") }
         val sent = answer.status in 200..299
 
-        // the read that proves it: a 204 is also what Apple says to a call it ignored
-        val readBack = if (sent) {
-            runCatching { AppleClient(pair).playlistTracks(link.remoteId).map { it.libraryId } }.getOrNull()
-        } else {
-            null
+        // The read that proves it: a 204 is also what Apple says to a call it ignored. It is not
+        // immediate either - a replace lands a moment later, so a single read taken in the same
+        // breath reports the list as it was and calls a good push unverified.
+        var readBack: List<String>? = null
+        if (sent) {
+            for (attempt in 0 until ReadBackAttempts) {
+                val read = runCatching {
+                    client.playlistTracks(link.remoteId).map { it.libraryId }
+                }.getOrNull()
+                if (read != null) readBack = read
+                if (read != null && PlaylistBody.sameOrder(libraryIds, read)) break
+                if (attempt < ReadBackAttempts - 1) delay(ReadBackGapMs)
+            }
         }
-        val verified = readBack != null && PlaylistBody.sameOrder(libraryIds, readBack)
+        val verified = sent && readBack != null && PlaylistBody.sameOrder(libraryIds, readBack!!)
 
         val reason = when {
             !sent -> PlaylistBody.sentence(answer.status, answer.body)
