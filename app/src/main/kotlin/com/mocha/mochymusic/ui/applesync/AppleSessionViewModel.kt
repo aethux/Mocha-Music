@@ -39,6 +39,13 @@ class AppleSessionViewModel @Inject constructor(
     var storefront by mutableStateOf("us")
         private set
 
+    // whether that storefront came from the account. Guessing one from the phone's locale is no better
+    // than guessing "us": Apple matches the storefront against the address it sees, and answers a
+    // mismatch with "choose another country" instead of the library. A fresh session opens the plain
+    // domain and lets Apple pick the country, then reads the account's own storefront back.
+    var hasAccountStorefront by mutableStateOf(false)
+        private set
+
     var status by mutableStateOf("Opening music.apple.com…")
         private set
 
@@ -76,7 +83,10 @@ class AppleSessionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dao.account().first()?.storefront?.takeIf { it.isNotBlank() }?.let { storefront = it }
+            dao.account().first()?.storefront?.takeIf { it.isNotBlank() }?.let {
+                storefront = it
+                hasAccountStorefront = true
+            }
             writesEnabled = AppleWritePrefs.enabled(context)
         }
     }
