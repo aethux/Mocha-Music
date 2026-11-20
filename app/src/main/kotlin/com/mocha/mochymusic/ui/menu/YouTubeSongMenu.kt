@@ -446,7 +446,9 @@ fun YouTubeSongMenu(
                             onClick = {
                                 val isInLibrary = librarySong?.song?.inLibrary != null
 
-                                coroutineScope.launch {
+                                // MOCHY-APPLE: the sheet's own scope is cancelled by the recomposition
+                                // this tap causes, so the add runs on a scope that outlives it
+                                kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                                     // MOCHY-APPLE: an add goes to Apple whenever the catalogue can
                                     // name the recording; YouTube's own library is only the fallback
                                     val asSong = com.mocha.mochymusic.db.entities.Song(

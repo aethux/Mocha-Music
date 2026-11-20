@@ -73,17 +73,24 @@ Traps hit again today: Room rejects a hand-written migration whose entity doesn'
 ## Open: the add from a search result (2026-11-20, unproven)
 
 `YouTubeSongMenu`'s "Add to library" only ever called `YouTube.toggleSongLibrary` and inserted a
-local row — Apple was never asked. It now asks `AppleSongWrites.pushLibrary` first and falls back to
-YouTube when the catalogue cannot name the recording (seam-tagged, 9 added lines, `seams.sh` 0).
+local row — Apple was never asked. It now offers the recording to `AppleSongWrites.pushLibrary`
+first and keeps YouTube as the fallback when the catalogue cannot name it (seam-tagged, `seams.sh`
+0), and the work runs on its own `CoroutineScope(Dispatchers.IO)` because the sheet's
+`rememberCoroutineScope()` is cancelled by the recomposition a tap causes.
 
-**Not proven, and the tap proves nothing yet**: on device (8.4.5 debug, `writes` on, session live)
-tapping it leaves *no* `audit` row at all — not `LIBRARY_ADD`, not a `BLOCK`, not a refusal — and no
-`song` row, while the menu's own label flips to "Remove from library" and the fork's card then says
-"2 songs aren't on Apple Music". Two candidate causes, both cheap to tell apart with one log line in
-`pushLibrary`: (a) the sheet's `coroutineScope` is cancelled by the dismiss before the launch body
-runs, so nothing is attempted; (b) `matchOnApple` throws and `runCatching` swallows it. Read the DB
-with `tar -cf - databases/mochy.db databases/mochy.db-wal` in one stream — copying the two files
-separately makes SQLite silently ignore the WAL, which is how the first read of this looked empty.
+**Still unproven, and here is exactly how far the evidence goes.** On device (8.4.5 debug, writes on,
+session live) a trace written to `cache/mocha-add.log` from the item's **first** statement never
+appears — while the same sheet's "Details" row opens Song Info from a tap at the same moment. The
+row's label still flips between "Add to library" and "Remove from library" on each tap. So the item
+is being hit and something changes, but its `onClick` body is not the thing running. Next move is the
+pattern that already worked for the playlist picker: hoist the request out of the sheet
+(`AddToPlaylistAsk`-style root-hosted state) instead of running it inside a `Material3MenuItemData`.
+
+Two traps worth remembering. `android.util.Log.d` from this app does **not** reach `adb logcat` on
+this phone (19 lines from the pid, none of them the app's own) — trace to a file in `cacheDir`
+instead. And **do not** read these databases by copying `mochy.db` and `mochy.db-wal` as two files:
+SQLite then silently ignores the WAL and recently written rows look absent. Stream them together
+(`tar -cf - databases/mochy.db databases/mochy.db-wal`) or read after a clean stop.
 
 ## Known broken (2026-11-20)
 
