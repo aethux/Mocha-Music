@@ -6,6 +6,11 @@ set -euo pipefail
 msg_file="$1"
 subject=$(head -n1 "$msg_file")
 
+# merges and reverts write their own subject, and saying so is the whole check
+case "$subject" in
+  "Merge "*|"Revert "*|Reapply*) exit 0 ;;
+esac
+
 if ! printf '%s' "$subject" | grep -qE '^apple-sync(\([a-z0-9-]+\))?: [a-z0-9].+'; then
   cat >&2 <<'EOF'
 commit-msg: bad subject.
@@ -42,6 +47,3 @@ if grep -qE '^seam:' "$msg_file"; then
   :
 fi
 
-case "$subject" in
-  "Merge "*|"Revert "*|Reapply*) exit 0 ;;
-esac
