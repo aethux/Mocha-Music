@@ -1083,12 +1083,12 @@ fun MorphingCover(
                     cardShape = if (squaredCards) artShape else null,
                     cardGap = if (squaredCards) SquaredCardGap else 0.dp,
                 ) { url, pictureModifier ->
-                    // MOCHY-APPLE: an Apple song's motion cover, drawn in the same box as its still
+                    // MOCHY-APPLE: an Apple song's motion cover, drawn in the same box as its still, with the listener's cover zoom on the still
                     com.mocha.mochymusic.applesync.ui.AppleCover(
                         songId = if (url == trackInfo.thumbnailUrl) trackInfo.mediaId else null,
                         modifier = (if (squaredCards) pictureModifier.then(cardGreyFilter) else pictureModifier)
                             .graphicsLayer { if (pictureHidden(url)) alpha = 0f },
-                    ) { coverModifier -> CoverPicture(thumbnailUrl = url, modifier = coverModifier) }
+                    ) { coverModifier -> CoverPicture(thumbnailUrl = url, modifier = coverModifier, zoom = com.mocha.mochymusic.applesync.ui.openCoverZoom(coverZoom, progressProvider, lyricsProgressProvider)) }
                 }
 
                 // Each song's canvas rides on its own cover's page, pinned to that song's place in the
