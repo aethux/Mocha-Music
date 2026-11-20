@@ -140,11 +140,8 @@ fun AppleSessionScreen(navController: NavController) {
                     // no storefront of our own on a first run: the bare domain lets Apple follow the
                     // address it sees, instead of answering with the country picker
                     loadUrl(
-                        if (viewModel.hasAccountStorefront) {
-                            "https://music.apple.com/${viewModel.storefront}/library/songs"
-                        } else {
-                            "https://music.apple.com/"
-                        },
+                        viewModel.region?.let { "https://music.apple.com/$it/library/songs" }
+                            ?: "https://music.apple.com/",
                     )
                     holder.value = this
                 }

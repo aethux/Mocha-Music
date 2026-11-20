@@ -2,11 +2,17 @@
 
 package com.mocha.mochymusic.ui.applesync
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -15,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
@@ -29,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mocha.mochymusic.R
+import com.mocha.mochymusic.applesync.AppleStorefronts
 import com.mocha.mochymusic.applesync.AppleAuditReport
 import com.mocha.mochymusic.ui.component.AppSwitch
 import com.mocha.mochymusic.ui.component.DefaultDialog
@@ -61,7 +69,15 @@ fun AppleSyncScreen(navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
+    // the Apple Music storefront the sign-in page opens in, chosen here rather than guessed
+    var region by remember { mutableStateOf<String?>(null) }
+    var pickingRegion by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { region = AppleStorefronts.read(context) }
+
     val signedIn = state !is AppleSyncViewModel.State.SignedOut
+
+    // coming back from the session page is the reason this runs: its tokens are saved by then
+    LaunchedEffect(Unit) { viewModel.refreshSession() }
 
     SubSettingsScaffold(
         title = stringResource(R.string.apple_sync_title),
@@ -94,6 +110,23 @@ fun AppleSyncScreen(navController: NavController) {
                             onClick = { navController.navigate(AppleSessionRoute) },
                         )
                     },
+                ),
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        SettingsGroup(
+            title = "Region",
+            style = SettingsGroupStyle.Grouped,
+            items =
+                listOf(
+                    SettingsItem(
+                        title = { Text(AppleStorefronts.name(region) ?: "Let Apple decide") },
+                        descriptionText = "Apple Music storefront the sign-in page opens in",
+                        icon = painterResource(R.drawable.globe),
+                        iconShape = CircleShape,
+                        onClick = { pickingRegion = true },
+                    ),
                 ),
         )
 
@@ -231,6 +264,54 @@ fun AppleSyncScreen(navController: NavController) {
         }
 
         Spacer(Modifier.height(140.dp))
+    }
+
+    if (pickingRegion) {
+        DefaultDialog(
+            onDismiss = { pickingRegion = false },
+            title = { Text("Region") },
+            buttons = {
+                TextButton(onClick = { pickingRegion = false }) {
+                    Text(stringResource(R.string.yt_sync_cancel))
+                }
+            },
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .heightIn(max = 380.dp)
+                        .verticalScroll(rememberScrollState()),
+            ) {
+                Text(
+                    text = "Which Apple Music storefront the sign-in page opens in. Apple answers a storefront it disagrees with by asking for a country instead of showing the library.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
+                for ((code, label) in AppleStorefronts.regions) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    pickingRegion = false
+                                    scope.launch {
+                                        AppleStorefronts.save(context, code)
+                                        region = code
+                                    }
+                                }
+                                .padding(vertical = 10.dp),
+                    ) {
+                        Text(label, modifier = Modifier.weight(1f))
+                        Text(
+                            text = if (region == code) "\u2713  " + code.uppercase() else code.uppercase(),
+                            color = if (region == code) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        }
     }
 
     if (confirmSignOut) {
