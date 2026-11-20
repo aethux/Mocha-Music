@@ -70,27 +70,33 @@ Traps hit again today: Room rejects a hand-written migration whose entity doesn'
   verified=1` with the signature back to the original 16 ids. Each push landed about a second after
   the tap, and `verified` is Apple's own list re-read and compared in order, not the 2xx.
 
-## Open: the add from a search result (2026-11-20, unproven)
+## Proven: an add from a search result reaches Apple (2026-11-20)
 
-`YouTubeSongMenu`'s "Add to library" only ever called `YouTube.toggleSongLibrary` and inserted a
-local row — Apple was never asked. It now offers the recording to `AppleSongWrites.pushLibrary`
-first and keeps YouTube as the fallback when the catalogue cannot name it (seam-tagged, `seams.sh`
-0), and the work runs on its own `CoroutineScope(Dispatchers.IO)` because the sheet's
-`rememberCoroutineScope()` is cancelled by the recomposition a tap causes.
+`YouTubeSongMenu`'s "Add to library" used to call only `YouTube.toggleSongLibrary` and insert a local
+row — Apple was never asked, so a song added from search never reached the library of record. It now
+offers the recording to `AppleSongWrites.pushLibrary` first (which matches the catalogue when the row
+has no Apple id, pushes the add and reads the library back) and keeps YouTube as the fallback for
+recordings the catalogue cannot name. The work runs on its own `CoroutineScope(Dispatchers.IO)`
+because the sheet's `rememberCoroutineScope()` is cancelled by the recomposition a tap causes.
 
-**Still unproven, and here is exactly how far the evidence goes.** On device (8.4.5 debug, writes on,
-session live) a trace written to `cache/mocha-add.log` from the item's **first** statement never
-appears — while the same sheet's "Details" row opens Song Info from a tap at the same moment. The
-row's label still flips between "Add to library" and "Remove from library" on each tap. So the item
-is being hit and something changes, but its `onClick` body is not the thing running. Next move is the
-pattern that already worked for the playlist picker: hoist the request out of the sheet
-(`AddToPlaylistAsk`-style root-hosted state) instead of running it inside a `Material3MenuItemData`.
+Proven on the device, twice, on the shipped code (8.4.5 debug, writes on, session live):
 
-Two traps worth remembering. `android.util.Log.d` from this app does **not** reach `adb logcat` on
-this phone (19 lines from the pid, none of them the app's own) — trace to a file in `cacheDir`
-instead. And **do not** read these databases by copying `mochy.db` and `mochy.db-wal` as two files:
-SQLite then silently ignores the WAL and recently written rows look absent. Stream them together
-(`tar -cf - databases/mochy.db databases/mochy.db-wal`) or read after a clean stop.
+```
+LIBRARY_ADD 1440801919 (Sultans Of Swing)  202  verified=1
+LIBRARY_ADD 1440912599 (Money For Nothing) 202  verified=1
+```
+
+202 is Apple accepting the add asynchronously; `verified=1` is `awaitLibraryId` finding the song in
+Apple's library afterwards, so the add is real and not just an accepted request. Local rows went in
+with the Apple id mapped (`cF3OWCYLLVQ`, `wTP2RUD_cL0`).
+
+**Probe notes, because two of them lied.** `android.util.Log.d` from this app does not reach
+`adb logcat` on this phone (19 lines from the pid, none of them the app's own) — and a file trace in
+`cacheDir` from the first statement of the click handler also never appeared, while the handler was
+in fact running. What settled it was a `TopToaster` probe, which is visible in a screenshot. Also:
+never read these databases by copying `mochy.db` and `mochy.db-wal` as two files — SQLite silently
+ignores the WAL and rows written seconds ago look absent. Stream them together
+(`tar -cf - databases/mochy.db databases/mochy.db-wal`).
 
 ## Known broken (2026-11-20)
 
