@@ -179,23 +179,26 @@ proven sign-in at risk for a cosmetic win — so the bar was replicated and the 
 Because the page was only reachable while signed out, the account row now opens it too: it is where a
 session would be renewed, and the only way to see what Mocha asks Apple for without signing out first.
 
-## Reproduced, unexplained: "Create playlist" does nothing (2026-11-20)
+## Fixed: "Create playlist" did nothing (2026-11-20)
 
-Found while making a local playlist to test the Apple create. Add to playlist → **Create playlist** →
-name the playlist → tap **Create playlist** in the dialog, and nothing happens: no row in `playlist`,
-no toast, the dialog stays open. Traced with a file write as the first statement of the button's
-`onClick` — the file is never created, so the handler does not run at all, while the name field in the
-same dialog takes typed text normally.
+The create sheet came up with its fields, and the pill under it did nothing. The cause was the fork's
+own "a menu opened from inside a menu replaces it" change: the second `showWithHandle` draws its
+content as a **page** over the open sheet, and a page carried only `content` — the nested sheet's
+**button bar was dropped**. So the pill on screen was the picker's own "Create playlist", whose onClick
+sets `showCreate = true` again: a no-op on a sheet that is already open. Nothing was broken in the
+create dialog at all, which is why every probe inside it looked dead.
 
-Tried and ruled out on the way: a tap at the pill's exact dumped bounds (five positions including two
-inside its own clickable view, which reports `enabled=true`), a long press, a double tap, and the
-dialog's own scope (which did die with the recomposition, so the create now runs on
-`CoroutineScope(Dispatchers.IO)` — a real fix, but not this one). Two candidates left: the pill's
-compose-level `enabled` is false while Android still reports the view enabled (a stuck `form.busy`),
-or the dialog is drawn in a window that is not the one the touch lands on.
+Fixed in `applesync/ui/SheetPages.kt`: a page now carries its `buttonBar` as well as its content, and
+the host draws the front page's bar when there is one (`PopupSheet.kt`, two lines changed, no lines
+added — `seams.sh` 0). The create dialog's own `CoroutineScope(Dispatchers.IO)` stayed too: its scope
+did die with the recomposition a tap causes.
 
-This matters beyond testing: playlists can only be made through that dialog — the playlists grid has
-no create button — so today a playlist on Apple can only be *linked to* one that already exists.
+Proven on the device with the real label: the pill appears, typing enables it, tapping creates the
+playlist — `Aeth Fixed` (`LPDTWNucyl`) and then `Aeth Shipped` (`LPoIIgodzx`), both deleted again after.
+
+**Still wrong, and small:** the freshly created playlist is empty. `AddToPlaylistDialog` opens the
+create sheet without `onPlaylistCreated`, so the song that started the flow is never added to the
+playlist it just made. Needs the picker to hand its ids to the create sheet and add them on success.
 
 ## Known broken (2026-11-20)
 

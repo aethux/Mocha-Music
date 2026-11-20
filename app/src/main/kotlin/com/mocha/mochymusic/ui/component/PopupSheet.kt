@@ -221,7 +221,7 @@ class PopupSheetState {
         content: @Composable ColumnScope.() -> Unit,
     ): PopupSheetHandle {
         // MOCHY-APPLE: a menu opened from inside a menu replaces it, and Back returns to it
-        frames.lastOrNull { !it.closing }?.let { front -> if (front.openAsPage(locked, fullBleed, surface, content)) return PopupSheetHandle(front) }
+        frames.lastOrNull { !it.closing }?.let { front -> if (front.openAsPage(locked, fullBleed, surface, buttonBar, content)) return PopupSheetHandle(front) }
 
         // A frame already on its way out stays on top until it's gone, so the new one slides in
         // underneath it rather than over a sheet that's leaving.
@@ -828,7 +828,7 @@ private fun SheetBody(
             )
         }
 
-        frame.buttonBar?.let { bar ->
+        (frame.pages.buttonBar ?: frame.buttonBar)?.let { bar ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

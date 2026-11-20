@@ -28,17 +28,31 @@ import com.mocha.mochymusic.ui.component.PopupSheetState
 /** The pages one sheet has taken on, on top of the content it was opened with. */
 internal class SheetPages(private val base: @Composable ColumnScope.() -> Unit) {
 
-    private val stack: SnapshotStateList<@Composable ColumnScope.() -> Unit> = mutableStateListOf()
+    /**
+     * A page is a menu, and a menu can carry a button bar of its own - "Create playlist" lives in
+     * one. Drawing the page's content and leaving the bar behind is how the create sheet came up
+     * with the picker's pill still under it, so the tap re-opened the sheet that was already open.
+     */
+    internal class Page(
+        val buttonBar: (@Composable () -> Unit)?,
+        val content: @Composable ColumnScope.() -> Unit,
+    )
+
+    private val stack: SnapshotStateList<Page> = mutableStateListOf()
 
     /** What the sheet draws: the last page, or its own content when nothing was pushed. */
     val content: @Composable ColumnScope.() -> Unit
-        get() = stack.lastOrNull() ?: base
+        get() = stack.lastOrNull()?.content ?: base
+
+    /** The bar the front page brought, so a nested sheet keeps its own action. */
+    val buttonBar: (@Composable () -> Unit)?
+        get() = stack.lastOrNull()?.buttonBar
 
     /** True while a page pushed over the base content is showing. */
     val hasPage: Boolean get() = stack.isNotEmpty()
 
-    fun push(page: @Composable ColumnScope.() -> Unit) {
-        stack.add(page)
+    fun push(buttonBar: (@Composable () -> Unit)?, page: @Composable ColumnScope.() -> Unit) {
+        stack.add(Page(buttonBar, page))
     }
 
     /** True when it stepped back a page; false when there was no page to step back from. */
@@ -59,10 +73,11 @@ internal fun PopupSheetState.Frame.openAsPage(
     locked: Boolean,
     fullBleed: Boolean,
     surface: Color?,
+    buttonBar: (@Composable () -> Unit)?,
     page: @Composable ColumnScope.() -> Unit,
 ): Boolean {
     if (locked || fullBleed || surface != null || this.locked || this.fullBleed) return false
-    pages.push(page)
+    pages.push(buttonBar, page)
     return true
 }
 
