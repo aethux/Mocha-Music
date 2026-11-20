@@ -219,7 +219,7 @@ fun LocalPlaylistScreen(
     val downloadUtil = LocalDownloadUtil.current
     var downloadState by remember { mutableIntStateOf(Download.STATE_STOPPED) }
 
-    val editable: Boolean = playlist?.playlist?.isEditable == true
+    val editable: Boolean = com.mochyy.mochymusic.applesync.ui.playlistIsEditable(playlist?.id)
     // unlocking from the menu turns the rows into drag handles; the bar's tick locks them again
     val isEditingOrder = sortType == PlaylistSongSortType.CUSTOM && !locked && !isSearching && editable && !inSelectMode
 
@@ -589,7 +589,7 @@ fun LocalPlaylistScreen(
                 PlaylistHeader(
                     onSearchClick = { isSearching = true },
                     // MOCHY-APPLE: Apple's own list, or one the account only follows
-                    readOnly = !currentPlaylist.playlist.isEditable,
+                    readOnly = !com.mochyy.mochymusic.applesync.ui.playlistIsEditable(currentPlaylist.playlist.id),
                     title = currentPlaylist.playlist.name,
                     // MOCHY-APPLE: credited to the playlist's own owner, and "collaborative" said in words
                     creators = credit.creators,
