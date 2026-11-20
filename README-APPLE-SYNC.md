@@ -14,6 +14,6 @@ This repo is the fork. The Apple Music work lives on the `apple-sync` branch.
 - Apple is the library of record; Mocha imports it as `AM_<catalogueId>` songs.
 - Writes go through an embedded music.apple.com page (tokens) and the documented REST endpoints (data), behind `AppleGuard`, which refuses anything pre-existing or unowned.
 - The epoch in `apple_sync.db` (1516 rows) is the promise that nothing of yours changes by accident.
-- Remotes: `origin` = your fork (`aethux/Mochy-Music`), `upstream` = `realidkroo/Mochy-Music`.
+- Remotes: `origin` = your fork (`aethux/Mocha-Music`), `upstream` = `realidkroo/Mochy-Music`.
 
 **Before any commit:** `./scripts/seams.sh` must exit 0.

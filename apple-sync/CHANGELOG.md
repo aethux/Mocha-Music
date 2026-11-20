@@ -20,7 +20,7 @@ those are derived from the class name, so they compile under the old package and
 
 What deliberately keeps upstream's spelling: the `MOCHY-APPLE` seam tags, the `mochyymodule` zip
 marker, the `X-Mochy-Auth`/`X-Mochy-Key` headers, the `mochy.db` file, resource ids such as
-`Theme.mochy`, and the `aethux/Mochy-Music` repo slug. They are wire formats, file names and what the
+`Theme.mochy`, and the `aethux/Mocha-Music` repo slug. They are wire formats, file names and what the
 rewritten `scripts/seams.sh` normalises away.
 
 That check now compares both sides with the rename undone and pairs a package move's old and new
@@ -32,7 +32,7 @@ Two side effects of the budget the rename exposed: the All songs page moved into
 Apple-only reads moved into `applesync/db/AppleSongDao.kt`, registered on the same database, leaving
 `DatabaseDao` room for real seams.
 
-Updates, the changelog and the commit list read `aethux/Mochy-Music`; the donate prompt and its two
+Updates, the changelog and the commit list read `aethux/Mocha-Music`; the donate prompt and its two
 rows are gone; Aeth is credited beside the upstream lead devs.
 
 ## The shape of the fork

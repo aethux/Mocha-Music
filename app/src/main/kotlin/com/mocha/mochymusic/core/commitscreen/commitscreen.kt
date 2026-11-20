@@ -106,7 +106,7 @@ fun CommitScreen(
         coroutineScope.launch(Dispatchers.IO) {
             try {
                 // MOCHY-APPLE: this build's own repo, not upstream's
-                val url = URL("https://api.github.com/repos/aethux/Mochy-Music/commits?branch=main&per_page=50")
+                val url = URL("https://api.github.com/repos/aethux/Mocha-Music/commits?branch=main&per_page=50")
                 val json = url.openStream().bufferedReader().use { it.readText() }
                 val array = JSONArray(json)
                 val outputFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault())
