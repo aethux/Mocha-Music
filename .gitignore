@@ -65,6 +65,8 @@ app/*.json
 
 # Keystores
 app/persistent-debug.keystore
+# MOCHY-APPLE: the release key lives here; it must never be committed
+app/keystore/
 
 # Native & C++ build outputs
 .externalNativeBuild
