@@ -148,6 +148,9 @@ object CrossmixPlanner {
                     val landing = pickLanding(style, out, inc, exit.swapMs, swap, period, tempo, locked, outVoice, inVoice, latestLanding) ?: continue
                     val match = if (locked) beatMatch(inc!!, landing.timeMs, tempo!!, period, maxSpeedUp) else null
                     if (style.needsBeatMatch && match == null) continue
+                    // MOCHY-APPLE: the unmatched cap follows the real lock, not the tempo estimate - a sweep that could not
+                    // lock must not run 16 beats because a matched pair would have been allowed to
+                    if (match == null && !style.entersAtEnd && length * period > MaxUnmatchedOverlapMs * settings.length.scale) continue
                     val inBeat = match?.inBeatMs ?: period
                     // heard from the start of a blend, or from the hand-over for a drop; up to a bar of silent run-up before that, so the beat is locked before anyone hears it
                     val heardFrom = if (style.entersAtEnd) length.toFloat() else 0f
@@ -576,9 +579,10 @@ object CrossmixPlanner {
         out: TrackAnalysis?,
     ): CrossmixPlan {
         val style = CrossmixStyle.FilterSweep
-        val beats = 16
-        // the song's own count when it has one, even a shaky one, so the sweep moves with it; else 10 s over the 16
-        val beatMs = out?.bpm?.takeIf { it in 70f..180f }?.let { 60_000.0 / it } ?: (ForcedBlendMs / beats)
+        // the song's own count when it has one, even a shaky one, so the sweep moves with it; else 10 s over 16 beats
+        val beatMs = out?.bpm?.takeIf { it in 70f..180f }?.let { 60_000.0 / it } ?: (ForcedBlendMs / 16)
+        // nothing here can lock, so the cap that keeps an unmatched overlap short applies to this blend too
+        val beats = min(16, (MaxUnmatchedOverlapMs / beatMs).toInt().coerceAtLeast(4))
         val lengthMs = (beatMs * beats).toLong()
         val lines = parseLines(outgoing.lyrics)
         val latestStart = (naturalEnd - lengthMs).coerceAtLeast(0L)
