@@ -348,7 +348,7 @@ private fun ColumnScope.AboutSheetContent(
     Box(Modifier.fillMaxWidth()) {
         // zero-size layout places the spinning ring behind the top icon without pushing the column down
         VersionRing(
-            text = "MOCHY $installed",
+            text = "MOCHA $installed",
             scrollProgress = { scrollState.value / ringScrollRangePx },
             modifier =
                 Modifier
