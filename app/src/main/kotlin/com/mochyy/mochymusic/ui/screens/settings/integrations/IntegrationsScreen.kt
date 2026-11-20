@@ -17,6 +17,7 @@ import com.mochyy.mochymusic.scrobble.ScrobbleSite
 import com.mochyy.mochymusic.ui.applesync.AppleSyncRoute
 import com.mochyy.mochymusic.ui.component.SubSettingsScaffold
 import com.mochyy.mochymusic.ui.screens.settings.importsync.YouTubeSyncRoute
+import com.mochyy.mochymusic.ui.screens.settings.integrations.backup.BackupRoute
 import com.mochyy.mochymusic.ui.screens.settings.integrations.discord.DiscordRoute
 
 const val IntegrationsRoute = "integrations_settings"
@@ -26,6 +27,8 @@ private val YouTubeMusicRed = Color(0xFFFF0000)
 
 // MOCHY-APPLE: Apple Music's own red, so its row sits with the others as a logo, not a headset
 private val AppleMusicRed = Color(0xFFFA243C)
+// backup has no brand of its own, so its white cloud sits on a plain blue tile
+private val BackupBlue = Color(0xFF2F7CF6)
 
 @Composable
 fun IntegrationsScreen(navController: NavController) {
@@ -66,6 +69,15 @@ fun IntegrationsScreen(navController: NavController) {
                 icon = R.drawable.provider_apple_music,
                 iconBackground = AppleMusicRed,
                 onClick = { navController.navigate(AppleSyncRoute) },
+            )
+
+            IntegrationRow(
+                name = stringResource(R.string.integration_backup_name),
+                description = stringResource(R.string.integration_backup_desc),
+                icon = R.drawable.backup,
+                iconBackground = BackupBlue,
+                iconPadding = 7.dp,
+                onClick = { navController.navigate(BackupRoute) },
             )
         }
 

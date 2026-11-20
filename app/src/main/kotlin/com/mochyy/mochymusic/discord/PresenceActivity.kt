@@ -94,9 +94,9 @@ data class PresenceActivity(
                     else -> null
                 },
                 state = PresenceText.line(settings.state, track),
-                largeImage = PresenceImages.pick(settings.largeImage, track, nowMs, settings.spin, settings.largeCustomImage) ?: PresencePicture.Logo,
+                largeImage = PresenceImages.pick(settings.largeImage, track, nowMs, settings.spin, settings.largeCustomImage, settings.canvasFps, settings.canvasSize) ?: PresencePicture.Logo,
                 largeText = PresenceText.line(settings.largeText, track),
-                smallImage = PresenceImages.pick(settings.smallImage, track, nowMs, settings.spin, settings.smallCustomImage),
+                smallImage = PresenceImages.pick(settings.smallImage, track, nowMs, settings.spin, settings.smallCustomImage, settings.canvasFps, settings.canvasSize),
                 smallText = PresenceText.line(settings.smallText, track),
                 startMs = start,
                 endMs = end,
