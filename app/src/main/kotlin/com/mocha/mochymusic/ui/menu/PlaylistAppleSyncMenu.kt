@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mocha.mochymusic.R
 import com.mocha.mochymusic.applesync.ApplePlaylistCreate
+import com.mocha.mochymusic.applesync.ApplePlaylistDelete
 import com.mocha.mochymusic.applesync.ApplePlaylistLinker
 import com.mocha.mochymusic.applesync.ApplePlaylistWrites
 import com.mocha.mochymusic.applesync.CoverOverrides
@@ -151,6 +152,51 @@ class PlaylistAppleSyncState internal constructor(
         pickerOpen = false
     }
 
+    var askDelete by mutableStateOf(false)
+        private set
+
+    /** A delete is destructive and irreversible on Apple's side, so it is asked, never assumed. */
+    fun askToDelete() {
+        askDelete = true
+    }
+
+    fun dismissDelete() {
+        askDelete = false
+    }
+
+    fun deleteOnApple() {
+        askDelete = false
+        scope.launch {
+            busy = true
+            message = null
+            val result = runCatching { ApplePlaylistDelete.delete(context, playlistId, quiet = true) }
+            linked = runCatching { linker.linked(playlistId) }.getOrNull()
+            message = result.exceptionOrNull()?.message
+                ?: result.getOrNull()?.refusal
+                ?: result.getOrNull()?.name?.let { context.getString(R.string.apple_playlist_deleted, it) }
+            busy = false
+        }
+    }
+
+    /**
+     * The row is always there: the menu it lives in is a snapshot of the state at the moment it
+     * opened, so a row that only exists once the link has been read never appears at all. The tap
+     * reads the link instead, and says so when there is none.
+     */
+    fun deleteMenuItem(): Material3MenuItemData = Material3MenuItemData(
+        title = { Text(stringResource(R.string.menu_apple_delete_title)) },
+        description = { Text(stringResource(R.string.menu_apple_delete_desc)) },
+        icon = { Icon(painter = painterResource(R.drawable.delete), contentDescription = null) },
+        onClick = {
+            val link = linked
+            if (link == null) {
+                message = context.getString(R.string.apple_playlist_unlinked)
+            } else {
+                askDelete = true
+            }
+        },
+    )
+
     fun menuItem(): Material3MenuItemData? = Material3MenuItemData(
         // linked, the row is the way to push by hand; unlinked, it is the way to choose the playlist
         title = {
@@ -266,6 +312,29 @@ fun rememberPlaylistAppleSync(playlistId: String, onDismiss: () -> Unit): Playli
                     )
                 }
             }
+        }
+    }
+
+    if (state.askDelete) {
+        DefaultDialog(
+            onDismiss = state::dismissDelete,
+            title = { Text(stringResource(R.string.menu_apple_delete_title)) },
+            buttons = {
+                TextButton(onClick = state::dismissDelete) {
+                    Text(stringResource(R.string.yt_sync_cancel))
+                }
+                TextButton(onClick = state::deleteOnApple) {
+                    Text(stringResource(R.string.menu_apple_delete_title))
+                }
+            },
+        ) {
+            Text(
+                text = stringResource(
+                    R.string.apple_playlist_delete_confirm,
+                    state.linked?.remoteName.orEmpty(),
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
     }
 

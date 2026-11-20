@@ -461,6 +461,7 @@ fun PlaylistMenu(
                     )
                     resync.menuItem()?.let(::add)
                     appleSync.menuItem()?.let(::add)  // MOCHY-APPLE
+                    add(appleSync.deleteMenuItem())  // MOCHY-APPLE
                     if (downloadPlaylist != true) {
                         add(
                             when (downloadState) {

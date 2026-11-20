@@ -213,4 +213,12 @@
     <string name="apple_playlist_create_failed">Could not create the playlist on Apple Music</string>
     <string name="apple_playlist_create_refused">Apple won’t take a new playlist right now (%1$s)</string>
     <string name="apple_playlist_create_unverified">Apple accepted the playlist but it has not appeared yet</string>
+    <!-- deleting a playlist this app made on Apple -->
+    <string name="menu_apple_delete_title">Delete it on Apple Music</string>
+    <string name="menu_apple_delete_desc">Takes the playlist off Apple; the copy here stays</string>
+    <string name="apple_playlist_delete_confirm">Delete “%1$s” from Apple Music? It disappears from your Apple library. The playlist here stays, and simply stops following it.</string>
+    <string name="apple_playlist_deleted">Deleted “%1$s” from Apple Music</string>
+    <string name="apple_playlist_delete_refused">Apple Music did not delete the playlist (%1$s)</string>
+    <string name="apple_playlist_delete_not_ours">“%1$s” was not made here, so Mocha will not delete it</string>
+    <string name="apple_playlist_delete_unverified">Apple accepted the delete but the playlist is still there</string>
 </resources>

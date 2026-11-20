@@ -122,6 +122,30 @@ Two test playlists were left on the account ("Aeth Apple Test", "Aeth Apple Test
 of real library songs) because the fork still has no delete-on-Apple action; remove them in Apple
 Music, or build that next and let the app do it.
 
+## Proven: a playlist this app made on Apple can be deleted (2026-11-20)
+
+`ApplePlaylistDelete` (new) plus a "Delete it on Apple Music" row in the playlist menu, behind a
+confirmation dialog that names the playlist. The guard is what makes it safe: a delete is refused for
+anything in the epoch, and refused again unless the playlist is in `owned` — the table written only
+when this fork created it — so the account's own playlists are not deletable from here whatever the
+menu offers. The local playlist is untouched; the link is dropped, so it simply stops following.
+
+Proven on the device, on both test playlists this session had left on the account:
+
+```
+PLAYLIST_DELETE p.NJZrr3rIOrrg6qR  204  verified=1
+PLAYLIST_DELETE p.dl0kkO6IMvvD8VJ  204  verified=1
+```
+
+`verified=1` is Apple's own playlist list no longer carrying the id — a 204 is also what Apple answers
+to a call it ignored. Both link rows and both `owned` rows went with them, and the account is back to
+its original 26 playlists.
+
+One UI lesson worth keeping: the menu a long-press opens is a **snapshot** of the state at that moment,
+so a row that only exists once an async read (`linked`) has finished never appears at all. The row is
+listed unconditionally now and the tap reads the link, which is also why the linked/unlinked title on
+the row next to it can read stale.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
