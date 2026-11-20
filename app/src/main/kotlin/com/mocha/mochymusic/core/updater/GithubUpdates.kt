@@ -14,7 +14,7 @@ import java.net.URL
 
 // MOCHY-APPLE: this build's own repo, so updates and the changelog describe what is installed
 const val GithubOwner = "aethux"
-const val GithubRepo = "Mochy-Music"
+const val GithubRepo = "Mocha-Music"
 
 const val GithubProfileUrl = "https://github.com/$GithubOwner"
 const val GithubRepoUrl = "https://github.com/$GithubOwner/$GithubRepo"

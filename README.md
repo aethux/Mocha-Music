@@ -29,7 +29,7 @@ wire format: the `mochyymodule` zip marker, the `X-Mochy-Auth` header, the `moch
   keeps to itself (a mix, or one the account only follows) is marked and refused, never replaced.
 - **Ordering and sorting on All songs**, animated Apple covers in the player, a cover picker, and the
   fork's own song menu with the four tiles.
-- **Updates come from this repo** (`aethux/Mochy-Music`), not upstream.
+- **Updates come from this repo** (`aethux/Mocha-Music`), not upstream.
 
 The engine, its tables and the traps already hit are written down in
 [`README-APPLE-SYNC.md`](README-APPLE-SYNC.md) and [`apple-sync/STATE.md`](apple-sync/STATE.md);
@@ -39,7 +39,7 @@ The engine, its tables and the traps already hit are written down in
 
 ## Install
 
-1. Open the [releases page](https://github.com/aethux/Mochy-Music/releases) and download the APK for
+1. Open the [releases page](https://github.com/aethux/Mocha-Music/releases) and download the APK for
    your phone: **arm64-v8a** is almost every phone from the last eight years, **universal** runs
    anywhere and is bigger.
 2. Install it. Android asks to allow installs from the browser or file manager you used.
