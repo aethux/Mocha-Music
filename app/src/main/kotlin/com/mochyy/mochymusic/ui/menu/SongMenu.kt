@@ -57,6 +57,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.music.innertube.YouTube
 import com.mochyy.mochymusic.LocalDatabase
+import com.mochyy.mochymusic.applesync.ui.AddToPlaylistAsk
 import com.mochyy.mochymusic.importer.ImportedVersions
 import com.mochyy.mochymusic.importer.TrackMatch
 import com.mochyy.mochymusic.ui.component.LocalMenuState
@@ -160,30 +161,9 @@ fun SongMenu(
         SongEditSheet(metadata = song.toMediaMetadata(), onDismiss = { showEditDialog = false })
     }
 
-    var showChoosePlaylistDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     var showErrorPlaylistAddDialog by rememberSaveable {
         mutableStateOf(false)
     }
-
-    AddToPlaylistDialog(
-        isVisible = showChoosePlaylistDialog,
-        onGetSong = { playlist ->
-            coroutineScope.launch(Dispatchers.IO) {
-                playlist.playlist.browseId?.let { browseId ->
-                    YouTube.addToPlaylist(browseId, song.id)
-                }
-            }
-            listOf(song.id)
-        },
-        onDismiss = {
-            showChoosePlaylistDialog = false
-        },
-        topSongId = song.id,
-        topSongArtworkUrl = song.song.thumbnailUrl,
-    )
 
     if (showErrorPlaylistAddDialog) {
         ListDialog(
@@ -287,7 +267,8 @@ fun SongMenu(
         item {
             // MOCHY-APPLE: the same four tiles the player's menu opens with. The library button and
             // the heart used to be a row and a small header button, which made one menu look like two
-            SongRowActionGrid(song, download?.state, coroutineScope) { showChoosePlaylistDialog = true }
+            // MOCHY-APPLE: the picker is drawn at the app's root - pushed here, its own host unmounts
+            SongRowActionGrid(song, download?.state, coroutineScope) { AddToPlaylistAsk.ask(song); onDismiss() }
         }
 
         item { Spacer(modifier = Modifier.height(10.dp)) }
@@ -518,6 +499,7 @@ fun SongMenu(
                                         )
                                         delete(playlistSong.map.copy(position = Int.MAX_VALUE))
                                     }
+                                    announceRemovedFromPlaylist(context, database, playlistSong.map.playlistId, song.song.title, song.song.thumbnailUrl)
                                     onDismiss()
                                 }
                             )
@@ -625,12 +607,7 @@ fun SongMenu(
         }
 
         // MOCHY-APPLE: what Apple makes of this song and where its cover came from
-        item {
-            SongInfoFooter(
-                songId = song.id,
-                inLibrary = song.song.inLibrary != null,
-            )
-        }
+        item { SongInfoFooter(song.id, song.song.inLibrary != null) }
     }
 }
 

@@ -964,6 +964,8 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("developer_space?person=$personIndex")
                         },
                     )
+                    // MOCHY-APPLE: the playlist picker, hosted above the sheet that asks for it
+                    com.mochyy.mochymusic.applesync.ui.AddToPlaylistOpener()
                     com.mochyy.mochymusic.ui.screens.donate.DonatePromptScheduler(
                         enabled = setupCompleted && onboardedHere && !forceShowSetup,
                     )

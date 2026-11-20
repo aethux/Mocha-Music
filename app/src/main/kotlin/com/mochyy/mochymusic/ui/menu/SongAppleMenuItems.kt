@@ -6,6 +6,7 @@
 
 package com.mochyy.mochymusic.ui.menu
 
+import android.content.Context
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,11 +21,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.applesync.di.ApplePlaylistEntryPoint
+import com.mochyy.mochymusic.db.MusicDatabase
 import com.mochyy.mochymusic.ui.component.Material3MenuItemData
+import com.mochyy.mochymusic.ui.component.TopToaster
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import com.mochyy.mochymusic.ui.pick.appleMatchRoute
 import com.mochyy.mochymusic.ui.pick.pickRecordingRoute
+
+/**
+ * Says a song left a playlist, and the playlist it left.
+ *
+ * A removal used to happen silently - and on an Apple playlist the difference between "gone here
+ * and there" and "did the tap work?" is exactly what the person needs to know.
+ */
+internal fun announceRemovedFromPlaylist(
+    context: Context,
+    database: MusicDatabase,
+    playlistId: String,
+    title: String,
+    thumbnail: String?,
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val name = runCatching { database.playlist(playlistId).first()?.playlist?.name }.getOrNull()
+            ?: context.getString(R.string.playlist_fallback_name)
+        TopToaster.show(
+            text = context.getString(R.string.playlist_removed_song_from, title, name),
+            thumbnail = thumbnail,
+            iconRes = R.drawable.remove,
+        )
+    }
+}
 
 @Composable
 fun appleSongMenuItems(
