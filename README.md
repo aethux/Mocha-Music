@@ -53,10 +53,12 @@ notifies when a newer build is published here.
 > does not replace Mochy Music and does not carry its data across. The library, the playlists and the
 > Apple Music session start empty, and the old app stays installed until you remove it.
 
-> [!WARNING]
-> The APKs published here are signed with the fork's **local debug key** unless the build machine had
-> `keystore/release.keystore` plus `STORE_PASSWORD` / `KEY_ALIAS` / `KEY_PASSWORD` set (see below).
-> That is fine for sideloading on your own phone; it is not an identity to trust for anything else.
+> [!IMPORTANT]
+> From **8.4.6** the APKs published here are signed with this fork's own release key
+> (`CN=Mocha Music, O=Aeth, C=IN`, SHA-256 `69:47:CF:5B:44:88:1C:DA:5A:06:56:45:90:C5:1E:61:12:7C:8D:B5:92:36:3D:4A:A2:64:9A:1D:B7:17:D7:8E`).
+> Releases up to and including **8.4.5** were signed with a **local debug key**, so Android will refuse
+> to update one over the other: uninstall 8.4.5 once, then install 8.4.6. From then on updates work
+> normally, because the key does not change again.
 
 Android 8.0+ (API 24). Android 7 works unofficially.
 
