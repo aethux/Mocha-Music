@@ -265,7 +265,10 @@ class DiscordAuth @Inject constructor(
         private const val LogTag = "DiscordAuth"
 
         val ClientId: String get() = BuildConfig.DISCORD_CLIENT_ID
-        val RedirectUri: String get() = "discord-$ClientId:/authorize/callback"
+        // MOCHY-APPLE: two slashes, not one. `discord-<id>:/authorize/callback` is what an
+        // Android intent filter needs, but Discord's portal refuses to save it (a URL with no
+        // host), and the token exchange has to send the same string that was registered.
+        val RedirectUri: String get() = "discord-$ClientId://authorize/callback"
 
         /**
          * sdk.social_layer_presence is Discord's own bundle for apps that show what the user is
