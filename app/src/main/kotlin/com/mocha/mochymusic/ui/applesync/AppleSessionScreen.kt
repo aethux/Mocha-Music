@@ -52,6 +52,11 @@ import androidx.navigation.NavController
 import com.mocha.mochymusic.LocalHideAppChrome
 import com.mocha.mochymusic.applesync.page.ApplePageScripts
 import com.mocha.mochymusic.applesync.page.WebViewApplePage
+import com.mocha.mochymusic.importer.account.AccountService
+import com.mocha.mochymusic.ui.screens.setup.onboarding.BrowserSheetBar
+import com.mocha.mochymusic.ui.screens.setup.onboarding.ProviderSquircle
+import androidx.compose.ui.res.stringResource
+import com.mocha.mochymusic.R as MochaR
 
 const val AppleSessionRoute = "apple_session"
 
@@ -75,6 +80,10 @@ fun AppleSessionScreen(navController: NavController) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var confirmWrites by remember { mutableStateOf(false) }
     var sheetOpen by remember { mutableStateOf(false) }
+    // what the bar shows: the page's own address, so the screen names the thing it is showing
+    var pageUrl by remember {
+        mutableStateOf(viewModel.region?.let { "https://music.apple.com/$it/library/songs" } ?: "https://music.apple.com/")
+    }
 
     // the page is the whole point of this screen, and the app's own bar and mini player were drawn on top of it
     val chrome = LocalHideAppChrome.current
@@ -86,19 +95,22 @@ fun AppleSessionScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // the page used to run under the status bar, so Apple's own "Sign In" sat behind the clock;
         // the bar keeps both controls above the page instead of on top of its header
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(horizontal = 4.dp, vertical = 2.dp),
-        ) {
-            TextButton(onClick = { navController.navigateUp() }) {
-                Text("\u2039 Back", color = Color.White)
-            }
-            TextButton(onClick = { sheetOpen = true }) {
-                Text("Mocha", color = Color.White)
+        // the same bar the module sign-in uses: the provider's own mark, what is being signed into,
+        // and the address the page is on - so this screen says what it is instead of two words
+        Column(modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars)) {
+            BrowserSheetBar(
+                icon = { ProviderSquircle(AccountService.APPLE_MUSIC, size = 38.dp) },
+                // the page is Apple Music itself, signed in or not: naming it "sign in to" was a lie the
+                // moment a session already existed
+                title = "Apple Music",
+                url = pageUrl,
+                onClose = { navController.navigateUp() },
+            )
+            TextButton(
+                onClick = { sheetOpen = true },
+                modifier = Modifier.padding(start = 10.dp),
+            ) {
+                Text("Mocha", color = Color.White.copy(alpha = 0.7f))
             }
         }
 
@@ -134,7 +146,12 @@ fun AppleSessionScreen(navController: NavController) {
                     val page = WebViewApplePage(this)
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
+                            url?.let { pageUrl = it }
                             currentOnPage(page)
+                        }
+
+                        override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
+                            url?.let { pageUrl = it }
                         }
                     }
                     // no storefront of our own on a first run: the bare domain lets Apple follow the

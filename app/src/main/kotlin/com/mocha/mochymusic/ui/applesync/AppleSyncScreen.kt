@@ -100,6 +100,9 @@ fun AppleSyncScreen(navController: NavController) {
                                     Text(stringResource(R.string.apple_sync_sign_out))
                                 }
                             },
+                            // signed in, the page is still worth a look: it is where a session would be
+                            // renewed, and the only way to see what Mocha is actually asking Apple for
+                            onClick = { navController.navigate(AppleSessionRoute) },
                         )
                     } else {
                         SettingsItem(

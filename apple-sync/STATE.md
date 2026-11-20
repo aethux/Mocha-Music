@@ -162,6 +162,23 @@ Wired without spending seam budget: the playlist screen was at 20 added lines, s
 action moved into `appleCollaboratorsNav` (5 lines to 1) and the cue is one appended call. It now sits
 at 17.
 
+## The session page wears the module sign-in's bar (2026-11-20)
+
+The hand-rolled row ("‹ Back" / "Mocha") is gone. The page now carries `BrowserSheetBar` with
+`ProviderSquircle(AccountService.APPLE_MUSIC)`, the title **Apple Music**, the **live URL** the page
+is on (`music.apple.com/in/home` after Apple's own storefront redirect), and the close button — the
+same bar the module sign-in uses, so the two look like one app. Verified on the phone: the page
+renders Apple's own header and Home below it, nothing under the clock, no app chrome over it.
+
+**What was not done, and why:** the WebView itself was left alone rather than moved onto
+`CaptureWebContent`. The fork's capture runs `ApplePageScripts.captureHook()` as a document-start
+script and drives `WebViewApplePage` through `AppleSessionViewModel`; `CaptureWebContent` is the
+importer's pipeline with its own probes. Swapping the pipeline to gain a bar would put a working,
+proven sign-in at risk for a cosmetic win — so the bar was replicated and the capture path kept.
+
+Because the page was only reachable while signed out, the account row now opens it too: it is where a
+session would be renewed, and the only way to see what Mocha asks Apple for without signing out first.
+
 ## Known broken (2026-11-20)
 
 - ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
