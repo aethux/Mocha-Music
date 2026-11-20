@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,10 +44,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mocha.mochymusic.LocalHideAppChrome
 import com.mocha.mochymusic.applesync.page.ApplePageScripts
 import com.mocha.mochymusic.applesync.page.WebViewApplePage
 
@@ -71,9 +76,34 @@ fun AppleSessionScreen(navController: NavController) {
     var confirmWrites by remember { mutableStateOf(false) }
     var sheetOpen by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // the page is the whole point of this screen, and the app's own bar and mini player were drawn on top of it
+    val chrome = LocalHideAppChrome.current
+    DisposableEffect(Unit) {
+        chrome.value = true
+        onDispose { chrome.value = false }
+    }
+
+    Column(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        // the page used to run under the status bar, so Apple's own "Sign In" sat behind the clock;
+        // the bar keeps both controls above the page instead of on top of its header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+        ) {
+            TextButton(onClick = { navController.navigateUp() }) {
+                Text("\u2039 Back", color = Color.White)
+            }
+            TextButton(onClick = { sheetOpen = true }) {
+                Text("Mocha", color = Color.White)
+            }
+        }
+
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
             factory = { context ->
                 WebView(context).apply {
                     settings.javaScriptEnabled = true
@@ -86,6 +116,10 @@ fun AppleSessionScreen(navController: NavController) {
                             "(KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36"
                     CookieManager.getInstance().setAcceptCookie(true)
                     CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+                    // the algorithmic dark mode turned Apple's own controls into white-on-white: the
+                    // site brings its own theme, the same fix the import capture WebView carries
+                    WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, false)
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) isForceDarkAllowed = false
                     // the recorder goes in before the page's own scripts: patch fetch afterwards and
                     // Apple's client never routes through it
                     if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
@@ -103,31 +137,17 @@ fun AppleSessionScreen(navController: NavController) {
                             currentOnPage(page)
                         }
                     }
-                    loadUrl("https://music.apple.com/${viewModel.storefront}/library/songs")
+                    // no storefront of our own on a first run: the bare domain lets Apple follow the
+                    // address it sees, instead of answering with the country picker
+                    loadUrl(
+                        viewModel.region?.let { "https://music.apple.com/$it/library/songs" }
+                            ?: "https://music.apple.com/",
+                    )
                     holder.value = this
                 }
             },
         )
 
-        // one small button, bottom right: the page keeps every other pixel
-        Button(
-            onClick = { sheetOpen = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-        ) {
-            Text("Mocha")
-        }
-
-        TextButton(
-            onClick = { navController.navigateUp() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(4.dp)
-                .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(12.dp)),
-        ) {
-            Text("‹ Back", color = Color.White)
-        }
     }
 
     if (sheetOpen) {
