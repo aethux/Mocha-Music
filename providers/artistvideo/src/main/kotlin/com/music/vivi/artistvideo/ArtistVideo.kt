@@ -1,4 +1,4 @@
-package com.mochyy.mochymusic.artistvideo
+package com.mocha.mochymusic.artistvideo
 
 import android.view.TextureView
 import android.view.ViewGroup

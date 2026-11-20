@@ -11,7 +11,7 @@ Read this first. It is the state of the fork, what is proven, and what is next.
 | Playlist create / add / replace / delete | sandbox run, verified by re-read, audit rows |
 | Library add / remove | 2 songs added and removed from the real library |
 | Favourite / unfavourite | `200` + heart present, then cleared |
-| Import into Mochy | `AM_<catalogueId>` songs in `mochy.db`, idempotent on re-run |
+| Import into Mocha | `AM_<catalogueId>` songs in `mochy.db`, idempotent on re-run |
 | Epoch + audit | 1516 rows, "everything that was there is still there" after every write test |
 
 ## Endpoints that matter (all confirmed on the account)
@@ -37,7 +37,7 @@ Read this first. It is the state of the fork, what is proven, and what is next.
 - A playlist is only writable once **linked** — the link row is the user's permission, and the guard refuses anything else.
 - Nothing in the epoch is ever modified; nothing not owned is ever deleted.
 - Songs added from other providers default to **not** syncing; adds to the library or to an Apple playlist sync both ways.
-- The UI follows Mochy's own patterns: settings groups for settings, playlist menus for playlist actions, import cards for progress.
+- The UI follows Mocha's own patterns: settings groups for settings, playlist menus for playlist actions, import cards for progress.
 
 ## Where this stopped (2026‑11‑19, all of it committed)
 
@@ -50,7 +50,7 @@ Built today, in the commits named in `git log upstream/main..HEAD`:
 - Tapping the playing row in the library opens the player (`LibraryEntityListScreen`) instead of restarting.
 - "See video" honoured in module/skin styles, and it says so instead of doing nothing when YouTube has no video.
 
-Fixed after their first test round, same day: the YouTube **liked-songs sync was un-liking every Apple song** on each run (`localToggleLike()` over everything not in YouTube's LM), which is why a heart never stuck; it now skips `AM_` ids. The **Apple → Mochy** direction now exists: `AppleImport` mirrors the rating onto the local row on every import (proven on device: a rating set through Apple's API came back as `liked = 1` after one refresh). The **library button** was refused 19 times in a row by the epoch (`PRE_EXISTING_OBJECT`) — a confirmed tap is now allowed: the refusal toast offers "Remove anyway" and says the removal cascades into Apple playlists. `aYesDoesNotRemoveAnIdTheAppHasNeverSeen` and friends hold that line.
+Fixed after their first test round, same day: the YouTube **liked-songs sync was un-liking every Apple song** on each run (`localToggleLike()` over everything not in YouTube's LM), which is why a heart never stuck; it now skips `AM_` ids. The **Apple → Mocha** direction now exists: `AppleImport` mirrors the rating onto the local row on every import (proven on device: a rating set through Apple's API came back as `liked = 1` after one refresh). The **library button** was refused 19 times in a row by the epoch (`PRE_EXISTING_OBJECT`) — a confirmed tap is now allowed: the refusal toast offers "Remove anyway" and says the removal cascades into Apple playlists. `aYesDoesNotRemoveAnIdTheAppHasNeverSeen` and friends hold that line.
 
 Unverified on device: the picker's UI and the rematch-aware re-import (compiles, installs, 48 applesync tests green). Still unproven: the library **add** push (needs a song whose Apple copy is not in the library yet).
 
@@ -74,23 +74,23 @@ Traps hit again today: Room rejects a hand-written migration whose entity doesn'
   row a create path, link what Apple answers with, then verify the ordered ids by re-read like
   every other write.
 
-- **Unsynced playlists with rules, made in Mochy.** A playlist that lives only here, filled by a
+- **Unsynced playlists with rules, made in Mocha.** A playlist that lives only here, filled by a
   rule the person sets (artist / liked / added-since / source), and never pushed: Apple has nowhere
   for a playlist this app creates, and the ones it makes come from rules of its own. It is the
   answer to "the automated playlists on Apple are not mine to change" - the same idea held locally.
   Needs: a rule model stored on the playlist row, one evaluation pass (the queries already exist),
-  a create/edit sheet in Mochy's own card style, and an explicit "not synced" mark so nothing here
+  a create/edit sheet in Mocha's own card style, and an explicit "not synced" mark so nothing here
   ever offers to link it.
 
 ## Not built yet, in the order I would do them
 
 0. **What was asked for next, in their words:**
    1. **The Apple match sheet comes back.** It was removed from the song menu today (only the YouTube picker in force-change survived). The song menu needs "Match on Apple Music…" again, searching the Apple catalogue and pinning the recording — this is the same sheet as the picker, with Apple as the provider.
-   2. **Adding to the library in Mochy must reach Apple**: on "add to library", match the song on Apple (`AppleMatcher`), and push the add when it matches.
-   3. **Like and add/remove must work both ways**: Mochy → Apple is built and proven; Apple → Mochy at pull time is **not** — `AppleImport` writes `liked` only when it inserts a new song, never on a re-import, and nothing reconciles a rating changed on Apple afterwards.
+   2. **Adding to the library in Mocha must reach Apple**: on "add to library", match the song on Apple (`AppleMatcher`), and push the add when it matches.
+   3. **Like and add/remove must work both ways**: Mocha → Apple is built and proven; Apple → Mocha at pull time is **not** — `AppleImport` writes `liked` only when it inserts a new song, never on a re-import, and nothing reconciles a rating changed on Apple afterwards.
    4. **When no Apple match is found on an add**: ask — a sheet with Apple search prefilled with the song's name, plus a **Skip** that adds the YouTube version instead, marked as not synced with Apple.
 1. **Manual rematch, Apple side.** The mapping, the resolver hook and the `externalId` path all exist; only the Apple-facing sheet and the "keep as YouTube" answer are missing. Monochrome has no search API, only `addLink`.
-2. **Playlists as real Mochy playlists** (import + membership), then add/remove/reorder push through the guard.
+2. **Playlists as real Mocha playlists** (import + membership), then add/remove/reorder push through the guard.
 3. **Refresh diff**: snapshot vs Apple tells us what was deleted on Apple; propose removals rather than deleting silently.
 4. Foreground service, so a sync survives the process being killed.
 
@@ -117,7 +117,7 @@ adb -s 001873517000081 install -r app/build/outputs/apk/universalFoss/debug/app-
 ```
 
 Emulator fallback: `apple-sync/dev/run-emulator.sh` (headless, `GPU=host`).
-Device database for inspection: `adb exec-out run-as com.mochyy.mochymusic.debug cat databases/apple_sync.db > /tmp/apple_sync.db` (pull the `-wal` too, or recent writes will not show).
+Device database for inspection: `adb exec-out run-as com.mocha.mochymusic.debug cat databases/apple_sync.db > /tmp/apple_sync.db` (pull the `-wal` too, or recent writes will not show).
 
 ## Traps this fork has already hit
 

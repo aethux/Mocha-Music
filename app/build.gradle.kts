@@ -19,12 +19,12 @@ plugins {
 }
 
 extensions.configure<ApplicationExtension> {
-    namespace = "com.mochyy.mochymusic"
+    namespace = "com.mocha.mochymusic"
     compileSdk = 37
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.mochyy.mochymusic"
+        applicationId = "com.mocha.mochymusic"
         minSdk = 24
         targetSdk = 37
         versionCode = 73

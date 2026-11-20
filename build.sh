@@ -183,7 +183,7 @@ if [ "$SKIP_BUILD" = false ]; then
         if [ -n "$CUSTOM_DATE" ]; then
             NOTICE_TITLE="mochy build #$BUILD_ATTEMPT $VARIANT ($CUSTOM_DATE)"
         fi
-        sed_in_place -e "s/text = \"Mochy DEV PREV\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
+        sed_in_place -e "s/text = \"Mocha DEV PREV\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
         sed_in_place -e "s/text = \"mochy build #[0-9]* .*\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
         sed_in_place -e "s/text = \"[0-9]*\.[0-9]*\.[0-9]*DEV\"/text = \"$BASE_VERSION build#$BUILD_ATTEMPT\"/g" "$BETA_NOTICE_FILE"
         sed_in_place -e "s/text = \"[0-9]*\.[0-9]*\.[0-9]* build#[0-9]*\"/text = \"$BASE_VERSION build#$BUILD_ATTEMPT\"/g" "$BETA_NOTICE_FILE"
@@ -238,11 +238,11 @@ if [ "$PUBLISH_RELEASE" = true ]; then
         fi
     }
 
-    format_apk "*universal-${FLAVOR}-release.apk" "mochy-$VERSION_LABEL-universal.apk"
-    format_apk "*arm64-${FLAVOR}-release.apk" "mochy-$VERSION_LABEL-arm64-v8a.apk"
-    format_apk "*armeabi-${FLAVOR}-release.apk" "mochy-$VERSION_LABEL-armeabi-v7a.apk"
-    format_apk "*x86_64-${FLAVOR}-release.apk" "mochy-$VERSION_LABEL-x86_64.apk"
-    format_apk "*x86-${FLAVOR}-release.apk" "mochy-$VERSION_LABEL-x86.apk"
+    format_apk "*universal-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-universal.apk"
+    format_apk "*arm64-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-arm64-v8a.apk"
+    format_apk "*armeabi-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-armeabi-v7a.apk"
+    format_apk "*x86_64-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-x86_64.apk"
+    format_apk "*x86-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-x86.apk"
 
     if [ -z "$CHANGELOG_TEXT" ]; then
         CHANGELOG_TEXT="mochy $VERSION_LABEL ($BUILD_ATTEMPT)"
@@ -251,7 +251,7 @@ if [ "$PUBLISH_RELEASE" = true ]; then
     # a nightly is its own prerelease, tagged by its version, so the app's nightly channel can tell them apart
     if [ -n "$NIGHTLY_NUMBER" ]; then
         TAG="nightly-$VERSION_LABEL"
-        TITLE="Mochy $VERSION_LABEL nightly ($BUILD_ATTEMPT)"
+        TITLE="Mocha $VERSION_LABEL nightly ($BUILD_ATTEMPT)"
         echo "Publishing nightly prerelease: '$TITLE'..."
         git tag -f "$TAG" main 2>/dev/null || true
         git push -f origin "$TAG" 2>/dev/null || true
@@ -303,11 +303,11 @@ if [ "$INSTALL_ON_DEVICES" = true ]; then
     else
         DEVICES=$(adb devices | grep -v "^List" | grep -w "device" | cut -f1)
         
-        PACKAGE_NAME="com.mochyy.mochymusic"
+        PACKAGE_NAME="com.mocha.mochymusic"
         if [ "$VARIANT" == "debug" ]; then
-            PACKAGE_NAME="com.mochyy.mochymusic.debug"
+            PACKAGE_NAME="com.mocha.mochymusic.debug"
         elif [ "$VARIANT" == "profileable" ]; then
-            PACKAGE_NAME="com.mochyy.mochymusic.profileable"
+            PACKAGE_NAME="com.mocha.mochymusic.profileable"
         fi
 
         if [ -z "$DEVICES" ]; then

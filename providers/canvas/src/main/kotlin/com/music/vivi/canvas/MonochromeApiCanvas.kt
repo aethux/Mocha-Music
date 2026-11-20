@@ -1,4 +1,4 @@
-package com.mochyy.mochymusic.canvas
+package com.mocha.mochymusic.canvas
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

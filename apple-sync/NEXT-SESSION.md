@@ -52,7 +52,7 @@ Working and verified on the device/account:
   the album endpoint with `?extend=editorialVideo` (108+ `apple_motion` rows with real
   `mvod.itunes.apple.com` HLS urls); "Clear cover cache" in Settings; player draws the
   animated cover in the same box via ExoPlayer (never confirmed visually).
-- **Playlists**: import as real Mochy playlists (26 playlists, 742 songs, Apple's order,
+- **Playlists**: import as real Mocha playlists (26 playlists, 742 songs, Apple's order,
   auto-linked, `bookmarkedAt` set so they appear in lists); refresh button now runs the
   playlist import too; push writer (`PUT …/playlists/{id}/tracks`, full list) plus a 5s
   watcher that pushes changed playlists; imports seed the watcher so they don't echo back.
@@ -96,7 +96,7 @@ Broken or unproven — fix before adding features:
 
 ## 4. Rules for the work
 
-- **The UI must look like Mochy's, never like a new app.** Reuse the app's own components
+- **The UI must look like Mocha's, never like a new app.** Reuse the app's own components
   before writing any: `SearchCategoryRow`, `LibraryGridScreen`/`LibraryGridArtwork`,
   `SheetActionCard`, `MenuRow`, `Material3MenuItemGroup`, `SettingsItem`/`SettingsGroup`,
   `ImportInfoCard`, `PlaylistSortControl`. Matching means the same heights, paddings,

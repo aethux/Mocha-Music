@@ -58,7 +58,7 @@ counter), `AppleLibraryDiff` (what disappeared). Reading is always allowed; writ
 audited, verified. The import mirrors Apple's rating into the local `liked` flag on every run, so a
 heart set in Apple comes back here.
 
-**Import into Mochy's own tables.** `AppleImport` writes `AM_<catalogueId>` rows: song, artist,
+**Import into Mocha's own tables.** `AppleImport` writes `AM_<catalogueId>` rows: song, artist,
 album links, cover. It is idempotent, and a refresh compares in memory instead of asking per row.
 
 **Matching.** `AppleMatcher` (catalogue search and ISRC), `AppleRematch` / `AppleRematchStore` (a
@@ -68,7 +68,7 @@ so upstream's test file stayed clean.
 **Albums.** `AppleAlbums` writes `AM_ALB_<id>` album rows, `song.albumId` and `song_album_map`, all
 in batched transactions, and skips the pass entirely when a stamp of the album set has not changed.
 
-**Playlists.** `ApplePlaylistImport` creates real Mochy playlists (Apple's order, bookmarked, linked),
+**Playlists.** `ApplePlaylistImport` creates real Mocha playlists (Apple's order, bookmarked, linked),
 `ApplePlaylistWrites` and `ApplePlaylistPush` send changes back, `ApplePlaylistLinker` links a local
 playlist to an Apple one, `PlaylistBody` builds the ordered track list.
 

@@ -14,7 +14,7 @@ SDK="${ANDROID_HOME:-$HOME/Android/Sdk}"
 ADB="$SDK/platform-tools/adb"
 EMU="$SDK/emulator/emulator"
 AVD="${AVD:-mochy}"
-PKG="com.mochyy.mochymusic.debug"
+PKG="com.mocha.mochymusic.debug"
 root=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
 
 "$ADB" start-server >/dev/null 2>&1 || true
@@ -48,7 +48,7 @@ echo "installing $(basename "$apk")"
 
 echo "launching $PKG"
 "$ADB" shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || \
-  "$ADB" shell am start -n "$PKG/com.mochyy.mochymusic.MainActivity" >/dev/null
+  "$ADB" shell am start -n "$PKG/com.mocha.mochymusic.MainActivity" >/dev/null
 
 "$ADB" devices -l | sed -n '2p'
 

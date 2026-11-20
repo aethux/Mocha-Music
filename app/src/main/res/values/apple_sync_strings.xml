@@ -14,10 +14,10 @@
     <string name="apple_sync_sign_in_title">Sign in</string>
     <string name="apple_sync_sign_in_desc">Connect your Apple Music library</string>
     <string name="apple_sync_sign_out">Sign out</string>
-    <string name="apple_sync_sign_out_confirm">Mochy will stop syncing with this account. Nothing on Apple is changed.</string>
+    <string name="apple_sync_sign_out_confirm">Mocha will stop syncing with this account. Nothing on Apple is changed.</string>
     <string name="apple_sync_changes_header">Changes</string>
-    <string name="apple_sync_allow_title">Allow Mochy to change your library</string>
-    <string name="apple_sync_allow_desc">Only playlists and songs Mochy created itself</string>
+    <string name="apple_sync_allow_title">Allow Mocha to change your library</string>
+    <string name="apple_sync_allow_desc">Only playlists and songs Mocha created itself</string>
     <string name="apple_sync_now_header">Now</string>
     <string name="apple_sync_check_title">Check my library</string>
     <string name="apple_sync_check_desc">Reads everything and reports anything missing</string>
@@ -28,7 +28,7 @@
     <string name="apple_sync_untouched">Everything that was there is still there</string>
     <string name="apple_sync_drift">Something changed</string>
     <string name="apple_sync_counts">%1$d songs and %2$d playlists in %3$s</string>
-    <string name="apple_sync_baseline">%1$d recorded before Mochy ever wrote anything</string>
+    <string name="apple_sync_baseline">%1$d recorded before Mocha ever wrote anything</string>
     <string name="apple_sync_missing">Missing since: %1$d</string>
     <string name="apple_sync_added">Added since: %1$d</string>
     <string name="apple_sync_baseline_taken">baseline taken</string>
@@ -39,7 +39,7 @@
     <string name="menu_apple_push_title">Send to Apple Music</string>
     <string name="menu_apple_push_desc">Sends this playlist’s songs, in this order, to Apple now</string>
     <string name="menu_apple_pick_title">Which Apple playlist?</string>
-    <string name="menu_apple_pick_body">Pick the Apple Music playlist this one should stay in step with. Linking is what allows Mochy to change it; nothing outside the link is touched.</string>
+    <string name="menu_apple_pick_body">Pick the Apple Music playlist this one should stay in step with. Linking is what allows Mocha to change it; nothing outside the link is touched.</string>
     <string name="menu_apple_linked">Linked to %1$s</string>
 
     <!-- Search YouTube Music by hand: the guess was wrong, so the user picks the recording -->
@@ -58,9 +58,9 @@
     <string name="pick_no_video">YouTube has no video for this song; pick one in the song\'s menu instead</string>
 
     <!-- The heart and the library button, pushed to Apple as they are pressed -->
-    <string name="apple_write_off">Turn on “Allow Mochy to change your library” first</string>
+    <string name="apple_write_off">Turn on “Allow Mocha to change your library” first</string>
     <string name="apple_write_signed_out">Apple signed this session out. Sign in again.</string>
-    <string name="apple_write_preexisting">Mochy won\'t remove a song that was in your library before it started syncing</string>
+    <string name="apple_write_preexisting">Mocha won\'t remove a song that was in your library before it started syncing</string>
     <string name="apple_write_added">Added to your Apple Music library</string>
     <string name="apple_write_removed">Removed from your Apple Music library</string>
     <string name="apple_write_pending">Apple is still adding it; it lands in a moment</string>
@@ -100,7 +100,7 @@
     <string name="apple_playlist_read_only_mark">Read-only Apple Music playlist</string>
     <string name="apple_playlist_unverified">Apple took it, but its list doesn’t match what was sent — check the playlist</string>
     <string name="apple_playlists_import">Import Apple playlists</string>
-    <string name="apple_playlists_import_desc">Brings every playlist on your account into Mochy as a real playlist, with its songs in Apple’s order, and links each one so changes can go back.</string>
+    <string name="apple_playlists_import_desc">Brings every playlist on your account into Mocha as a real playlist, with its songs in Apple’s order, and links each one so changes can go back.</string>
     <string name="apple_playlists_imported">%1$d playlists · %2$d songs imported</string>
     <string name="apple_covers_clear">Clear cover cache</string>
     <string name="apple_covers_clear_desc">Covers are remembered, so imports and refreshes don’t fetch them again. Clearing this makes the next import fetch every cover once more — animated artwork first, then Apple’s still, then YouTube’s.</string>
@@ -130,12 +130,12 @@
     <string name="apple_like_removing">Removing “%1$s” from your favourites…</string>
     <string name="apple_like_added">Loved “%1$s” on Apple Music</string>
     <string name="apple_like_removed">“%1$s” is no longer a favourite on Apple Music</string>
-    <string name="apple_like_unmapped">“%1$s” isn\'t on Apple Music yet, so this heart stays in Mochy</string>
+    <string name="apple_like_unmapped">“%1$s” isn\'t on Apple Music yet, so this heart stays in Mocha</string>
     <string name="apple_write_adding">Adding “%1$s” to Apple Music…</string>
     <string name="apple_write_removing">Taking “%1$s” out of Apple Music…</string>
     <string name="apple_write_added_as">Added “%1$s” — %2$s to your Apple Music library</string>
-    <string name="apple_write_no_match">Apple Music has no match for \'%1$s\'. It stays in Mochy only.</string>
-    <string name="apple_write_remove_confirm">Mochy didn\'t add “%1$s” to your library. Removing it also takes it out of every Apple playlist.</string>
+    <string name="apple_write_no_match">Apple Music has no match for \'%1$s\'. It stays in Mocha only.</string>
+    <string name="apple_write_remove_confirm">Mocha didn\'t add “%1$s” to your library. Removing it also takes it out of every Apple playlist.</string>
     <string name="apple_write_remove_anyway">Remove anyway</string>
     <string name="lib_playlists_show_grid">Show as grid</string>
     <string name="lib_playlists_show_list">Show as list</string>
@@ -155,7 +155,7 @@
     <string name="apple_summary_days">synced %1$d days ago</string>
     <string name="apple_sync_connected">Connected</string>
     <string name="apple_sync_ok">OK</string>
-    <string name="apple_sync_allow_confirm">Mochy will only touch playlists and songs it created itself. Anything that was in your library before it ever wrote is refused by a check in the code, not by good intentions.</string>
+    <string name="apple_sync_allow_confirm">Mocha will only touch playlists and songs it created itself. Anything that was in your library before it ever wrote is refused by a check in the code, not by good intentions.</string>
     <string name="apple_sync_no_answer">Apple didn’t answer.</string>
     <string name="apple_refresh_desc">Sync with Apple Music</string>
     <string name="apple_mark_missing">No Apple Music copy</string>

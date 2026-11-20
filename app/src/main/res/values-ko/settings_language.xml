@@ -155,9 +155,9 @@
     <string name="customise_cover_rounding">커버\n모서리</string>
     <string name="customise_icons">아이콘</string>
     <string name="customise_icons_caption">홈 화면에 새 아이콘이 표시되기까지 몇 초 걸릴 수 있습니다. 해당 아이콘으로 Mochy를 열면 앱 시작 화면에도 같은 아이콘이 표시됩니다.</string>
-    <string name="app_icon_family_mark">Mochy</string>
-    <string name="app_icon_family_outline">Mochy 윤곽선</string>
-    <string name="app_icon_family_anime">애니풍 Mochy</string>
+    <string name="app_icon_family_mark">Mocha</string>
+    <string name="app_icon_family_outline">Mocha 윤곽선</string>
+    <string name="app_icon_family_anime">애니풍 Mocha</string>
     <string name="app_icon_default">기본</string>
     <string name="app_icon_white">흰색</string>
     <string name="app_icon_black">검은색</string>
@@ -168,10 +168,10 @@
     <string name="app_icon_outline_black">검은색</string>
     <string name="app_icon_outline_material">Material U</string>
     <string name="app_icon_outline_transparent">투명</string>
-    <string name="app_icon_anime_white">Mochy 흰색</string>
-    <string name="app_icon_anime_dark">Mochy 어두운색</string>
-    <string name="app_icon_anime_material">Mochy Material U</string>
-    <string name="app_icon_anime_transparent">Mochy 투명</string>
+    <string name="app_icon_anime_white">Mocha 흰색</string>
+    <string name="app_icon_anime_dark">Mocha 어두운색</string>
+    <string name="app_icon_anime_material">Mocha Material U</string>
+    <string name="app_icon_anime_transparent">Mocha 투명</string>
     <string name="customise_icons_show_all">모든 아이콘 표시</string>
     <string name="customise_icons_show_less">아이콘 적게 표시</string>
     <string name="app_icon_customize">맞춤 설정</string>

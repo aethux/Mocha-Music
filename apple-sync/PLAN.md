@@ -1,4 +1,4 @@
-# Mochy + Apple Music: two-way library and playlist sync
+# Mocha + Apple Music: two-way library and playlist sync
 
 Build plan for a personal fork of `realidkroo/Mochy-Music` (GPL-3.0, Kotlin/Compose, Android).
 Written 2026-11-18. Target: Apple Music becomes the library of record, YouTube stays as a
@@ -8,8 +8,8 @@ secondary source, everything syncs both ways, and upstream updates keep pulling 
 
 ## 1. Goal
 
-1. Listen to music in Mochy from whatever source works. Apple's AAC 256 stream is fine.
-2. Two-way library sync: adding a song to the library in Mochy adds it to the Apple Music
+1. Listen to music in Mocha from whatever source works. Apple's AAC 256 stream is fine.
+2. Two-way library sync: adding a song to the library in Mocha adds it to the Apple Music
    library; removing it removes it from Apple. And the reverse.
 3. Two-way playlist sync: adds and removes in either place reach the other.
 4. Playlist cover art does not need to sync (Apple exposes no artwork write).
@@ -23,7 +23,7 @@ release.
 
 ## 2. Locked decisions
 
-- Apple is the source of truth. Mochy's Room database is a local replica plus a queue of edits
+- Apple is the source of truth. Mocha's Room database is a local replica plus a queue of edits
   made offline.
 - Offline listening is Monochrome plus local files. Apple streams cannot be stored.
 - The Apple source module already in the repo (`modules/applemusic`) stays the player. The sync
@@ -122,7 +122,7 @@ Go: steps 2-6 behave as described.
 Run 2026-11-18, storefront `in`: 9/9 passed. create 201, add 204, `PUT` removal 204 (once the body
 was right), library add 202 and landing, library delete 204, cascade yes, playlist delete 204. The
 first attempt failed only on the `PUT` body shape, which is now settled.
-No-go: library delete is refused or silently ignored. The fallback is "removal is Mochy-only,
+No-go: library delete is refused or silently ignored. The fallback is "removal is Mocha-only,
 manual cleanup on Apple", which is weak enough that the fork should be reconsidered first.
 
 Record the results in `apple-sync/spike-results.md` in the fork, because the merge rules
@@ -133,9 +133,9 @@ depend on the cascade answer.
 ### Truth, replica, provenance
 
 - Apple holds the library and the linked playlists.
-- Mochy's `song` table holds rows for everything visible, with provenance in the sidecar DB:
+- Mocha's `song` table holds rows for everything visible, with provenance in the sidecar DB:
   `apple` (catalog id + library id), `youtube` (video id), `local` (file).
-- A Mochy playlist is an ordered list of those rows. The Apple copy is the subsequence of rows
+- A Mocha playlist is an ordered list of those rows. The Apple copy is the subsequence of rows
   that have library ids, in the same order. YouTube-only rows simply don't exist on the Apple
   side. That is what makes mixed playlists work without a second model.
 - Song ids for Apple rows are `am:<catalogId>`. No collision with YouTube ids, and it makes
@@ -149,7 +149,7 @@ depend on the cascade answer.
 ### Storage: a sidecar database
 
 All new state lives in `AppleSyncDatabase` (Room, its own file), version 1, created by new code in
-`com.mochyy.mochymusic.applesync`. Upstream's `InternalDatabase` is untouched, so every upstream
+`com.mocha.mochymusic.applesync`. Upstream's `InternalDatabase` is untouched, so every upstream
 schema bump (v43 as of 2026-11-18, 24 entities) rebases with zero conflicts. The DB is opened with
 `fallbackToDestructiveMigration`, so `mochy.db` must never hold state the sync cannot rebuild.
 Joins happen in Kotlin, keyed by string
@@ -386,16 +386,16 @@ albums, artists mirrored into Room with `am:` ids, playback through the Apple mo
 song exactly, and the YouTube library still works untouched.
 
 P2, library writes (1.5 weeks). The WebView transport plus `addToLibrary` and its delete pair, queue
-and verification, cascade warning. Done when: add on Mochy appears on an iPhone within a minute;
+and verification, cascade warning. Done when: add on Mocha appears on an iPhone within a minute;
 remove behaves the same and never removes something it shouldn't.
 
 P3, playlist push (2 weeks). Link or create, per-playlist direction, additions by `POST`,
 removals and order by `PUT`, snapshot maintenance, and the request-replay layer in the page for
-the operations MusicKit won't call directly. Done when: edits in Mochy land in Apple on a linked
+the operations MusicKit won't call directly. Done when: edits in Mocha land in Apple on a linked
 playlist, including removals, and a dry run matches what actually happens.
 
 P4, pull and merge (1.5 weeks). Remote additions and removals into Room, echo suppression,
-conflict rules, undo. Done when: an edit made in the Apple app shows up in Mochy and nothing
+conflict rules, undo. Done when: an edit made in the Apple app shows up in Mocha and nothing
 bounces back.
 
 P5, unmatched flow (1 week). Candidate picker, manual search, YouTube fallback, mixed playlists.
