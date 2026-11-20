@@ -1,3 +1,4 @@
+# MOCHY-APPLE: the fork's package name, so the startup profile points at real classes
 # Mochy's own code, compiled ahead of time when the app is installed or updated.
 #
 # Without this only the libraries' own profiles shipped, so every screen of the app ran in the
