@@ -200,8 +200,8 @@ into the exact recording that's in the library.
 The rule is add, don't edit. Everything new goes in its own packages:
 
 ```
-app/src/main/kotlin/com/mochyy/mochymusic/applesync/       engine, API client, storage, work
-app/src/main/kotlin/com/mochyy/mochymusic/ui/applesync/    screens, sheets, view models
+app/src/main/kotlin/com/mocha/mochymusic/applesync/       engine, API client, storage, work
+app/src/main/kotlin/com/mocha/mochymusic/ui/applesync/    screens, sheets, view models
 modules/applemusic/                                        untouched except one seamless hook
 ```
 

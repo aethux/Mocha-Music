@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# MOCHY-APPLE: this fork ships as Mocha, built from aethux/Mochy-Music
 # BSD sed needs an empty backup suffix; GNU sed does not.
 sed_in_place() {
     if [[ "$OSTYPE" == darwin* ]]; then
@@ -28,7 +29,7 @@ CUSTOM_BUILD_INFO=""
 IS_CUSTOM_BUILD=false
 NIGHTLY_NUMBER=""
 
-BETA_NOTICE_FILE="app/src/main/kotlin/com/mochyy/mochymusic/ui/screens/beta/BetaNoticeScreen.kt"
+BETA_NOTICE_FILE="app/src/main/kotlin/com/mocha/mochymusic/ui/screens/beta/BetaNoticeScreen.kt"
 
 cleanup() {
     # a nightly's fourth number only lives for its own build
@@ -179,12 +180,12 @@ if [ "$SKIP_BUILD" = false ]; then
 
     # update beta notice
     if [ -f "$BETA_NOTICE_FILE" ]; then
-        NOTICE_TITLE="mochy build #$BUILD_ATTEMPT $VARIANT"
+        NOTICE_TITLE="mocha build #$BUILD_ATTEMPT $VARIANT"
         if [ -n "$CUSTOM_DATE" ]; then
-            NOTICE_TITLE="mochy build #$BUILD_ATTEMPT $VARIANT ($CUSTOM_DATE)"
+            NOTICE_TITLE="mocha build #$BUILD_ATTEMPT $VARIANT ($CUSTOM_DATE)"
         fi
         sed_in_place -e "s/text = \"Mocha DEV PREV\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
-        sed_in_place -e "s/text = \"mochy build #[0-9]* .*\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
+        sed_in_place -e "s/text = \"mocha build #[0-9]* .*\"/text = \"$NOTICE_TITLE\"/g" "$BETA_NOTICE_FILE"
         sed_in_place -e "s/text = \"[0-9]*\.[0-9]*\.[0-9]*DEV\"/text = \"$BASE_VERSION build#$BUILD_ATTEMPT\"/g" "$BETA_NOTICE_FILE"
         sed_in_place -e "s/text = \"[0-9]*\.[0-9]*\.[0-9]* build#[0-9]*\"/text = \"$BASE_VERSION build#$BUILD_ATTEMPT\"/g" "$BETA_NOTICE_FILE"
     fi
@@ -245,7 +246,7 @@ if [ "$PUBLISH_RELEASE" = true ]; then
     format_apk "*x86-${FLAVOR}-release.apk" "mocha-$VERSION_LABEL-x86.apk"
 
     if [ -z "$CHANGELOG_TEXT" ]; then
-        CHANGELOG_TEXT="mochy $VERSION_LABEL ($BUILD_ATTEMPT)"
+        CHANGELOG_TEXT="mocha $VERSION_LABEL ($BUILD_ATTEMPT)"
     fi
 
     # a nightly is its own prerelease, tagged by its version, so the app's nightly channel can tell them apart

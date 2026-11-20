@@ -11,7 +11,7 @@ have already cost time. Read `apple-sync/STATE.md`, `apple-sync/PLAN.md` and
 Read, in this order, and summarise the structure back before proposing anything:
 
 1. `apple-sync/STATE.md` — what is proven, what is next, the decisions already taken.
-2. `app/src/main/kotlin/com/mochyy/mochymusic/applesync/` — the whole engine:
+2. `app/src/main/kotlin/com/mocha/mochymusic/applesync/` — the whole engine:
    `AppleClient` (reads), `AppleLibraryWrites`/`AppleSongWrites` (writes), `AppleGuard`
    (the permission model), `AppleImport`, `AppleLibraryPull`, `ApplePlaylistImport`,
    `ApplePlaylistWrites`, `ApplePlaylistPush`, `AppleCovers`, `CoverOverrides`,

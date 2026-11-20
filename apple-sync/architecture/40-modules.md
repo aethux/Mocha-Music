@@ -1,7 +1,7 @@
 # 40. Modules
 
 Modules are how Mochy gains sources, lyrics, metadata, looks and player UI without shipping them in
-the APK. The contract is `modules/api/src/main/kotlin/com/mochyy/mochymusic/module/MochyModule.kt`,
+the APK. The contract is `modules/api/src/main/kotlin/com/mocha/mochymusic/module/MochyModule.kt`,
 plain Kotlin, `MODULE_API_VERSION = 3`.
 
 ## The contract
