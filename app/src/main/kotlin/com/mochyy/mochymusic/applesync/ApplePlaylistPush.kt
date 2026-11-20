@@ -151,7 +151,9 @@ object ApplePlaylistPush {
         // Apple will never see must not look like one it took.
         val editable = runCatching { dao.playlist(link.remoteId)?.canEdit }.getOrNull()
             ?: runCatching { database.playlistEntity(playlistId)?.isEditable }.getOrNull()
-        if (editable == false) {
+        // a shared playlist carries canEdit=false and still takes edits: only Apple's own are skipped
+        val shared = runCatching { dao.playlistMeta(playlistId)?.collaborative }.getOrNull() == true
+        if (editable == false && !shared) {
             lastSent[playlistId] = signature
             if (talk) complainFrozen(context, playlistId, signature)
             return

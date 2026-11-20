@@ -117,9 +117,9 @@ internal suspend fun addToPlaylistKeepingSync(
     ids: List<String>,
 ) {
     if (ids.isEmpty()) return
-    // MOCHY-APPLE: Apple's own lists, and the ones only followed, refuse every rewrite - so an add
-    // that stayed here would be a playlist that exists in one place. Say it, do not keep it.
-    if (!playlist.playlist.isEditable) {
+    // MOCHY-APPLE: Apple's own lists refuse every rewrite - so an add that stayed here would be a
+    // playlist that exists in one place. Say it, do not keep it. A shared playlist is not one of them.
+    if (com.mochyy.mochymusic.applesync.ApplePlaylistRules.isAppleOnly(context, playlist)) {
         TopToaster.error(context.getString(R.string.apple_playlist_read_only))
         return
     }

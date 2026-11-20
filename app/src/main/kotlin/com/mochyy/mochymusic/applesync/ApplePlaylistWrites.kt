@@ -80,9 +80,9 @@ object ApplePlaylistWrites {
 
         // Apple's own answer about who may change this playlist. The replica is the engine's copy of
         // it; the playlist row is what the import wrote. Only when neither knows is it left open.
-        val editable = runCatching { dao.playlist(link.remoteId)?.canEdit }.getOrNull()
+        val editable = (runCatching { dao.playlist(link.remoteId)?.canEdit }.getOrNull()
             ?: runCatching { database.playlistEntity(playlistId)?.isEditable }.getOrNull()
-            ?: true
+            ?: true) || runCatching { dao.playlistMeta(playlistId)?.collaborative }.getOrNull() == true
 
         // the songs that can be sent, in order: Apple takes its own library ids and nothing else
         val maps = database.playlistSongMaps(playlistId, 0)
