@@ -28,8 +28,8 @@ extensions.configure<ApplicationExtension> {
         minSdk = 24
         targetSdk = 37
         // MOCHY-APPLE: this fork carries its own version, ahead of upstream 8.4.3
-        versionCode = 75
-        versionName = "8.4.5 build#1282"
+        versionCode = 76
+        versionName = "8.4.6 build#1283"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
