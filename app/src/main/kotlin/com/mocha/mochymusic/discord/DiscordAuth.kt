@@ -138,6 +138,7 @@ class DiscordAuth @Inject constructor(
                 "/oauth2/token",
                 mapOf(
                     "client_id" to ClientId,
+                    "client_secret" to ClientSecret,  // MOCHY-APPLE: see ClientSecret
                     "grant_type" to "authorization_code",
                     "code" to code,
                     "redirect_uri" to RedirectUri,
@@ -190,6 +191,7 @@ class DiscordAuth @Inject constructor(
                 "/oauth2/token",
                 mapOf(
                     "client_id" to ClientId,
+                    "client_secret" to ClientSecret,  // MOCHY-APPLE: see ClientSecret
                     "grant_type" to "refresh_token",
                     "refresh_token" to refreshToken,
                 ),
@@ -265,14 +267,17 @@ class DiscordAuth @Inject constructor(
         private const val LogTag = "DiscordAuth"
 
         val ClientId: String get() = BuildConfig.DISCORD_CLIENT_ID
+
+        // MOCHY-APPLE: no PUBLIC_OAUTH2_CLIENT flag, so a self-made app must send its secret
+        val ClientSecret: String get() = BuildConfig.DISCORD_CLIENT_SECRET
         val RedirectUri: String get() = "discord-$ClientId:/authorize/callback"
 
         /**
-         * sdk.social_layer_presence is Discord's own bundle for apps that show what the user is
-         * doing. Any app can turn it on in the Developer Portal (Social SDK), unlike
-         * activities.write on its own, which needs Discord's approval.
+         * MOCHY-APPLE: asked for openid+identify only. `sdk.social_layer_presence` is Discord's
+         * Social SDK bundle, and an ordinary OAuth app answers it with `invalid_scope` - which is
+         * what this fork hit. Presence is still published over the gateway with these two.
          */
-        private const val Scopes = "openid identify sdk.social_layer_presence"
+        private const val Scopes = "openid identify"
 
         /** renew a little before Discord's deadline, so a long song never meets an expired token */
         private const val RenewEarlyMs = 10 * 60_000L

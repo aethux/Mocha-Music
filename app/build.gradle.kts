@@ -59,6 +59,7 @@ extensions.configure<ApplicationExtension> {
         val discordClientId = localProperties.getProperty("DISCORD_CLIENT_ID")
             ?: System.getenv("DISCORD_CLIENT_ID") ?: ""
         buildConfigField("String", "DISCORD_CLIENT_ID", "\"$discordClientId\"")
+        buildConfigField("String", "DISCORD_CLIENT_SECRET", "\"${localProperties.getProperty("DISCORD_CLIENT_SECRET") ?: System.getenv("DISCORD_CLIENT_SECRET") ?: ""}\"")
         manifestPlaceholders["discordRedirectScheme"] =
             if (discordClientId.isNotBlank()) "discord-$discordClientId" else "mochy-discord-unset"
 
