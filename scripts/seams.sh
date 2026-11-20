@@ -32,7 +32,8 @@ norm() {
 
 # A seam is a change to a file upstream owns. New files this fork adds are not seams even
 # when they sit in an upstream directory (scripts/, docs/).
-git diff --name-status -M "$base"...HEAD -- . ':(exclude)*applesync*' ':(exclude)apple-sync/*' > "$tmp/status"
+git diff --name-status -M "$base"...HEAD -- . ':(exclude)*applesync*' ':(exclude)apple-sync/*' \
+    ':(exclude)README.md' ':(exclude)LICENSE' ':(exclude).github/*' > "$tmp/status"
 
 # A package move, read as a rename: git pairs most of them itself, but a file this fork
 # rewrote heavily falls under its similarity cut-off and arrives as a delete and an add.
