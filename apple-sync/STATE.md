@@ -200,8 +200,10 @@ playlist — `Aeth Fixed` (`LPDTWNucyl`) and then `Aeth Shipped` (`LPoIIgodzx`),
 `onPlaylistCreated`, so the song that started the flow never joined the playlist it made. It now
 passes `topSongId` through `copySongsToPlaylist` (a fork file, so the upstream picker gains one line
 and stays inside its 20-line seam budget). Proven: `Aeth Song2` (`LPjOBKDEYC`) was created with its
-song at position 0. A multi-select flow still has no `topSongId` to hand over — nothing to add there
-yet.
+song at position 0. A playlist screen's "add every song of this one to another" flow now hands its songs over as well
+(`initialSongIds`), so a create from there is not empty either. Compile-checked; not driven on the
+phone yet — the picker's create button was not reachable from that path in this session.
+`SelectionSongsMenu` is dead code (nothing calls it), so it was left alone.
 
 ## Known broken (2026-11-20)
 

@@ -86,6 +86,7 @@ fun LocalPlaylistMenu(
         onDismiss = { showAddToPlaylist = false },
         topSongId = topSong?.id,
         topSongArtworkUrl = topSong?.song?.thumbnailUrl,
+        initialSongIds = songs.map { it.song.id },  // MOCHY-APPLE: a create keeps the songs
     )
 
     Column(

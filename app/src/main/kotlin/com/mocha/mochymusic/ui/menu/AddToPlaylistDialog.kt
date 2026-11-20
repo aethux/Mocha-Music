@@ -144,6 +144,8 @@ fun AddToPlaylistDialog(
     viewModel: PlaylistsViewModel = hiltViewModel(),
     topSongId: String? = null,
     topSongArtworkUrl: String? = null,
+    // MOCHY-APPLE: everything the flow is about, so a create from a multi-select is not empty
+    initialSongIds: List<String> = emptyList(),
 ) {
     val database = LocalDatabase.current
     val menuState = LocalMenuState.current
@@ -218,7 +220,11 @@ fun AddToPlaylistDialog(
             topSongArtworkUrl = topSongArtworkUrl,
             // MOCHY-APPLE: the song this flow started with belongs in the playlist it just made
             onPlaylistCreated = { newId ->
-                com.mocha.mochymusic.applesync.ui.copySongsToPlaylist(database, newId, listOfNotNull(topSongId))
+                com.mocha.mochymusic.applesync.ui.copySongsToPlaylist(
+                    database,
+                    newId,
+                    initialSongIds.ifEmpty { listOfNotNull(topSongId) },
+                )
             },
         )
     }
