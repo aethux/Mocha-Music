@@ -56,14 +56,25 @@ Unverified on device: the picker's UI and the rematch-aware re-import (compiles,
 
 Traps hit again today: Room rejects a hand-written migration whose entity doesn't declare the index it creates; `adb input tap` on a skin player's heart lands on the seekbar.
 
+## Proven on the new package, 2026-11-20 (8.4.5)
+
+- **Sign-in**: the page captured both tokens (sealed in DataStore), the account row then said the
+  account's name, and the integrations page showed Sign out. The page itself is fixed: own bar, no
+  app chrome over it, and a **Region** setting (28 storefronts, "let Apple decide") because a
+  guessed storefront gets Apple's "choose another country" prompt instead of the library.
+- **Audit**: `AUDIT_FIRST_RUN ALLOW 200 verified=1`, "1493 songs and 26 playlists in IN".
+- **Import**: `1419 new songs · 0 already there · 26 of 26 playlists updated · 1032 playlist songs ·
+  took 2m 11s`; the library holds 1405 songs, 26 playlists, 911 albums, 795 artists.
+- **Playlist writes, both directions** on "Angst and Yearn" (`p.vMO5BDKs1bb82mE`): add → audit
+  `PLAYLIST_REPLACE 204 verified=1` with the new song in the link signature; remove → `204
+  verified=1` with the signature back to the original 16 ids. Each push landed about a second after
+  the tap, and `verified` is Apple's own list re-read and compared in order, not the 2xx.
+
 ## Known broken (2026-11-20)
 
-- **Add to playlist does nothing from a song's menu.** Reproduced: the sheet closes on the tile
-  tap and no picker appears. `AddToPlaylistDialog` is hosted *inside* `SongMenu`, which is the
-  sheet's content, so it is unmounted with the sheet before it can draw. Changing its state from
-  `rememberSaveable` to `remember` did not help. It needs a host outside the sheet - one shared
-  request state (song id) plus `AddToPlaylistDialog` in the root composition - or a picker drawn as
-  a `SheetPages` page, which the cover sheet already proves works.
+- ~~**Add to playlist does nothing from a song's menu.**~~ **Fixed and verified**: the picker is
+  hosted above the sheet, it opens from a song's menu, and the push to Apple is the write proven
+  above.
 
 ## Deferred on purpose
 
