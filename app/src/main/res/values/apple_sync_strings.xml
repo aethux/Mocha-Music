@@ -96,6 +96,8 @@
     </plurals>
     <string name="apple_playlist_push_failed">Apple didn’t take the playlist change</string>
     <string name="apple_playlist_not_editable">Apple doesn’t allow this playlist to be changed — it’s one you follow, not one you made</string>
+    <string name="apple_playlist_read_only">Apple Music keeps this playlist to itself — songs can’t be added or removed here</string>
+    <string name="apple_playlist_read_only_mark">Read-only Apple Music playlist</string>
     <string name="apple_playlist_unverified">Apple took it, but its list doesn’t match what was sent — check the playlist</string>
     <string name="apple_playlists_import">Import Apple playlists</string>
     <string name="apple_playlists_import_desc">Brings every playlist on your account into Mochy as a real playlist, with its songs in Apple’s order, and links each one so changes can go back.</string>
@@ -194,4 +196,5 @@
     <string name="apple_removed_remove_all">Remove all here</string>
     <string name="apple_removed_working">Talking to Apple Music…</string>
     <string name="apple_playlist_pushed_short">Playlist sent to Apple Music</string>
+    <string name="apple_playlist_pushed_skipped">%1$d songs sent to Apple Music · %2$d have no Apple Music copy</string>
 </resources>

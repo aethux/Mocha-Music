@@ -49,6 +49,7 @@ import com.mochyy.mochymusic.ui.component.DefaultDialog
 import com.mochyy.mochymusic.ui.component.LocalMenuState
 import com.mochyy.mochymusic.ui.component.PlaylistThumbnail
 import com.mochyy.mochymusic.ui.component.PopupSheetHandle
+import com.mochyy.mochymusic.ui.component.TopToaster
 import com.mochyy.mochymusic.ui.component.RemoteFocus
 import com.mochyy.mochymusic.ui.component.SheetLabel
 import com.mochyy.mochymusic.ui.component.SheetPillButton
@@ -116,6 +117,12 @@ internal suspend fun addToPlaylistKeepingSync(
     ids: List<String>,
 ) {
     if (ids.isEmpty()) return
+    // MOCHY-APPLE: Apple's own lists, and the ones only followed, refuse every rewrite - so an add
+    // that stayed here would be a playlist that exists in one place. Say it, do not keep it.
+    if (!playlist.playlist.isEditable) {
+        TopToaster.error(context.getString(R.string.apple_playlist_read_only))
+        return
+    }
     val browseId = playlist.playlist.browseId
     if (browseId != null) {
         com.mochyy.mochymusic.importer.PlaylistAddedHere.add(context, playlist.id, ids)
@@ -193,7 +200,8 @@ fun AddToPlaylistDialog(
                         currentOnDismiss()
                     },
                 ) {
-                    AddToPlaylistContent(playlists = playlists, onPick = pick)
+                    // MOCHY-APPLE: a playlist Apple keeps for itself cannot take a song, so it is not offered
+                    AddToPlaylistContent(playlists = com.mochyy.mochymusic.applesync.ui.editablePlaylists(playlists), onPick = pick)
                 }
             onDispose {
                 if (!closed) sheet[0]?.dismiss()

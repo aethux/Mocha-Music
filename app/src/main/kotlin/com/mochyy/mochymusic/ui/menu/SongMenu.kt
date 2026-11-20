@@ -142,6 +142,9 @@ fun SongMenu(
     }
     val menuState = LocalMenuState.current
 
+    // MOCHY-APPLE: a playlist Apple keeps for itself loses nothing here; its own screen says why
+    val playlistEditable = com.mochyy.mochymusic.applesync.ui.playlistIsEditable(playlistSong?.map?.playlistId)
+
     val orderedArtists by produceState(initialValue = emptyList<ArtistEntity>(), song) {
         withContext(Dispatchers.IO) {
             val artistMaps = database.songArtistMap(song.id).sortedBy { it.position }
@@ -469,7 +472,7 @@ fun SongMenu(
                             )
                         )
                     }
-                    if (playlistSong != null) {
+                    if (playlistSong != null && playlistEditable) {
                         add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.remove_from_playlist)) },

@@ -975,6 +975,8 @@ fun PlaylistHeader(
     onSearchClick: (() -> Unit)? = null,
     // MOCHY-APPLE: a shared playlist's people, from a round button beside shuffle
     onCollaboratorsClick: (() -> Unit)? = null,
+    // MOCHY-APPLE: a playlist Apple keeps for itself - a mix, or one the account only follows
+    readOnly: Boolean = false,
 ) {
     val playlistStyle by rememberEnumPreference(PlaylistStyleKey, defaultValue = PlaylistStyle.FLOW)
     val framedCover = LocalPlaylistFramedCover.current
@@ -1052,6 +1054,7 @@ fun PlaylistHeader(
                         onClick = onCollaboratorsClick,
                     )
                 }
+                com.mochyy.mochymusic.applesync.ui.ReadOnlyPlaylistMark(readOnly) // MOCHY-APPLE
                 if (onSearchClick != null) {
                     Spacer(Modifier.width(4.dp))
                     CircleAction(

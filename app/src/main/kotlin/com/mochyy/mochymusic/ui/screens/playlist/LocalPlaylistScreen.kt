@@ -588,6 +588,8 @@ fun LocalPlaylistScreen(
                 val savedRemote = currentPlaylist.playlist.browseId != null && !currentPlaylist.playlist.isEditable
                 PlaylistHeader(
                     onSearchClick = { isSearching = true },
+                    // MOCHY-APPLE: Apple's own list, or one the account only follows
+                    readOnly = !currentPlaylist.playlist.isEditable,
                     title = currentPlaylist.playlist.name,
                     // MOCHY-APPLE: credited to the playlist's own owner, and "collaborative" said in words
                     creators = credit.creators,
